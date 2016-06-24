@@ -1,0 +1,86 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
+    <ProductVersion>8.0.30703</ProductVersion>
+    <SchemaVersion>2.0</SchemaVersion>
+    <ProjectGuid>{66E1FD7C-E24A-4D33-9B6D-A7C84C6324F1}</ProjectGuid>
+    <OutputType>Library</OutputType>
+    <AppDesignerFolder>Properties</AppDesignerFolder>
+    <RootNamespace>UnAli</RootNamespace>
+    <AssemblyName>UnAli</AssemblyName>
+    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <FileAlignment>512</FileAlignment>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+  </PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Core" />
+    <Reference Include="System.Web" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Xml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Help\AlipayCore.cs" />
+    <Compile Include="Help\Alipaynotify.cs" />
+    <Compile Include="Help\Config.cs" />
+    <Compile Include="Help\F2FBiz.cs" />
+    <Compile Include="Help\LogHelper.cs" />
+    <Compile Include="Help\PayResultEnum.cs" />
+    <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="UnAliAttr.cs" />
+    <Compile Include="UnAliHelp.cs" />
+    <Compile Include="UnAliMch.cs" />
+    <Compile Include="UnAliMchEvent.cs" />
+    <Compile Include="UnAliRSA.cs" />
+    <Compile Include="UnAttrContent.cs" />
+    <Compile Include="UnAttrErrorEvent.cs" />
+    <Compile Include="UnAttrExtend.cs" />
+    <Compile Include="UnAttrGoods.cs" />
+    <Compile Include="UnAttrPub.cs" />
+    <Compile Include="UnAttrReturn.cs" />
+    <Compile Include="UnNotify.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\AopSdk\AopSdk.csproj">
+      <Project>{9C11CAE5-5188-4E71-825B-68FC3135728A}</Project>
+      <Name>AopSdk</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UnCommon\UnCommon.csproj">
+      <Project>{3998BC66-8A08-46CC-BD68-B0C5E3D85E1E}</Project>
+      <Name>UnCommon</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UnQuote\UnQuote.csproj">
+      <Project>{FAFE77FD-B2AF-4BF6-A6D0-06A8DF53FA66}</Project>
+      <Name>UnQuote</Name>
+    </ProjectReference>
+  </ItemGroup>
+  <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
+       Other similar extension points exist, see Microsoft.Common.targets.
+  <Target Name="BeforeBuild">
+  </Target>
+  <Target Name="AfterBuild">
+  </Target>
+  -->
+</Project>

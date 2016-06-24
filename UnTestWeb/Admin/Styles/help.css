@@ -1,0 +1,10 @@
+﻿.nav,.secon_nav{display:none;}
+.left{background:#f6fbff; border:1px solid #e0e6fc; width:20%; height:600px; float:left;}
+.right{border:1px solid #dbe2ff; width:75%; height:600px; float:left; border-left:none; line-height:20px; padding:0% 2%; overflow-y:scroll;}
+.left ul{overflow:hidden;}
+.left li{line-height:30px; text-indent:1em; border-bottom:1px solid #f6fbff;}
+.left a{color:#2ca8dc;}
+.left .left_hover,.left li:hover{background:#fff; border-bottom:1px solid #e0e6fc;}
+.left_hover a{color:#333;}
+.right .title{font-size:14px; color:#143b8a; border-bottom:1px dotted #e6eef1; line-height:40px;}
+.right li{margin:10px 0px; color:#546172;}

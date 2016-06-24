@@ -1,0 +1,26 @@
+﻿body{margin:0 auto; padding:0 auto; background:#eee; font:12px/20px "宋体",Arial,Helvetica,sans-serif;}
+ul,li,p,span,a,img,em{margin:0 auto; padding:0px; list-style:none; text-decoration:none; border:none;}
+a{cursor:pointer;}
+h1,h2,h3,h4,from,input{margin:0 auto; padding:0;}
+.clear{clear:both;}
+.blue{color:#0081ba;}
+.blue1{color:#009adb;}
+.yellow{color:#ff6600;}
+.font14{font-size:14px;}
+.bold{font-weight:bold;}
+.fl{float:left;}
+/*--------------main------------------*/
+.logo{width:60%; margin:0 auto; padding-top:60px;}
+.main{background:#fcfcfc; width:100%;}
+.main_content{width:700px; margin:0 auto; padding:60px 0px; text-align:center;}
+.main_content li{margin-top:20px;}
+.main_content span{font-family:"微软雅黑"; font-size:18px; line-height:38px; display:inline-block; width:90px; text-align:justify;}
+.yhm,.mm,.yzm{line-height:36px; display:inline-block; width:350px; border:1px solid #e3e3e3; padding-left:36px;}
+input{border:none; width:96%; padding:10px 0px 10px 10px; *padding:9px 0px 9px 10px; background:#fff;}
+.yhm{background:url(/Admin/Images/login/yhm.png) left top no-repeat;}
+.mm{background:url(/Admin/Images/login/mm.png) left top no-repeat;}
+.yzm{background:url(/Admin/Images/login/yzm.png) left top no-repeat;}
+.liVer {margin:0;display:none;}
+.ver{width:350px;margin:0;display:inline-block;text-align:left;margin:0 0 0 -35px;}
+.ver img { cursor:pointer;}
+.login_button{background:#078fcf; padding:0px; font-family:"微软雅黑"; font-size:20px; border-radius:3px; width:70%; margin-top:10px; text-align:center; line-height:44px; height:44px; color:#fff;}

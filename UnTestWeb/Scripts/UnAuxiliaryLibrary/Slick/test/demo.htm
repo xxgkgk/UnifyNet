@@ -1,0 +1,40 @@
+﻿<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<title>jQuery幻灯片插件slick演示1_dowebok </title>
+<link rel="stylesheet" href="../slick.css">
+<style>
+* { margin: 0; padding: 0;}
+.slick { width: 600px; margin: 0 auto;}
+.slick-prev:before, .slick-next:before { position: absolute; left: 0; top: 1px; color: #ccc;}
+.slick-prev { left: -35px;}
+.slick-next { right: -35px;}
+.slick-dots { bottom: -35px;}
+</style>
+</head>
+
+<body>
+
+<h1 style="margin: 40px; font: 32px Microsoft Yahei; text-align: center;">jQuery幻灯片插件slick演示1</h1>
+
+<div class="slick">
+	<div><img src="http://idowebok.u.qiniudn.com/84/1.jpg" alt=""></div>
+	<div><img src="http://idowebok.u.qiniudn.com/84/2.jpg" alt=""></div>
+	<div><img src="http://idowebok.u.qiniudn.com/84/3.jpg" alt=""></div>
+	<div><img src="http://idowebok.u.qiniudn.com/84/4.jpg" alt=""></div>
+	<div><img src="http://idowebok.u.qiniudn.com/84/5.jpg" alt=""></div>
+</div>
+
+<script src="../../../Jquery/jquery-1.11.3.min.js"></script>
+<script src="../slick.min.js"></script>
+<script>
+    $(function () {
+        $('.slick').slick({
+            dots: true
+        });
+    });
+</script>
+<a href="http://www.dowebok.com/demo/2014/84/" target="_blank">说明文档</a>
+</body>
+</html>

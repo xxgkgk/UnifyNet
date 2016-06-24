@@ -1,0 +1,22 @@
+﻿.line{width:100%; height:1px; overflow:hidden; background:#dfdfdf; margin:20px 0px;}
+.edit{line-height:40px; margin-left:5%;}
+.edit .ct{}
+.edit .ct .select{margin-left:-3px;}
+.edit .ct .radiobutton{}
+.edit .ct .title{width:70px;text-align:right; display:inline-block; margin-right:1em; vertical-align:top;}
+.edit .ct .text,.lable{padding:5px 0px 5px 5px; border:1px solid #e1e1e1; border-color:#bebebe #e1e1e1 #e1e1e1 #cfcfcf; color:#666;width:30%;}
+.edit .ct .lable{border:0;border-bottom:1px solid #e1e1e1;}
+.edit .ct .lable_num{width:50px;border:0;border-bottom:1px solid #e1e1e1;text-align:center;}
+.edit .ct .button{padding:5px;border:1px solid #e1e1e1;}
+.edit .ct .textarea{width:40%;height:100px;border:1px solid #e1e1e1;}
+.edit .ct .editor{margin:-30px 0 0 85px;}
+.edit .ct .error{color:#ff0000;padding:0 0 0 10px;display:none;}
+.edit .ct #ImagePath_img {display:none;}
+        
+.edit .op {display:block;margin:0 0 25% 0;height:80px;position:fixed;z-index:9999;bottom:0;right:0;}
+.edit .op li{}
+.edit .op #reset{width:70px;padding:5px;margin:0 10px 0 10px;cursor:pointer;}
+.edit .op #save{width:70px;padding:5px;margin:0 10px 0 10px;cursor:pointer;}
+.edit .op #update{width:70px;padding:5px;margin:0 10px 0 10px;cursor:pointer;}
+        
+.edit_editor{}

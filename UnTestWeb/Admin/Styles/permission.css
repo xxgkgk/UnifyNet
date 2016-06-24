@@ -1,0 +1,29 @@
+﻿.add{border:1px solid #d4d4d4; width:99.8%; border-bottom-width:0px; background:url(/Admin/Images/public/cz_bg.png) repeat-x;}
+.add a{background:url(/Admin/Images/public/add.png) no-repeat left center; padding:2px 0px 2px 20px; line-height:31px; color:#000; margin-left:10px;}
+table{border:1px solid #d4d4d4; text-align:center; line-height:40px;}
+table td{border:1px solid #d4d4d4; border-width:1px 0px 0px 0px; text-align:center;}
+thead{background:url(/Admin/Images/public/thead_bg.png) repeat-x; height:30px; line-height:30px;}
+#pageBody,pageTurn{display:none;}
+.editor,.delete{padding:3px 1em 3px 20px; color:#417eb7; margin-right:5px;}
+.editor{background:url(/Admin/Images/public/editor.png) left center no-repeat;}
+.delete{background:url(/Admin/Images/public/delete.png) left center no-repeat;}
+/*创建权限*/
+.open{width:100%; height:100%; *min-height:600px; position:fixed; *position:absolute; top:0; left:0; background:url(/Admin/Images/public/open_bg.png) repeat; z-index:2;}
+.open_main{width:46%; position:fixed; *position:absolute; left:25%; background:#fff; border-radius:5px; padding:30px 2%; z-index:3; line-height:48px; font-size:14px;}
+.open_main span{width:18%; text-align:right; display:inline-block;}
+.open_main em{margin-right:2em;}
+.open_main p{display:inline-block; width:70%; *display:inline;}
+.open_main .ml_19{margin-left:19%; display:inline-block; _margin:10px 0px 30px 19%;}
+.text{width:80%; line-height:14px; font-size:14px; border:1px solid #d2d2d2; height:20px; color:#666; text-indent:1em;}
+.main_title{font-weight:bold; background:url(/Admin/Images/public/wz_tb.png) left center no-repeat; padding:0px 0px 0px 10px;}
+.main_close{padding-right:15px; background:url(/Admin/Images/public/close.png) right 1.3em no-repeat; display:block; height:48px; overflow:hidden;}
+.checkbox{margin:0px 3px 0px 0px;}
+.main_content{border-top:1px solid #dfdfdf;}
+.main_content em{margin-right:1.7em;}
+.main_content.main_open{height:auto; padding-right:15px; background:url(/Admin/Images/public/open.png) right 1.3em no-repeat; display:block;}
+.main_button{text-align:center;}
+.main_button a{background:url(/Admin/Images/public/button_bg.png) no-repeat; display:inline-block; width:103px; height:40px; line-height:40px; color:#fff; font-weight:bold; font-size:14px; margin:10px 30px 0px;}
+/*搜索*/
+.searchKeyWord{float:left;width:140px;height:27px;background:url("/Admin/Images/public/box_pre.png") 0 0 no-repeat;position:relative;margin-left:2px;margin-bottom:15px}
+#searchItem{outline:none;border:0;float:left;width:115px;height:23px;margin-left:4px;margin-top:1px}
+#sureItem{float:left;width:18px;height:23px;background:url("/Admin/Images/public/search_pre.png")3px 7px no-repeat;position:absolute;right:0;top:0}

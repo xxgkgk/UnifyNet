@@ -1,0 +1,121 @@
+﻿<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Site.master.cs" Inherits="Web.Admin.Master.Site" %>
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head id="Head1" runat="server">
+    <title>后台管理系统</title>
+    <meta http-equiv="Content-Type" content="text/html;charset=utf-8"/>
+    <link href="/Admin/Styles/public.css" type="text/css" rel="Stylesheet" />
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Jquery/jquery-1.8.0.js" ></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Jquery/jqueryExt.js" ></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Upload/ajaxfileupload.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UEditor/ueditor.config.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UEditor/ueditor.all.min.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UEditor/lang/zh-cn/zh-cn.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Layer/layer.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnInit.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnXMMPXml.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnHttpClient.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnCookie.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnAttrRst.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnQuote/UnPage.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnQuote/UnEditUp.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnQuote/UnEditRst.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnQuote/UnRedirect.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnQuote/UnHref.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/BackInfo.js"></script>
+    <style type="text/css">
+        .nav_sub1.nav_sub2,.nav_sub3,.nav_sub4{display:none;}
+    </style>
+    <asp:ContentPlaceHolder ID="head" runat="server">
+    </asp:ContentPlaceHolder>
+</head>
+<body>
+    <div class="top">
+        <span>欢迎您 <a id="name"></pa><a href="javascript:;" id="logout">【退出】</a><a href="#" class="blue" style="display:none;">使用帮助</a></span>
+        <img alt="" src="/Admin/Images/public/top_logo.png" />
+    </div>
+    <div class="nav">
+        <a href="javascript:;" class="nav_sub1">主菜单1</a>
+        <a href="javascript:;" class="nav_sub2">主菜单2</a>
+    </div>
+    <div class="clear"></div>
+    <div class="secon_nav" id="sub1">
+        <a href="/Admin/Test/edit.aspx">主菜单1-1</a>
+        <a href="/Admin/Test/list.aspx">主菜单1-2</a>
+    </div>
+    <div class="secon_nav" id="sub2">
+        <a href="/Admin/Test/edit.aspx">主菜单2-1</a>
+        <a href="/Admin/Test/list.aspx">主菜单2-2</a>
+    </div>
+    <div class="content">
+        <asp:ContentPlaceHolder ID="content" runat="server">
+        </asp:ContentPlaceHolder>
+    </div>
+    <script type="text/javascript">
+        var href = UnHref.createNew(window.location.href);
+
+        // 鼠标移动在主导航元素上
+        $("a[class^='nav_']").mouseenter(function () {
+            $("a[class^='nav_']").css("background-color", "#417eb7");
+            $("a[class^='nav_']").css("color", "#fff");
+            $(this).css("background-color", "#dedede");
+            $(this).css("color", "#000");
+            $(".secon_nav").css("display", "none");
+            var id = $(this).attr("class").replace("nav_", "");
+            $("#" + id).css("display", "block");
+        });
+
+        // 鼠标移开次级导航栏
+        $(".secon_nav").mouseleave(function () {
+            setNav();
+        });
+
+        // 设置导航栏
+        function setNav() {
+            switch (href.path().toLowerCase()) {
+                case "/admin/test/list.aspx":
+                    $(".nav_sub2").trigger("mouseover");
+                    setEfft("sub2", 0);
+                    break;
+                case "/admin/test/edit.aspx":
+                    $(".nav_sub2").trigger("mouseover");
+                    setEfft("sub2", 1);
+                    break;
+                default:
+                    $(".nav_sub1").trigger("mouseover");
+                    break;
+            }
+        }
+
+        // 设置导航效果
+        function setEfft(id, index) {
+            $("#" + id).find("a").eq(index).css("font-weight", "bold");
+            $("#" + id).find("a").eq(index).css("font-size", "14px");
+        }
+
+
+        // 退出登录
+        $("#logout").click(function () {
+            UnCookie.deleteCookies("alCookie", "/");
+            location.href = "/admin/login.htm";
+        });
+
+        // 加载完成
+        $(function () {
+            var id = UnCookie.getCookies("alCookie", "ID");
+            if (id + "" == "") {
+                $("#logout").trigger("click");
+                return;
+            }
+            var user = UnCookie.getCookies("alCookie", "User");
+            var name = UnCookie.getCookies("alCookie", "Name");
+            $("#name").html(user + "，" + name);
+            setNav();
+        });
+
+    </script>
+    <asp:ContentPlaceHolder ID="bottom" runat="server">
+    </asp:ContentPlaceHolder>
+</body>
+</html>
+

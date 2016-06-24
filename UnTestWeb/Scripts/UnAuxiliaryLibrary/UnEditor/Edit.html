@@ -1,0 +1,62 @@
+﻿<!--
+作者：李晓龙，xxgkgk@sina.com
+版权：商业用途请获得授权
+环境：IE系列6.0以上
+时间：2010.11.6
+-->
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN">
+<html>
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<title>李晓龙HTML在线编辑器</title>
+<link type="text/css" rel="stylesheet" href="Css/PubEdit.css" media="all"/>
+</head>
+<body> 
+<div id="warp">
+    <div id="design">
+        <div id="but1"></div>
+        <div id="but2"></div>
+        <div style="clear:both;display:none;"></div>
+        <div id="editbox">
+            <div id="ffk"></div>
+            <input id="ffv" value="0" type="hidden"/>
+            <div id="fsk"></div>
+            <input id="fsv" value="0" type="hidden"/>
+            <div id="ffck"></div>
+            <input id="ffcv" value="0" type="hidden"/>
+            <div id="fbck"></div>
+            <input id="fbcv" value="0" type="hidden"/>
+            <div id="tbk"></div>
+            <input id="tbv" value="0" type="hidden"/>
+            <div id="facek"></div>
+            <input id="facev" value="0" type="hidden"/>
+            <form action="" name="form1" id="form1" method="post" target="myif" enctype="multipart/form-data"> 
+            <div id="imgk"></div>
+            <input id="imgv" value="0" type="hidden"/>
+            <input id="imglbv" value="0" type="hidden"/>
+            <input id="imgsv" value="0" type="hidden"/>
+            <div id="mediak"></div>
+            <input id="mediav" value="0" type="hidden"/>
+            <input id="medialbv" value="0" type="hidden"/>
+            <input id="mediasv" value="0" type="hidden"/>
+            <div id="filek"></div>
+            <input id="filev" value="0" type="hidden"/>
+            <input id="filelbv" value="0" type="hidden"/>
+            <input id="filesv" value="0" type="hidden"/>
+            </form>
+         <iframe id="htmledit" name="htmledit" onmouseout="sublr(1)" src="enter.html" frameborder="0"  marginwidth="0" marginheight="0"></iframe>
+        </div>
+        <div id="codebox"><textarea id="codeedit" onmouseout="sublr(1)" rows="" cols=""></textarea></div>
+    </div>
+</div>
+<input id="wayv" value="0" type="hidden"/>
+<iframe id="myif" name="myif" style="display:none"></iframe>
+</body>
+</html>
+<script type="text/javascript" src="JScript/PubEdit.js"></script>
+<script type="text/javascript">
+effbut('but1','justifyleft,justifycenter,justifyright,justifyfull,absoluteposition,selectall,unselect,copy,delete,cut,redo,undo,removeformat,modecode,modeedit,sizeminus,sizeplus','居左,居中,居右,两端对齐,绝对定位,全选,全选,复制,删除,剪切,恢复,撤消,清除格式,源码视图,设计视图,缩小编辑区,扩大编辑区')
+effbut('but2','bold,italic,underline,strikethrough,ff,fs,ffc,fbc,createlink,unlink,subscript,superscript,tb,face,img,media,file','粗体,斜体,下划线,中划线,字体,文字大小,文字颜色,文字背景色,链接,清除链接,下标,上标,表格,表情,图片(jpg/gif),媒体(rm/wmv),文件(rar)')
+window.onload=function(){sublr(0);}
+function swh_ck(x){}
+</script>

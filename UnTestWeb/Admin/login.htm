@@ -1,0 +1,117 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>后台 — 登录</title>
+    <link href="/Admin/Styles/login.css" type="text/css" rel="Stylesheet" />
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Jquery/jquery-1.8.0.js" ></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Layer/layer.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnInit.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnXMMPXml.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnHttpClient.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnCookie.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnAttrRst.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/XmlData.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/ApiBase.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/ApiNote.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/AdminLogin.js"></script>
+    <script type="text/javascript" src="/Scripts/UnModel/HttpM.js"></script>
+    <script type="text/javascript" src="/Scripts/UnModel/ValidCodeM.js"></script>
+    <script type="text/javascript" src="/Scripts/UnModel/AdminLoginM.js"></script>
+</head>
+<body>
+    <div class="logo"><img alt="" src="/Admin/Images/public/top_logo.png" /></div>
+    <div class="main">
+        <div class="main_content">
+            <ul>
+                <li><span>用户名：</span><em class="yhm"><input type="text" id="user" /></em></li>
+                <li><span>密&emsp;码：</span><em class="mm"><input type="password" id="pass" /></em></li>
+                <li><span>验证码：</span><em class="yzm"><input type="text" id="ver" /></em></li>
+                <li class="liVer"><span></span><em class="ver"><img id="verImg" alt="看不清?击点刷新" title="看不清?击点刷新"/></em></li>
+                <li><input type="button" value="登录" class="login_button" /></li>
+            </ul>
+        </div>
+    </div>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Jquery/jquery.md5.js" ></script>
+    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnEncMD5.js"></script>
+    <script type="text/javascript">;
+
+    // 验证码-校验
+    function validCode() {
+        var ver = $("#ver").val();
+        if (ver.length == 0 || ver.length > 6) {
+            layer.msg("验证码错误!");
+            return;
+        }
+        var vcm = ValidCodeM.createNew(success_ver, null);
+        vcm.valid(ver);
+    }
+
+    // 验证码-成功
+    function success_ver(data) {
+        if (data.ApiNote.NoteCode == 1) {
+            validLogin();
+            $("#verImg").trigger("click");
+        }
+        else {
+            layer.msg("验证码错误!");
+            $("#verImg").trigger("click");
+            $(".liVer").hide()
+        }
+    };
+
+    // 验证码-更新
+    $("#verImg").click(function () {
+        $("#verImg").attr("src", UnInit.verCodeUrl("create", null));
+        $("#ver").val("");
+    });
+
+    // 验证码-显示控制
+    $("#ver").focus(function () {
+        if ($(".liVer").is(":hidden")) {
+            $("#verImg").trigger("click");
+            $(".liVer").show();
+        };
+    });
+
+    // 登录-校验
+    function validLogin() {
+        var al = AdminLogin.createNew();
+        al.User = $("#user").val();
+        al.Pass = $("#pass").val();
+        if (al.User.length < 5 || al.Pass.length < 5) {
+            layer.msg("账号/密码错误!");
+            return;
+        }
+        al.Pass = UnEncMD5.getMd5Hashs(al.Pass);
+        var alm = AdminLoginM.createNew(success_login, null);
+        alm.valid(al);
+    }
+
+    // 登录-成功
+    function success_login(data) {
+        if (data.ApiNote.NoteCode == 1) {
+            location.href = "/Admin/Test/edit.aspx";
+        }
+        else {
+            layer.msg("帐号/密码错误!");
+            $("#verImg").trigger("click");
+            $(".liVer").hide()
+        }
+        $(".login_button").val("登录");
+    };
+
+    // 登录
+    $(".login_button").click(function () {
+        validCode();
+    });
+
+    // 回车
+    $("html").die().live("keydown", function (event) {
+        if (event.keyCode == 13) {
+            validCode();
+        }
+    });    
+
+    </script>
+</body>
+</html>

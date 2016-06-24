@@ -1,0 +1,21 @@
+﻿table{border:1px solid #d4d4d4; text-align:center; line-height:40px;}
+table td{border:1px solid #d4d4d4; border-width:1px 0px 0px 0px; text-align:center;}
+thead{background:url(/Admin/Images/public/thead_bg.png) repeat-x; height:30px; line-height:30px;}
+.editor,.delete{padding:3px 1em 3px 20px; color:#417eb7; margin-right:5px;}
+.editor{background:url(/Admin/Images/public/editor.png) left center no-repeat;}
+.delete{background:url(/Admin/Images/public/delete.png) left center no-repeat;}
+/*审核操作*/
+.line{width:100%; height:1px; overflow:hidden; background:#dfdfdf; margin:20px 0px;}
+.audit_title{font-weight:bold; font-size:14px; background:url(/Admin/Images/public/wz_tb.png) left center no-repeat; padding:0px 0px 0px 10px;}
+.main_left{display:inline-block; width:45%;}
+.main_right{display:inline-block; width:45%; vertical-align:top;}
+.audit_main{width:100%; display:block; line-height:40px;}
+.audit_main em{color:#666;}
+.audit_main span{display:inline-block; width:14%; text-align:right;}
+.audit_img{position:relative; z-index:1; display:block;}
+.audit_img em{position:absolute; left:38px; color:#000; line-height:94px;}
+.audit_text{width:25%; height:50px; border:1px solid; border-color:#bebebe #e1e1e1 #e1e1e1 #cfcfcf; line-height:20px;}
+.blue{margin-left:1em;}
+.audit_main i{display:inline-block; margin-right:2em;}
+
+
