@@ -56,6 +56,10 @@
       <Project>{3998BC66-8A08-46CC-BD68-B0C5E3D85E1E}</Project>
       <Name>UnCommon</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UnDataBase\UnDataBase.csproj">
+      <Project>{be6e344c-cefb-4c2e-8104-b82ea3ee4b7e}</Project>
+      <Name>UnDataBase</Name>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

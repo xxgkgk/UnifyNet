@@ -11,11 +11,17 @@ namespace UnDataBase
 {
     public class UnSql
     {
+        #region 其它参数
+
         // 数据库处理对象字典
         private static Dictionary<string, UnSqlHelp> conDic = new Dictionary<string, UnSqlHelp>();
 
         // 数据库操作对象
         private UnSqlHelp help = null;
+
+        #endregion
+
+        #region 实例化
 
         /// <summary>
         /// 实例化
@@ -25,6 +31,59 @@ namespace UnDataBase
         {
             help = new UnSqlHelp(constr);
         }
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="ip">ip地址</param>
+        /// <param name="port">端口</param>
+        /// <param name="user">账号</param>
+        /// <param name="pass">密码</param>
+        /// <param name="dbName">连接的数据库</param>
+        public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model)
+        {
+            string constr;
+            switch (model)
+            {
+                case UnSqlConnectModel.Create:
+                case UnSqlConnectModel.ConnectOrCreate:
+                    constr = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
+                    string crtstr = UnSqlStr.createDB(dbName, model);
+                    // 创建对象
+                    help = new UnSqlHelp(constr);
+                    // 创建数据库
+                    help.exSql(crtstr);
+                    break;
+            }
+            constr = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
+            help = new UnSqlHelp(constr);
+            // 创建翻页存储过程
+            help.exSql(UnSqlStr.drop_Prc_Pageing());
+            help.exSql(UnSqlStr.create_Prc_Pageing());
+        }
+
+        #endregion
+
+        #region 创建表
+
+        public void createTable(Type t)
+        {
+            string s1 = UnSqlStr.createTableBase(t);
+            string s2 = UnSqlStr.createTableRelation(t);
+            string s3 = UnSqlStr.dropTableRelation(t);   
+        }
+
+        public void updateTable(Type t)
+        {
+
+        }
+
+        #endregion
+
+        #region 基本存储过程/函数等
+
+
+        #endregion
 
         #region 添加数据
 
@@ -291,14 +350,34 @@ namespace UnDataBase
             return null;
         }
 
-        // 获取翻页数据
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <param name="columns">字段</param>
+        /// <param name="keyName">主键名</param>
+        /// <param name="table">表名</param>
+        /// <param name="where">条件</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize)
         {
             UnSqlPage page = help.getPage(columns, keyName, table, where, order, currentPage, pageSize);
             return page;
         }
 
-        // 获取翻页数据
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="where">条件</param>
+        /// <param name="whereArgs">条件参数</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage<T>(string columns, string where, string[] whereArgs, string order, int currentPage, int pageSize) where T : new()
         {
             string keyName = UnToGen.getAutoNum<T>(true);
@@ -309,7 +388,17 @@ namespace UnDataBase
             return page;
         }
 
-        // 获取翻页数据
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="where">条件</param>
+        /// <param name="whereArgs">条件参数</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage<T>(string columns, string where, string whereArgs, string order, int currentPage, int pageSize) where T : new()
         {
             string keyName = UnToGen.getAutoNum<T>(true);
@@ -332,7 +421,15 @@ namespace UnDataBase
             return page;
         }
 
-        // 获取翻页数据
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage<T>(string columns, string order, int currentPage, int pageSize) where T : new()
         {
             string keyName = UnToGen.getAutoNum<T>(true);
@@ -342,7 +439,12 @@ namespace UnDataBase
             return page;
         }
 
-        // 递归ID
+        /// <summary>
+        /// 递归查询
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="ID">开始ID</param>
+        /// <returns>返回所有递归ID</returns>
         public string recursiveID<T>(int ID) where T : new()
         {
             string CodeName = "";
@@ -362,13 +464,23 @@ namespace UnDataBase
             return IDList.TrimEnd(',');
         }
 
-        // SQL查询
+        /// <summary>
+        /// 查询数据
+        /// </summary>
+        /// <param name="sql">sql</param>
+        /// <param name="parms">参数</param>
+        /// <returns>返回DataTable</returns>
         public DataTable queryDT(string sql,SqlParameter[] parms)
         {
             return help.getDataTable(sql, parms);
         }
 
-        // 查询第一行第一个值
+        /// <summary>
+        /// 查询第一行第一个值
+        /// </summary>
+        /// <param name="sql">sql</param>
+        /// <param name="parms"参数></param>
+        /// <returns>无数据则返回NULL</returns>
         public object queryScalar(String sql, SqlParameter[] parms)
         {
             DataTable dt = queryDT(sql, parms);
@@ -379,7 +491,11 @@ namespace UnDataBase
             return null;
         }
 
-        // 查询第一行第一个值并转为Int
+        /// <summary>
+        /// 查询第一行第一个值并转为Int
+        /// </summary>
+        /// <param name="sql">sql</param>
+        /// <param name="parms"参数></param>
         public int? queryScalarToInt(String sql, SqlParameter[] parms)
         {
             try
@@ -392,7 +508,11 @@ namespace UnDataBase
             }
         }
 
-        // 查询第一行第一个值并转为String
+        /// <summary>
+        /// 查询第一行第一个值并转为Stringt
+        /// </summary>
+        /// <param name="sql">sql</param>
+        /// <param name="parms"参数></param>
         public String queryScalarToString(String sql, SqlParameter[] parms)
         {
             try
@@ -446,5 +566,13 @@ namespace UnDataBase
         }
 
         #endregion
+
+        /// <summary>
+        /// 开始事务
+        /// </summary>
+        public void beginTransaction()
+        {
+           help.beginTransaction();
+        }
     }
 }

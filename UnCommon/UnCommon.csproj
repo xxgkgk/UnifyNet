@@ -56,6 +56,7 @@
     <Compile Include="Encrypt\UnEncRSA.cs" />
     <Compile Include="Encrypt\UnEncSign.cs" />
     <Compile Include="Encrypt\UnEncSignEnu.cs" />
+    <Compile Include="Entity\UnAttrSql.cs" />
     <Compile Include="Entity\UnAttrPgs.cs" />
     <Compile Include="Entity\UnAttrRst.cs" />
     <Compile Include="Entity\UnAttrtStati.cs" />

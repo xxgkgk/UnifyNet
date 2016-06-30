@@ -19,20 +19,39 @@ namespace UnDataBase
         // 连接字符串
         private string cS = "";
 
+        // 连接对象
+        private SqlConnection conn = null;
+
+        // 事务对象
+        private SqlTransaction tran = null;
+
         /// <summary>
         /// 获得连接对象
         /// </summary>
         /// <returns></returns>
         private SqlConnection getConn()
         {
-            SqlConnection cn = new SqlConnection(cS);
-            cn.Open();
-            return cn;
+            if (conn == null)
+            {
+                conn = new SqlConnection(cS);
+            }
+            switch (conn.State)
+            {
+                case ConnectionState.Closed:
+                    conn.Open();
+                    break;
+                case ConnectionState.Broken:
+                    conn.Dispose();
+                    conn.Open();
+                    break;
+            }
+            return conn;
         }
 
         // 错误日志
         private void writeLog(string pre, string e)
         {
+            close();
             UnFile.writeLog(pre, e);
         }
 
@@ -72,13 +91,11 @@ namespace UnDataBase
         {
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand(cmdText, getConn()))
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand(cmdText, cn))
-                    {
-                        Sqlcmd.ExecuteNonQuery();
-                        return true;
-                    }
+                    Sqlcmd.ExecuteNonQuery();
+                    close();
+                    return true;
                 }
             }
             catch (Exception e)
@@ -98,14 +115,12 @@ namespace UnDataBase
         {
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand())
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand())
-                    {
-                        setcmd(Sqlcmd, cn, null, CommandType.Text, cmdText, sqlPmtA);
-                        Sqlcmd.ExecuteNonQuery();
-                        return true;
-                    }
+                    setcmd(Sqlcmd, getConn(), null, CommandType.Text, cmdText, sqlPmtA);
+                    Sqlcmd.ExecuteNonQuery();
+                    close();
+                    return true;
                 }
             }
             catch (Exception e)
@@ -126,14 +141,12 @@ namespace UnDataBase
         {
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand())
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand())
-                    {
-                        setcmd(Sqlcmd, cn, null, CommandType.StoredProcedure, cmdText, sqlPmtA);
-                        Sqlcmd.ExecuteNonQuery();
-                        return true;
-                    }
+                    setcmd(Sqlcmd, getConn(), null, CommandType.StoredProcedure, cmdText, sqlPmtA);
+                    Sqlcmd.ExecuteNonQuery();
+                    close();
+                    return true;
                 }
             }
             catch (Exception e)
@@ -178,16 +191,14 @@ namespace UnDataBase
         {
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand())
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand())
-                    {
-                        setcmd(Sqlcmd, cn, null, CommandType.Text, cmdText, null);
-                        SqlDataAdapter SqlDA = new SqlDataAdapter(Sqlcmd);
-                        DataSet DS = new DataSet();
-                        SqlDA.Fill(DS);
-                        return DS;
-                    }
+                    setcmd(Sqlcmd, getConn(), null, CommandType.Text, cmdText, null);
+                    SqlDataAdapter SqlDA = new SqlDataAdapter(Sqlcmd);
+                    DataSet DS = new DataSet();
+                    SqlDA.Fill(DS);
+                    close();
+                    return DS;
                 }
             }
             catch (Exception e)
@@ -207,16 +218,14 @@ namespace UnDataBase
         {
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand())
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand())
-                    {
-                        setcmd(Sqlcmd, cn, null, CommandType.Text, cmdText, parms);
-                        SqlDataAdapter SqlDA = new SqlDataAdapter(Sqlcmd);
-                        DataSet DS = new DataSet();
-                        SqlDA.Fill(DS);
-                        return DS;
-                    }
+                    setcmd(Sqlcmd, getConn(), null, CommandType.Text, cmdText, parms);
+                    SqlDataAdapter SqlDA = new SqlDataAdapter(Sqlcmd);
+                    DataSet DS = new DataSet();
+                    SqlDA.Fill(DS);
+                    close();
+                    return DS;
                 }
             }
             catch (Exception e)
@@ -266,14 +275,12 @@ namespace UnDataBase
         {
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand())
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand())
-                    {
-                        setcmd(Sqlcmd, cn, null, CommandType.Text, cmdText, null);
-                        object obj = Sqlcmd.ExecuteScalar();
-                        return obj;
-                    }
+                    setcmd(Sqlcmd, getConn(), null, CommandType.Text, cmdText, null);
+                    object obj = Sqlcmd.ExecuteScalar();
+                    close();
+                    return obj;
                 }
             }
             catch (Exception e)
@@ -293,14 +300,12 @@ namespace UnDataBase
         {
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand())
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand())
-                    {
-                        setcmd(Sqlcmd, cn, null, CommandType.Text, cmdText, sqlPmtA);
-                        object obj = Sqlcmd.ExecuteScalar();
-                        return obj;
-                    }
+                    setcmd(Sqlcmd, getConn(), null, CommandType.Text, cmdText, sqlPmtA);
+                    object obj = Sqlcmd.ExecuteScalar();
+                    close();
+                    return obj;
                 }
             }
             catch (Exception e)
@@ -326,14 +331,12 @@ namespace UnDataBase
         {
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand())
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand())
-                    {
-                        setcmd(Sqlcmd, cn, null, cmdType, cmdText, sqlPmtA);
-                        Sqlcmd.ExecuteScalar();
-                        return Sqlcmd.Parameters.GetEnumerator();
-                    }
+                    setcmd(Sqlcmd, getConn(), null, cmdType, cmdText, sqlPmtA);
+                    Sqlcmd.ExecuteScalar();
+                    close();
+                    return Sqlcmd.Parameters.GetEnumerator();
                 }
             }
             catch (Exception e)
@@ -353,31 +356,29 @@ namespace UnDataBase
         /// <returns></returns>
         public SqlParameterCollection getPageKeys(string keyName, string from, int currentPage, int pageSize)
         {
-            SqlParameter[] pmts = new SqlParameter[] { 
+            SqlParameter[] pmts = new SqlParameter[] {
                 new SqlParameter("@KeyName", keyName),
-                new SqlParameter("@From", from), 
+                new SqlParameter("@From", from),
                 new SqlParameter("@CurrentPage", currentPage),
-                new SqlParameter("@pageSize", pageSize), 
+                new SqlParameter("@pageSize", pageSize),
                 new SqlParameter("@TotalNumber", 0),
                 new SqlParameter("@TotalPages", 0),
-                new SqlParameter("@Keys", "") 
+                new SqlParameter("@Keys", "")
             };
             try
             {
-                using (SqlConnection cn = getConn())
+                using (SqlCommand Sqlcmd = new SqlCommand())
                 {
-                    using (SqlCommand Sqlcmd = new SqlCommand())
-                    {
-                        setcmd(Sqlcmd, cn, null, CommandType.StoredProcedure, "Pro_PageKeys", pmts);
-                        Sqlcmd.Parameters["@Keys"].Size = 100000;
-                        Sqlcmd.Parameters["@CurrentPage"].Direction = ParameterDirection.InputOutput;
-                        Sqlcmd.Parameters["@pageSize"].Direction = ParameterDirection.InputOutput;
-                        Sqlcmd.Parameters["@TotalNumber"].Direction = ParameterDirection.Output;
-                        Sqlcmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
-                        Sqlcmd.Parameters["@Keys"].Direction = ParameterDirection.Output;
-                        Sqlcmd.ExecuteNonQuery();
-                        return Sqlcmd.Parameters;
-                    }
+                    setcmd(Sqlcmd, getConn(), null, CommandType.StoredProcedure, "Pro_PageKeys", pmts);
+                    Sqlcmd.Parameters["@Keys"].Size = 100000;
+                    Sqlcmd.Parameters["@CurrentPage"].Direction = ParameterDirection.InputOutput;
+                    Sqlcmd.Parameters["@pageSize"].Direction = ParameterDirection.InputOutput;
+                    Sqlcmd.Parameters["@TotalNumber"].Direction = ParameterDirection.Output;
+                    Sqlcmd.Parameters["@TotalPages"].Direction = ParameterDirection.Output;
+                    Sqlcmd.Parameters["@Keys"].Direction = ParameterDirection.Output;
+                    Sqlcmd.ExecuteNonQuery();
+                    close();
+                    return Sqlcmd.Parameters;
                 }
             }
             catch (Exception e)
@@ -428,5 +429,35 @@ namespace UnDataBase
             return page;
         }
 
+        /// <summary>
+        /// 开始事务
+        /// </summary>
+        /// <returns></returns>
+        public void beginTransaction()
+        {
+            tran = getConn().BeginTransaction();
+        }
+
+        /// <summary>
+        /// 提交结果
+        /// </summary>
+        public void commitTransaction()
+        {
+            tran.Commit();
+            tran.Dispose();
+            close();
+        }
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        private void close()
+        {
+            if (conn != null && tran == null)
+            {
+                conn.Close();
+                //conn.Dispose();
+            }
+        }
     }
 }

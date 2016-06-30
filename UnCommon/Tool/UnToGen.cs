@@ -5,6 +5,7 @@ using System.Text;
 using System.Reflection;
 using System.Data;
 using UnCommon.Files;
+using UnCommon.Entity;
 
 namespace UnCommon.Tool
 {
@@ -195,7 +196,7 @@ namespace UnCommon.Tool
         /// <returns></returns>
         public static bool isField(PropertyInfo item)
         {
-            //Console.WriteLine(item.PropertyType.IsValueType+"/" + item.PropertyType.Name);
+            //Console.WriteLine(item.Name + "/" + item.PropertyType.IsValueType + "/" + item.PropertyType.Name);
             //是值,字符串,字节
             if (item.PropertyType.IsValueType || item.PropertyType.Name.StartsWith("String") || item.PropertyType.Name.StartsWith("Byte"))
             {
@@ -208,7 +209,6 @@ namespace UnCommon.Tool
             }
             return false;
         }
-
 
         /// <summary>
         /// 是否类

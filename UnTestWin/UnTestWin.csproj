@@ -47,9 +47,22 @@
     <Reference Include="HPSocketCS">
       <HintPath>..\UnLibrary\HPSocketCS.dll</HintPath>
     </Reference>
+    <Reference Include="Microsoft.VisualStudio.CoreUtility, Version=14.0.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\UnLibrary\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\UnLibrary\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\UnLibrary\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Redis">
+      <HintPath>..\UnLibrary\ServiceStack.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\UnLibrary\ServiceStack.Text.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -87,11 +100,23 @@
     <Compile Include="Other.Designer.cs">
       <DependentUpon>Other.cs</DependentUpon>
     </Compile>
+    <Compile Include="Redis.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Redis.Designer.cs">
+      <DependentUpon>Redis.cs</DependentUpon>
+    </Compile>
     <Compile Include="Udp.cs">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Udp.Designer.cs">
       <DependentUpon>Udp.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Sql.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Sql.Designer.cs">
+      <DependentUpon>Sql.cs</DependentUpon>
     </Compile>
     <Compile Include="WeiXin.cs">
       <SubType>Form</SubType>
@@ -123,8 +148,14 @@
       <DependentUpon>Resources.resx</DependentUpon>
       <DesignTime>True</DesignTime>
     </Compile>
+    <EmbeddedResource Include="Redis.resx">
+      <DependentUpon>Redis.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Udp.resx">
       <DependentUpon>Udp.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Sql.resx">
+      <DependentUpon>Sql.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="WeiXin.resx">
       <DependentUpon>WeiXin.cs</DependentUpon>
