@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using UnCommon;
+using UnCommon.Entity;
 
 namespace UnEntity
 {
@@ -16,6 +17,7 @@ namespace UnEntity
         // ID
         public long WxPayOrderID { get; set; }
         // 唯一编号
+        [UnAttrSql(fieldType = "varchar(50)", isPrimaryKey = true)]
         public string WxPayOrderUID { get; set; }
         // 添加时间
         public DateTime? AddTime { get; set; }

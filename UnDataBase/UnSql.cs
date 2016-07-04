@@ -11,10 +11,7 @@ namespace UnDataBase
 {
     public class UnSql
     {
-        #region 其它参数
-
-        // 数据库处理对象字典
-        private static Dictionary<string, UnSqlHelp> conDic = new Dictionary<string, UnSqlHelp>();
+        #region 私有变量
 
         // 数据库操作对象
         private UnSqlHelp help = null;
@@ -57,22 +54,97 @@ namespace UnDataBase
             }
             constr = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
             help = new UnSqlHelp(constr);
-            // 创建翻页存储过程
+            // 翻页存储过程
             help.exSql(UnSqlStr.drop_Prc_Pageing());
             help.exSql(UnSqlStr.create_Prc_Pageing());
+            // 判断字段是否存在 
+            help.exSql(UnSqlStr.drop_mfn_IsColumnExists());
+            help.exSql(UnSqlStr.create_mfn_IsColumnExists());
+            // 查询某个字段的所有索引
+            help.exSql(UnSqlStr.drop_mfn_GetColumnIndexes());
+            help.exSql(UnSqlStr.create_mfn_GetColumnIndexes());
+            // 删除指定列的所有索引  
+            help.exSql(UnSqlStr.drop_mp_DropColumnIndexes());
+            help.exSql(UnSqlStr.create_mp_DropColumnIndexes());
+            // 删除某个表的某列的所有约束
+            help.exSql(UnSqlStr.drop_mp_DropColConstraint());
+            help.exSql(UnSqlStr.create_mp_DropColConstraint());
+            // 删除指定字段的所有约束和索引
+            help.exSql(UnSqlStr.drop_mp_DropColConstraintAndIndex());
+            help.exSql(UnSqlStr.create_mp_DropColConstraintAndIndex());
         }
 
         #endregion
 
-        #region 创建表
+        #region 表操作
 
+        /// <summary>
+        /// 创建表
+        /// </summary>
+        /// <param name="t"></param>
         public void createTable(Type t)
         {
             string s1 = UnSqlStr.createTableBase(t);
-            string s2 = UnSqlStr.createTableRelation(t);
-            string s3 = UnSqlStr.dropTableRelation(t);   
+            //Console.WriteLine(s1);
+            help.exSql(s1);
         }
 
+        /// <summary>
+        /// 删除表
+        /// </summary>
+        /// <param name="t"></param>
+        public void dropTable(Type t)
+        {
+            string s1 = UnSqlStr.dropTable(t);
+            Console.WriteLine(s1);
+            help.exSql(s1);
+        }
+
+        /// <summary>
+        /// 创建表关系
+        /// </summary>
+        public void createTableRelation(Type t)
+        {
+            string s1 = UnSqlStr.createTableRelation(t);
+            //Console.WriteLine(s1);
+            if (s1.Length > 0)
+            {
+                help.exSql(s1);
+            }
+        }
+
+        /// <summary>
+        /// 清除表关系
+        /// </summary>
+        /// <param name="t"></param>
+        public void dropTableRelation(Type t)
+        {
+            string s2 = UnSqlStr.dropTableRelation(t);
+            //Console.WriteLine(s2);
+            if (s2.Length > 0)
+            {
+                help.exSql(s2);
+            }
+        }
+
+        /// <summary>
+        /// 清除表所有约束和索引
+        /// </summary>
+        /// <param name="t"></param>
+        public void dropTableRelationAll(Type t)
+        {
+            string tableName = UnToGen.getTableName(t);
+            var list = UnToGen.getListField(t);
+            foreach (var name in list)
+            {
+                help.dropColumnCI(tableName, name);
+            }
+        }
+
+        /// <summary>
+        /// 更新表
+        /// </summary>
+        /// <param name="t"></param>
         public void updateTable(Type t)
         {
 
@@ -80,8 +152,12 @@ namespace UnDataBase
 
         #endregion
 
-        #region 基本存储过程/函数等
+        #region 基础SQL
 
+        private void dropTableCI(Type t)
+        {
+            string s = @"";
+        }
 
         #endregion
 
@@ -96,13 +172,13 @@ namespace UnDataBase
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t);
             StringBuilder strSql = new StringBuilder();
-            strSql.Append("Insert Into " + typeof(T).Name + " ");
+            strSql.Append("Insert Into " + UnToGen.getTableName(typeof(T)) + " ");
             strSql.Append(UnSqlStr.getAddStr<T>(SqlPmtA));
             strSql.Append(" Select SCOPE_IDENTITY() As KeyID");
             long KeyID = Convert.ToInt64(help.getExSc(strSql.ToString(), SqlPmtA));
             return KeyID;
         }
-        
+
         #endregion
 
         #region 删除数据
@@ -110,7 +186,7 @@ namespace UnDataBase
         public bool delete<T>(string selection, string selectionArgs) where T : new()
         {
             StringBuilder strSql = new StringBuilder();
-            strSql.Append("Delete " + typeof(T).Name + " ");
+            strSql.Append("Delete " + UnToGen.getTableName(typeof(T)) + " ");
             strSql.Append(UnSqlStr.getSelectionSql<T>(selection, selectionArgs));
             return help.exSql(strSql.ToString());
         }
@@ -153,15 +229,17 @@ namespace UnDataBase
         {
             List<SqlParameter> list = new List<SqlParameter>();
             int i = 0;
-            foreach (string arg in selectionArgs)
+            if (selectionArgs != null)
             {
-                selection = selection.Replace("'{" + i + "}'", "@p" + i);
-                selection = selection.Replace("{" + i + "}", "@p" + i);
-                SqlParameter par = new SqlParameter("p" + i, arg);
-                list.Add(par);
-                i++;
+                foreach (string arg in selectionArgs)
+                {
+                    selection = selection.Replace("'{" + i + "}'", "@p" + i);
+                    selection = selection.Replace("{" + i + "}", "@p" + i);
+                    SqlParameter par = new SqlParameter("p" + i, arg);
+                    list.Add(par);
+                    i++;
+                }
             }
-            
             string strSql = UnSqlStr.getQuerySql<T>(columns, selection, null, groupBy, having, orderBy);
             return query<T>(strSql, list.ToArray());
         }
@@ -256,7 +334,6 @@ namespace UnDataBase
             }
             return default(T);
         }
-
 
         /// <summary>
         /// 查询数据表
@@ -380,8 +457,8 @@ namespace UnDataBase
         /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage<T>(string columns, string where, string[] whereArgs, string order, int currentPage, int pageSize) where T : new()
         {
-            string keyName = UnToGen.getAutoNum<T>(true);
-            string table = typeof(T).Name;
+            string keyName = UnToGen.getAutoNum(typeof(T), true);
+            string table = UnToGen.getTableName(typeof(T));
             where = UnSqlStr.getQueryPageWhere<T>(where, whereArgs);
             UnSqlPage page = help.getPage(columns, keyName, table, where, order, currentPage, pageSize);
             page.TSource = UnToGen.dtToT<T>(page.DataSource);
@@ -401,8 +478,8 @@ namespace UnDataBase
         /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage<T>(string columns, string where, string whereArgs, string order, int currentPage, int pageSize) where T : new()
         {
-            string keyName = UnToGen.getAutoNum<T>(true);
-            string table = typeof(T).Name;
+            string keyName = UnToGen.getAutoNum(typeof(T),true);
+            string table = UnToGen.getTableName(typeof(T));
             string[] args = null;
             if (whereArgs != null && whereArgs.Length > 0)
             {
@@ -432,8 +509,8 @@ namespace UnDataBase
         /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage<T>(string columns, string order, int currentPage, int pageSize) where T : new()
         {
-            string keyName = UnToGen.getAutoNum<T>(true);
-            string table = typeof(T).Name;
+            string keyName = UnToGen.getAutoNum(typeof(T),true);
+            string table = UnToGen.getTableName(typeof(T));
             UnSqlPage page = help.getPage(columns, keyName, table, null, order, currentPage, pageSize);
             page.TSource = UnToGen.dtToT<T>(page.DataSource);
             return page;
@@ -456,7 +533,7 @@ namespace UnDataBase
                 }
             }
             string IDList = "";
-            DataTable _DataTable = help.getDataTable("declare @Id Int;set @Id=" + ID + ";With GetInd as(Select * from " + typeof(T).Name + " where ID=@Id union all select w1.* from " + typeof(T).Name + " w1 inner join GetInd on w1." + CodeName + " = convert(nvarchar(20),GetInd." + CodeName + ") + convert(nvarchar(20),GetInd.ID)) select * from GetInd");
+            DataTable _DataTable = help.getDataTable("declare @Id Int;set @Id=" + ID + ";With GetInd as(Select * from " + UnToGen.getTableName(typeof(T)) + " where ID=@Id union all select w1.* from " + UnToGen.getTableName(typeof(T)) + " w1 inner join GetInd on w1." + CodeName + " = convert(nvarchar(20),GetInd." + CodeName + ") + convert(nvarchar(20),GetInd.ID)) select * from GetInd");
             foreach (DataRow _DataRow in _DataTable.Rows)
             {
                 IDList += _DataRow["ID"] + ",";
@@ -470,7 +547,7 @@ namespace UnDataBase
         /// <param name="sql">sql</param>
         /// <param name="parms">参数</param>
         /// <returns>返回DataTable</returns>
-        public DataTable queryDT(string sql,SqlParameter[] parms)
+        public DataTable queryDT(string sql, SqlParameter[] parms)
         {
             return help.getDataTable(sql, parms);
         }
@@ -524,8 +601,7 @@ namespace UnDataBase
                 return null;
             }
         }
-
-
+            
         #endregion
 
         #region 修改数据
@@ -542,7 +618,7 @@ namespace UnDataBase
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
             bool b = false;
-            string sql = "Update " + typeof(T).Name + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " " + UnSqlStr.getSelectionSql<T>(selection, selectionArgs);
+            string sql = "Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " " + UnSqlStr.getSelectionSql<T>(selection, selectionArgs);
             b = help.exSql(sql, SqlPmtA);
             return b;
         }
@@ -560,19 +636,30 @@ namespace UnDataBase
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
             bool b = false;
-            string sql = "Update " + typeof(T).Name + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " " + UnSqlStr.getSelectionSql<T>(selection, selectionArgs);
+            string sql = "Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " " + UnSqlStr.getSelectionSql<T>(selection, selectionArgs);
             b = help.exSql(sql, SqlPmtA);
             return b;
         }
 
         #endregion
 
+        #region 事务
         /// <summary>
         /// 开始事务
         /// </summary>
-        public void beginTransaction()
+        public SqlTransaction beginTransaction()
         {
-           help.beginTransaction();
+            return help.beginTransaction();
         }
+
+        /// <summary>
+        /// 提交事务
+        /// </summary>
+        /// <param name="tran"></param>
+        public void commitTransactio(SqlTransaction tran)
+        {
+            help.commitTransaction(tran);
+        }
+        #endregion 事务
     }
 }

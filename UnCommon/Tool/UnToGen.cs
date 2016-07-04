@@ -15,15 +15,15 @@ namespace UnCommon.Tool
     public class UnToGen
     {
         /// <summary>
-        /// 获取泛型属性组
+        /// 获取特性组(核心)
         /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="t"></param>
         /// <returns></returns>
-        public static List<string> getListField<T>()
+        public static List<PropertyInfo> getListFieldPropertyInfo(Type t)
         {
-            PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var properties  = t.GetProperties(BindingFlags.Instance | BindingFlags.Public);
             int length = properties.Length;
-            List<string> list = new List<string>();
+            List<PropertyInfo> list = new List<PropertyInfo>();
             if (length <= 0)
             {
                 return list;
@@ -31,8 +31,133 @@ namespace UnCommon.Tool
             for (int i = 0; i < length; i++)
             {
                 PropertyInfo item = properties[i];
-                string name = item.Name;
                 if (isField(item))
+                {
+                    list.Add(item);
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 获取字段组核心)
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static List<string> getListField(Type t)
+        {
+            var list = new List<string>();
+            var pros = getListFieldPropertyInfo(t);
+            foreach (var item in pros)
+            {
+                string name = item.Name;
+                UnAttrSql attr = getAttrSql(item);
+                if (attr != null && attr.fieldName != null)
+                {
+                    name = attr.fieldName;
+                }
+
+                // 排除仅大小写不同的字段
+                bool isHave = false;
+                foreach (string p in list)
+                {
+                    if (p.ToLower() == name.ToLower())
+                    {
+                        isHave = true;
+                    }
+                }
+                if (!isHave)
+                {
+                    list.Add(name);
+                }
+
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 获取自定义属性
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static UnAttrSql getAttrSql(Type t)
+        {
+            //取类上的自定义特性
+            UnAttrSql classAttr = null;
+            object[] objs = t.GetCustomAttributes(typeof(UnAttrSql), true);
+            foreach (object obj in objs)
+            {
+                classAttr = obj as UnAttrSql;
+            }
+            return classAttr;
+        }
+
+        /// <summary>
+        /// 获取自定义属性
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static UnAttrSql getAttrSql(PropertyInfo item)
+        {
+            UnAttrSql attr = null;
+            object[] objAttrs = item.GetCustomAttributes(typeof(UnAttrSql), true);
+            if (objAttrs.Length > 0)
+            {
+                attr = objAttrs[0] as UnAttrSql;
+            }
+            return attr;
+        }
+
+        /// <summary>
+        /// 获取表名(核心)
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static string getTableName(Type t)
+        {
+            UnAttrSql attr = getAttrSql(t);
+            if (attr != null && attr.tableName != null)
+            {
+                return attr.tableName;
+            }
+            return t.Name;
+        }
+
+        /// <summary>
+        /// 获取字段名(核心)
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static string getFieldName(PropertyInfo item)
+        {
+            UnAttrSql attr = getAttrSql(item);
+            if (attr != null && attr.fieldName != null)
+            {
+                return attr.fieldName;
+            }
+            return item.Name;
+        }
+
+        /// <summary>
+        /// 获取不含自增ID的字段组(核心)
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <returns></returns>
+        public static List<string> getFieldNoAutoInc<T>()
+        {
+            var fields = getListField(typeof(T));
+            int length = fields.Count;
+            List<string> list = new List<string>();
+            if (length <= 0)
+            {
+                return list;
+            }
+            // 自动编号
+            string autoName = getAutoNum(typeof(T), false);
+            foreach (var name in fields)
+            {
+                // 排除自动编号
+                if (name != autoName)
                 {
                     list.Add(name);
                 }
@@ -41,55 +166,25 @@ namespace UnCommon.Tool
         }
 
         /// <summary>
-        /// 获取SQL字段组
+        /// 获取字段组
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">泛型</typeparam>
         /// <returns></returns>
-        public static List<string> getSqlFields<T>()
+        public static List<string> getListField<T>()
         {
-            PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            int length = properties.Length;
-            List<string> list = new List<string>();
-            if (length <= 0)
-            {
-                return list;
-            }
-            // 自动编号
-            string autoName = getAutoNum<T>(false);
-            for (int i = 0; i < length; i++)
-            {
-                PropertyInfo item = properties[i];
-                string name = item.Name;
-                // 排除自动编号
-                if (isField(item) && name != autoName)
-                {
-                    // 排除仅大小写不同的字段
-                    bool isHave = false;
-                    foreach (string p in list)
-                    {
-                        if (p.ToLower() == name.ToLower())
-                        {
-                            isHave = true;
-                        }
-                    }
-                    if (!isHave)
-                    {
-                        list.Add(name);
-                    }
-                }
-            }
-            return list;
+            return getListField(typeof(T));
         }
+
 
         /// <summary>
         /// 获得首位自动编号名
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <returns></returns>
-        public static string getAutoNum<T>(bool addPre)
+        public static string getAutoNum(Type t,bool addPre)
         {
-            PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            int length = properties.Length;
+            var properties = UnToGen.getListFieldPropertyInfo(t);
+            int length = properties.Count;
             // 自动编号
             string autoName = null;
             for (int i = 0; i < length; i++)
@@ -101,7 +196,7 @@ namespace UnCommon.Tool
                     // 默认自动编号为首位
                     autoName = name;
                     // 如果找到构造为 表名+ID 则就是自动编号
-                    if (name == typeof(T).Name + "ID")
+                    if (name == getTableName(t) + "ID")
                     {
                         autoName = name;
                         break;
@@ -112,7 +207,7 @@ namespace UnCommon.Tool
             // 是否需要含表前缀
             if (addPre)
             {
-                return typeof(T).Name + "." + autoName;
+                return getTableName(t) + "." + autoName;
             }
             else
             {
@@ -127,8 +222,8 @@ namespace UnCommon.Tool
         /// <returns></returns>
         public static string getFields<T>()
         {
-            PropertyInfo[] properties = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            int length = properties.Length;
+            var properties = UnToGen.getListFieldPropertyInfo(typeof(T));
+            int length = properties.Count;
             string strA = null;
             for (int i = 0; i < length; i++)
             {
@@ -302,8 +397,9 @@ namespace UnCommon.Tool
             {
                 return tStr;
             }
-            PropertyInfo[] properties = t.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            if (properties.Length <= 0)
+            var properties = UnToGen.getListFieldPropertyInfo(typeof(T));
+            int length = properties.Count;
+            if (length <= 0)
             {
                 return tStr;
             }
@@ -331,7 +427,7 @@ namespace UnCommon.Tool
         public static T drToT<T>(DataRow dr) where T : new()
         {
             T t = new T();
-            PropertyInfo[] pis = t.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
+            var pis = typeof(T).GetProperties(BindingFlags.Instance | BindingFlags.Public);
             int length = pis.Length;
             if (length <= 0)
             {
@@ -341,7 +437,7 @@ namespace UnCommon.Tool
             for (int i = 0; i < length; i++)
             {
                 PropertyInfo pi = pis[i];
-                string strName = pi.Name;
+                string strName = getFieldName(pi);
                 if (UnToGen.isField(pi))
                 {
                     // 如果是字段

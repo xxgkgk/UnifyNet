@@ -1,0 +1,51 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using UnCommon.Entity;
+
+namespace UnCommon
+{
+    public class TestUser
+    {
+        // 自增ID
+        [UnAttrSql(fieldType = "bigint IDENTITY(1,1)", fieldNULL = false)]
+        public long? TestUserID { get; set; }
+
+        // 编码
+        [UnAttrSql(fieldType = "varchar(32)", fieldNULL = false, fieldDefault = "1234")]
+        public string TestUserUID { get; set; }
+
+        // GUID,主键
+        [UnAttrSql(isPrimaryKey = true, fieldNULL = false)]
+        public Guid? TestUserGUID { get; set; }
+
+        // 用户名
+        [UnAttrSql(fieldType = "varchar(16)", fieldNULL = false, indexModel = IndexModel.Unique)]
+        public string Name { get; set; }
+
+        // 用户密码,MD5*2
+        [UnAttrSql(fieldType = "varchar(32)", fieldNULL = false)]
+        public string Pass { get; set; }
+
+        // 是否删除
+        [UnAttrSql(fieldNULL = false, fieldDefault = "0")]
+        public bool? IsDelete { get; set; }
+
+        // 单列索引A
+        [UnAttrSql(fieldType = "varchar(32)")]
+        public string NonclusteredA { get; set; }
+
+        // 单列索引
+        [UnAttrSql(fieldType = "varchar(32)")]
+        public string NonclusteredB { get; set; }
+
+        // 联合索引A
+        [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionNonclustered)]
+        public string UnionNonclusteredA { get; set; }
+
+        // 联合索引B
+        [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionNonclustered)]
+        public string UnionNonclusteredB { get; set; }
+    }
+}

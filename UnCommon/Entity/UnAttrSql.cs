@@ -18,14 +18,19 @@ namespace UnCommon.Entity
         public string tableName;
 
         /// <summary>
-        /// 字段类开
+        /// 字段名
+        /// </summary>
+        public string fieldName;
+
+        /// <summary>
+        /// 字段类型
         /// </summary>
         public string fieldType;
 
         /// <summary>
         /// 字段默认值
         /// </summary>
-        public string fieldDefault = null;
+        public string fieldDefault;
 
         /// <summary>
         /// 字段是否允许空值
@@ -33,17 +38,42 @@ namespace UnCommon.Entity
         public bool fieldNULL = true;
 
         /// <summary>
-        /// 约束类型
+        /// 是否主键
         /// </summary>
-        public ConstraintModel constraintModel = ConstraintModel.None;
+        public bool isPrimaryKey = false;
 
         /// <summary>
-        /// 参数值集合
+        /// 是否外键
         /// </summary>
-        public object value;
+        public bool isForeignKey = false;
 
         /// <summary>
-        /// 是索引,
+        /// 外键值
+        /// </summary>
+        public string[] foreignKeyValue;
+
+        /// <summary>
+        /// 是否唯一
+        /// </summary>
+        public bool isUnique = false;
+
+        /// <summary>
+        /// 唯一约束值
+        /// </summary>
+        public string uniqueValue;
+
+        /// <summary>
+        /// 检查约束
+        /// </summary>
+        public bool isCheck = false;
+
+        /// <summary>
+        /// 检查约束
+        /// </summary>
+        public string checkValue;
+
+        /// <summary>
+        /// 索引类型,
         /// </summary>
         public IndexModel indexModel = IndexModel.None;
     }
@@ -56,7 +86,8 @@ namespace UnCommon.Entity
         None,
         Clustered,
         Nonclustered,
-        Unique
+        Unique,
+        UnionNonclustered
     }
 
     /// <summary>
@@ -71,5 +102,4 @@ namespace UnCommon.Entity
         Check,
         ForeignKey
     }
-    
 }

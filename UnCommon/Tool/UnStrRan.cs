@@ -76,5 +76,29 @@ namespace UnCommon.Tool
             return DateTime.Now.ToString("yyyyMMddHHmmss") + UnInit.pid();
         }
 
+        /// <summary>
+        /// 获取16位短GUID
+        /// </summary>
+        /// <returns></returns>
+        public static string getShortGUID()
+        {
+            long i = 1;
+            foreach (byte b in Guid.NewGuid().ToByteArray())
+            {
+                i *= ((int)b + 1);
+            }
+            return string.Format("{0:x}", i - DateTime.Now.Ticks);
+        }
+
+        /// <summary>
+        /// 获取19位数字型GUID
+        /// </summary>
+        /// <returns></returns>
+        public static long getIntGUID()
+        {
+            byte[] buffer = Guid.NewGuid().ToByteArray();
+            return BitConverter.ToInt64(buffer, 0);
+        }
+
     }
 }

@@ -48,6 +48,10 @@
     <Compile Include="EmailInfo.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="SMSInfo.cs" />
+    <Compile Include="TestCard.cs" />
+    <Compile Include="TestCardType.cs" />
+    <Compile Include="TestUser.cs" />
+    <Compile Include="TestUserDetail.cs" />
     <Compile Include="WxPayOrder.cs" />
     <Compile Include="XmlData.cs" />
   </ItemGroup>

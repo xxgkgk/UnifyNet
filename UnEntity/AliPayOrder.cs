@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using UnCommon.Entity;
 
-namespace UnCommon
+namespace UnEntity
 {
     [UnAttrSql(tableName = "AliPayOrder")]
     /// <summary>
@@ -16,7 +16,7 @@ namespace UnCommon
         [UnAttrSql(fieldType = "bigint IDENTITY(1,1)")]
         public long AliPayOrderID { get; set; }
         // 唯一编号
-        [UnAttrSql(fieldType = "varchar(50) Not Null", constraintModel = ConstraintModel.PrimaryKey)]
+        [UnAttrSql(fieldType = "varchar(50)", isForeignKey = true)]
         public string AliPayOrderUID { get; set; }
         // 添加时间
         public string AddTime { get; set; }
@@ -34,12 +34,12 @@ namespace UnCommon
         // 合作者身份ID
         public string Partner { get; set; }
         // 客户端号
-        [UnAttrSql(constraintModel = ConstraintModel.ForeignKey, value = new string[]{"A","id"})]
+        [UnAttrSql(isForeignKey = true, foreignKeyValue = new string[]{ "WxPayOrder", "WxPayOrderUID" })]
         public string AppID { get; set; }
         // 总费用
         public decimal Total_Fee { get; set; }
         // 订单标题
-        [UnAttrSql(constraintModel = ConstraintModel.ForeignKey, value = new string[] { "B", "uid" })]
+        //[UnAttrSql(constraintModel = ConstraintModel.ForeignKey, constraintValue = new string[] { "SMSInfo", "SMSInfo" })]
         public string Subject { get; set; }
         // 订单描述
         public string Body { get; set; }

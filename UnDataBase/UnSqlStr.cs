@@ -15,7 +15,7 @@ namespace UnDataBase
     /// </summary>
     public class UnSqlStr
     {
-        #region 创建及删除
+        #region 表操作
 
         /// <summary>
         /// 创建数据库
@@ -50,20 +50,15 @@ namespace UnDataBase
         /// <returns></returns>
         public static string createTableBase(Type t)
         {
-            PropertyInfo[] properties = t.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            int length = properties.Length;
+            var properties = UnToGen.getListFieldPropertyInfo(t);
+            int length = properties.Count;
             StringBuilder sb = new StringBuilder();
             if (length <= 0)
             {
                 return null;
             }
             //取类上的自定义特性
-            UnAttrSql classAttr = null;
-            object[] objs = t.GetCustomAttributes(typeof(UnAttrSql), true);
-            foreach (object obj in objs)
-            {
-                classAttr = obj as UnAttrSql;
-            }
+            UnAttrSql classAttr = UnToGen.getAttrSql(t);
             string tableName = t.Name;
             if (classAttr != null && classAttr.tableName != null)
             {
@@ -77,61 +72,54 @@ namespace UnDataBase
                 string name = item.Name;
                 if (UnToGen.isField(item))
                 {
-                    UnAttrSql attr = null;
-                    object[] objAttrs = item.GetCustomAttributes(typeof(UnAttrSql), true);
-                    if (objAttrs.Length > 0)
-                    {
-                        attr = objAttrs[0] as UnAttrSql;
-                    }
-                    // 字段修饰
-                    if (attr == null || attr.fieldType == null)
+                    UnAttrSql attr = UnToGen.getAttrSql(item);
+                    if (attr == null)
                     {
                         attr = new UnAttrSql();
-                        attr.fieldNULL = true;
+                    }
+                    // 字段修饰
+                    if (attr.fieldType == null)
+                    {
                         Type type = item.PropertyType;
                         if (type.Equals(typeof(String)))
                         {
                             attr.fieldType = "varchar(8000)";
                         }
-                        else if (type.Equals(typeof(Int32)))
+                        else if (type.Equals(typeof(Int32)) || type.Equals(typeof(Nullable<Int32>)))
                         {
                             attr.fieldType = "int";
                         }
-                        else if (type.Equals(typeof(Int64)))
+                        else if (type.Equals(typeof(Int64)) || type.Equals(typeof(Nullable<Int64>)))
                         {
                             attr.fieldType = "bigint";
                         }
-                        else if (type.Equals(typeof(Boolean)))
+                        else if (type.Equals(typeof(Boolean)) || type.Equals(typeof(Nullable<Boolean>)))
                         {
                             attr.fieldType = "bit";
                         }
-                        else if (type.Equals(typeof(DateTime)))
+                        else if (type.Equals(typeof(DateTime)) || type.Equals(typeof(Nullable<DateTime>)))
                         {
                             attr.fieldType = "datetime";
                         }
-                        else if (type.Equals(typeof(Decimal)))
+                        else if (type.Equals(typeof(Decimal)) || type.Equals(typeof(Nullable<Decimal>)))
                         {
                             attr.fieldType = "decimal";
                         }
-                        else if (type.Equals(typeof(Guid)))
+                        else if (type.Equals(typeof(Guid)) || type.Equals(typeof(Nullable<Guid>)))
                         {
                             attr.fieldType = "uniqueidentifier";
                         }
                         else
                         {
+
                         }
                     }
-                    string nullStr = "";
-                    string defaultStr = "";
+                    string nullStr = "NULL";
                     if (!attr.fieldNULL)
                     {
-                        nullStr = "Not NULL";
+                        nullStr = "NOT NULL";
                     }
-                    if (attr.fieldDefault != null)
-                    {
-                        defaultStr = "Default(" + defaultStr + ")";
-                    }
-                    sb.AppendLine(name + " " + attr.fieldType + " " + defaultStr + " " + nullStr + ",");
+                    sb.AppendLine("[" + name + "] " + attr.fieldType + " " + nullStr + ",");
                 }
             }
             sb.AppendLine(");");
@@ -145,25 +133,14 @@ namespace UnDataBase
         /// <returns></returns>
         public static string createTableRelation(Type t)
         {
-            PropertyInfo[] properties = t.GetProperties(BindingFlags.Instance | BindingFlags.Public);
-            int length = properties.Length;
+            var properties = UnToGen.getListFieldPropertyInfo(t);
+            int length = properties.Count;
             StringBuilder sb = new StringBuilder();
             if (length <= 0)
             {
                 return null;
             }
-            //取类上的自定义特性
-            UnAttrSql classAttr = null;
-            object[] objs = t.GetCustomAttributes(typeof(UnAttrSql), true);
-            foreach (object obj in objs)
-            {
-                classAttr = obj as UnAttrSql;
-            }
-            string tableName = t.Name;
-            if (classAttr != null && classAttr.tableName != null)
-            {
-                tableName = classAttr.tableName;
-            }
+            string tableName = UnToGen.getTableName(t);
             Dictionary<string, StringBuilder> dicSql = new Dictionary<string, StringBuilder>();
             dicSql.Add("con_PrimarykKey", new StringBuilder());
             dicSql.Add("con_ForeignKey", new StringBuilder());
@@ -173,11 +150,12 @@ namespace UnDataBase
             dicSql.Add("ind_Clustered", new StringBuilder());
             dicSql.Add("ind_Nonclustered", new StringBuilder());
             dicSql.Add("ind_Unique", new StringBuilder());
+            dicSql.Add("ind_UnionNonclustered", new StringBuilder());
 
             Dictionary<string, StringBuilder> dicNames = new Dictionary<string, StringBuilder>();
             dicNames.Add("con_PrimarykKey", new StringBuilder());
             dicNames.Add("ind_Clustered", new StringBuilder());
-            dicNames.Add("ind_Nonclustered", new StringBuilder());
+            dicNames.Add("ind_UnionNonclustered", new StringBuilder());
             dicNames.Add("ind_Unique", new StringBuilder());
 
             for (int i = 0; i < length; i++)
@@ -196,51 +174,48 @@ namespace UnDataBase
                     // 关系SQL创建
                     if (attr != null)
                     {
-                        // 约束关系
-                        switch (attr.constraintModel)
+                        // 主键
+                        if (attr.isPrimaryKey)
                         {
-                            case ConstraintModel.PrimaryKey:
-                                keyName = "CON_PK_" + name;
-                                if (dicSql["con_PrimarykKey"].Length == 0)
-                                {
-                                    dicSql["con_PrimarykKey"].Append("Alter Table " + tableName + " Add Constraint " + keyName + " Primary Key(");
-                                }
-                                dicNames["con_PrimarykKey"].Append(name + ",");
-                                break;
-                            case ConstraintModel.ForeignKey:
-                                if (attr.value != null)
-                                {
-                                    var value = (string[])attr.value;
-                                    keyName = "CON_FK_" + value[0];
-                                    dicSql["con_ForeignKey"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Foreign Key (" + name + ") References " + value[0] + "(" + value[1] + ");");
-                                }
-                                break;
-                            case ConstraintModel.Unique:
-                                keyName = "CON_UQ_" + name;
-                                dicSql["con_UniQue"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Unique(" + name + ");");
-                                break;
-                            case ConstraintModel.Default:
-                                keyName = "CON_DE_" + name;
-                                if (attr.value != null)
-                                {
-                                    var value = (string)attr.value;
-                                    dicSql["con_Default"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Default(" + value + ") For " + name + ";");
-                                }
-                                break;
-                            case ConstraintModel.Check:
-                                keyName = "CON_CH_" + name;
-                                if (attr.value != null)
-                                {
-                                    var value = (string)attr.value;
-                                    dicSql["con_Check"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Check(" + value + ");");
-                                }
-                                break;
+                            keyName = "CON_PK_" + tableName + "_" + name;
+                            if (dicSql["con_PrimarykKey"].Length == 0)
+                            {
+                                dicSql["con_PrimarykKey"].Append("Alter Table " + tableName + " Add Constraint " + keyName + " Primary Key(");
+                            }
+                            dicNames["con_PrimarykKey"].Append(name + ",");
                         }
-                        // 索引关系
+                        // 外键
+                        if (attr.isForeignKey)
+                        {
+                            if (attr.foreignKeyValue != null)
+                            {
+                                keyName = "CON_FK_" + tableName + "_" + attr.foreignKeyValue[0] + "_" + attr.foreignKeyValue[1];
+                                dicSql["con_ForeignKey"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Foreign Key (" + name + ") References " + attr.foreignKeyValue[0] + "(" + attr.foreignKeyValue[1] + ");");
+                            }
+                        }
+                        // 默认值
+                        if (attr.fieldDefault != null)
+                        {
+                            keyName = "CON_DE_" + tableName + "_" + name;
+                            dicSql["con_Default"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Default(" + attr.fieldDefault + ") For " + name + ";");
+                        }
+                        // 唯一
+                        if (attr.isUnique)
+                        {
+                            keyName = "CON_UN_" + tableName + "_" + name;
+                            dicSql["con_Default"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Unique(" + attr.uniqueValue + ") For " + name + ";");
+                        }
+                        // Check
+                        if (attr.isCheck)
+                        {
+                            keyName = "CON_CH_" + tableName + "_" + name;
+                            dicSql["con_Check"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Check(" + attr.checkValue + ");");
+                        }
+                        // 索引
                         switch (attr.indexModel)
                         {
                             case IndexModel.Clustered:// 聚集索引
-                                keyName = "IND_CL_" + name;
+                                keyName = "IND_CL_" + tableName + "_" + name;
                                 if (dicSql["ind_Clustered"].Length == 0)
                                 {
                                     dicSql["ind_Clustered"].Append("Create Index " + keyName + " On " + tableName + "(");
@@ -248,20 +223,24 @@ namespace UnDataBase
                                 dicNames["ind_Clustered"].Append(name + ",");
                                 break;
                             case IndexModel.Nonclustered:// 非聚集索引
-                                keyName = "IND_NC_" + name;
-                                if (dicSql["ind_Nonclustered"].Length == 0)
-                                {
-                                    dicSql["ind_Nonclustered"].Append("Create Nonclustered Index " + keyName + " On " + tableName + "(");
-                                }
-                                dicNames["ind_Nonclustered"].Append(name + ",");
+                                keyName = "IND_NO_" + tableName + "_" + name;
+                                dicSql["ind_Nonclustered"].Append("Create Nonclustered Index " + keyName + " On " + tableName + "(" + name + ")");
                                 break;
                             case IndexModel.Unique:// 唯一索引
-                                keyName = "IND_UN_" + name;
+                                keyName = "IND_UN_" + tableName + "_" + name;
                                 if (dicSql["ind_Unique"].Length == 0)
                                 {
                                     dicSql["ind_Unique"].Append("Create Unique Index " + keyName + " On " + tableName + "(");
                                 }
                                 dicNames["ind_Unique"].Append(name + ",");
+                                break;
+                            case IndexModel.UnionNonclustered:// 联合非聚集索引
+                                keyName = "IND_UNNO_" + tableName + "_" + name;
+                                if (dicSql["ind_UnionNonclustered"].Length == 0)
+                                {
+                                    dicSql["ind_UnionNonclustered"].Append("Create Nonclustered Index " + keyName + " On " + tableName + "(");
+                                }
+                                dicNames["ind_UnionNonclustered"].Append(name + ",");
                                 break;
                         }
                     }
@@ -285,7 +264,7 @@ namespace UnDataBase
                     sb.AppendLine(item.Value.ToString());
                 }
             }
-            return sb.ToString().TrimEnd();
+            return sb.ToString().Trim();
         }
 
         /// <summary>
@@ -323,12 +302,7 @@ namespace UnDataBase
             dicSql.Add("ind_Clustered", new StringBuilder());
             dicSql.Add("ind_Nonclustered", new StringBuilder());
             dicSql.Add("ind_Unique", new StringBuilder());
-
-            Dictionary<string, StringBuilder> dicNames = new Dictionary<string, StringBuilder>();
-            dicNames.Add("con_PrimarykKey", new StringBuilder());
-            dicNames.Add("ind_Clustered", new StringBuilder());
-            dicNames.Add("ind_Nonclustered", new StringBuilder());
-            dicNames.Add("ind_Unique", new StringBuilder());
+            dicSql.Add("ind_UnionNonclustered", new StringBuilder());
 
             for (int i = 0; i < length; i++)
             {
@@ -346,56 +320,58 @@ namespace UnDataBase
                     // 关系SQL创建
                     if (attr != null)
                     {
-                        // 约束关系
-                        switch (attr.constraintModel)
+
+                        // 主键
+                        if (attr.isPrimaryKey)
                         {
-                            case ConstraintModel.PrimaryKey:
-                                keyName = "CON_PK_" + name;
-                                dicSql["con_PrimarykKey"].Append(dropConstraints(tableName, keyName));
-                                break;
-                            case ConstraintModel.ForeignKey:
-                                if (attr.value != null)
-                                {
-                                    var value = (string[])attr.value;
-                                    keyName = "CON_FK_" + value[0];
-                                    dicSql["con_ForeignKey"].AppendLine(dropConstraints(tableName, keyName).ToString());
-                                }
-                                break;
-                            case ConstraintModel.Unique:
-                                keyName = "CON_UQ_" + name;
-                                dicSql["con_UniQue"].AppendLine(dropConstraints(tableName, keyName).ToString());
-                                break;
-                            case ConstraintModel.Default:
-                                keyName = "CON_DE_" + name;
-                                if (attr.value != null)
-                                {
-                                    var value = (string)attr.value;
-                                    dicSql["con_Default"].AppendLine(dropConstraints(tableName, keyName).ToString());
-                                }
-                                break;
-                            case ConstraintModel.Check:
-                                keyName = "CON_CH_" + name;
-                                if (attr.value != null)
-                                {
-                                    var value = (string)attr.value;
-                                    dicSql["con_Check"].AppendLine(dropConstraints(tableName, keyName).ToString());
-                                }
-                                break;
+                            keyName = "CON_PK_" + tableName + "_" + name;
+                            dicSql["con_PrimarykKey"].Append(dropConstraints(ConstraintModel.PrimaryKey, tableName, keyName));
                         }
-                        // 索引关系
+                        // 外键
+                        if (attr.isForeignKey)
+                        {
+                            if (attr.foreignKeyValue != null)
+                            {
+                                keyName = "CON_FK_" + tableName + "_" + attr.foreignKeyValue[0] + "_" + attr.foreignKeyValue[1];
+                                dicSql["con_ForeignKey"].AppendLine(dropConstraints(ConstraintModel.ForeignKey, tableName, keyName).ToString());
+                            }
+                        }
+                        // 默认值
+                        if (attr.fieldDefault != null)
+                        {
+                            keyName = "CON_DE_" + tableName + "_" + name;
+                            dicSql["con_Default"].AppendLine(dropConstraints(ConstraintModel.Default, tableName, keyName).ToString());
+                        }
+                        // 唯一
+                        if (attr.isUnique)
+                        {
+                            keyName = "CON_UN_" + tableName + "_" + name;
+                            dicSql["con_UniQue"].AppendLine(dropConstraints(ConstraintModel.Unique, tableName, keyName).ToString());
+                        }
+                        // Check
+                        if (attr.isCheck)
+                        {
+                            keyName = "CON_CH_" + tableName + "_" + name;
+                            dicSql["con_Check"].AppendLine(dropConstraints(ConstraintModel.Check, tableName, keyName).ToString());
+                        }
+                        // 索引
                         switch (attr.indexModel)
                         {
                             case IndexModel.Clustered:// 聚集索引
-                                keyName = tableName + ".IND_CL_" + name;
-                                dicSql["ind_Clustered"].Append(dropIndex(tableName, keyName));
+                                keyName = tableName + ".IND_CL_" + tableName + "_" + name;
+                                dicSql["ind_Clustered"].Append(dropIndex(IndexModel.Clustered, tableName, keyName));
                                 break;
                             case IndexModel.Nonclustered:// 非聚集索引
-                                keyName = "IND_NC_" + name;
-                                dicSql["ind_Clustered"].Append(dropIndex(tableName, keyName));
+                                keyName = "IND_NO_" + tableName + "_" + name;
+                                dicSql["ind_Nonclustered"].Append(dropIndex(IndexModel.Nonclustered, tableName, keyName));
                                 break;
                             case IndexModel.Unique:// 唯一索引
-                                keyName = "IND_UN_" + name;
-                                dicSql["ind_Clustered"].Append(dropIndex(tableName, keyName));
+                                keyName = "IND_UN_" + tableName + "_" + name;
+                                dicSql["ind_Unique"].Append(dropIndex(IndexModel.Unique, tableName, keyName));
+                                break;
+                            case IndexModel.UnionNonclustered:// 联合非聚集索引
+                                keyName = "IND_UNNO_" + tableName + "_" + name;
+                                dicSql["ind_UnionNonclustered"].Append(dropIndex(IndexModel.UnionNonclustered, tableName, keyName));
                                 break;
                         }
                     }
@@ -410,7 +386,7 @@ namespace UnDataBase
                     sb.AppendLine(item.Value.ToString());
                 }
             }
-            return sb.ToString().TrimEnd();
+            return sb.ToString().Trim();
         }
 
         /// <summary>
@@ -419,11 +395,24 @@ namespace UnDataBase
         /// <param name="tableName">表名</param>
         /// <param name="keyName">约束名</param>
         /// <returns></returns>
-        private static StringBuilder dropConstraints(string tableName,string keyName)
+        private static StringBuilder dropConstraints(ConstraintModel model,string tableName, string keyName)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("If Exists (Select * From sys.check_constraints Where object_id = OBJECT_ID(N'[dbo].[" + keyName + "]') And parent_object_id = OBJECT_ID(N'[dbo].[" + tableName + "]'))");
-            sb.Append("Alter Table " + tableName + " Drop Constraint " + keyName + ";");
+            switch (model)
+            {
+                case ConstraintModel.Default:
+                    sb.AppendLine("IF  EXISTS (SELECT * FROM dbo.sysobjects WHERE id = OBJECT_ID(N'[" + keyName + "]') AND type = 'D')");
+                    sb.Append("Alter Table " + tableName + " Drop Constraint " + keyName + ";");
+                    break;
+                case ConstraintModel.ForeignKey:
+                    sb.AppendLine("IF  EXISTS (SELECT * FROM sys.foreign_keys WHERE object_id = OBJECT_ID(N'[dbo].[" + keyName + "]') AND parent_object_id = OBJECT_ID(N'[dbo].[" + tableName + "]'))");
+                    sb.Append("Alter Table " + tableName + " Drop Constraint " + keyName + ";");
+                    break;
+                default:
+                    sb.AppendLine("IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'" + tableName + "') AND name = N'" + keyName + "')");
+                    sb.Append("Alter Table " + tableName + " Drop Constraint " + keyName + ";");
+                    break;
+            }
             return sb;
         }
 
@@ -433,11 +422,23 @@ namespace UnDataBase
         /// <param name="tableName">表名</param>
         /// <param name="keyName">约束名</param>
         /// <returns></returns>
-        private static StringBuilder dropIndex(string tableName, string keyName)
+        private static StringBuilder dropIndex(IndexModel model, string tableName, string keyName)
         {
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("If Exists (Select * From sysindexes Where id = object_id('" + tableName + "') And name='" + keyName + "')");
-            sb.Append("Drop Index " + keyName + ";");
+            switch (model)
+            {
+                case IndexModel.Unique:
+                case IndexModel.Clustered:
+                case IndexModel.Nonclustered:
+                case IndexModel.UnionNonclustered:
+                    sb.AppendLine("IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[" + tableName + "]') AND name = N'" + keyName + "')");
+                    sb.Append("DROP INDEX [" + keyName + "] ON [dbo].[" + tableName + "] WITH ( ONLINE = OFF )");
+                    break;
+                default:
+                    sb.AppendLine("If Exists (Select * From sys.indexes Where id = object_id('" + tableName + "') And name='" + keyName + "')");
+                    sb.Append("Drop Index " + keyName + ";");
+                    break;
+            }
             return sb;
         }
 
@@ -461,7 +462,7 @@ namespace UnDataBase
         /// <returns></returns>
         public static string dropTable(Type t)
         {
-            return dropTable(t.GetType().Name);
+            return dropTable(UnToGen.getTableName(t));
         }
 
         /// <summary>
@@ -508,9 +509,19 @@ namespace UnDataBase
             return addColumn(t.Name, columnName);
         }
 
+        /// <summary>
+        /// 查询表所有列
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static string getAllColumn(Type t)
+        {
+            return "Select name from syscolumns where id=(select max(id) from sysobjects where xtype='u' and name='" + t.Name + "')";
+        }
+
         #endregion
 
-        #region 存储过程/函数等
+        #region 基础SQL
 
         /// <summary>
         /// 删除翻页存储过程
@@ -577,7 +588,195 @@ AS
             return s;
         }
 
+        /// <summary>
+        /// 删除-判断字段是否存在
+        /// </summary>
+        /// <returns></returns>
+        public static string drop_mfn_IsColumnExists()
+        {
+            return @"if OBJECT_ID(N'dbo.mfn_IsColumnExists', N'FN') is not null  
+    drop function dbo.mfn_IsColumnExists ;";
+        }
 
+        /// <summary>
+        /// 创建-判断字段是否存在
+        /// </summary>
+        /// <returns></returns>
+        public static string create_mfn_IsColumnExists()
+        {
+            return @"create function dbo.mfn_IsColumnExists(@TableName NVARCHAR(128), @ColumnName NVARCHAR(128))  
+    returns bit  
+as  
+begin  
+    declare @rt bit  
+    set @rt=0  
+    if (select name from sys.syscolumns where name=@ColumnName and id=OBJECT_ID(@TableName)) is not null  
+        set @rt=1  
+    return @rt  
+end;";
+        }
+
+        /// <summary>
+        /// 删除-查询某个字段的所有索引  
+        /// </summary>
+        /// <returns></returns>
+        public static string drop_mfn_GetColumnIndexes()
+        {
+            return @"if OBJECT_ID(N'dbo.mfn_GetColumnIndexes', N'TF') is not null  
+    drop function dbo.mfn_GetColumnIndexes;";
+        }
+
+        /// <summary>
+        /// 创建-查询某个字段的所有索引  
+        /// </summary>
+        /// <returns></returns>
+        public static string create_mfn_GetColumnIndexes()
+        {
+            return @"create function dbo.mfn_GetColumnIndexes(@TableName NVARCHAR(128), @ColumnName NVARCHAR(128))  
+    returns @ret table  
+    (  
+        id int,  
+        name NVARCHAR(128)  
+    )  
+as  
+begin  
+    declare @tid int, @colid int  
+  
+    -- 先查询出表id和列id  
+    select @tid=OBJECT_ID(@tablename)  
+    select @colid=colid from sys.syscolumns where id=@tid and name=@columnname  
+  
+    -- 查询出索引名称  
+    insert into @ret select ROW_NUMBER() OVER(ORDER BY cols.index_id) as id, inds.name idxname from sys.index_columns cols  
+        left join sys.indexes inds on cols.object_id=inds.object_id and cols.index_id=inds.index_id   
+        where cols.object_id=@tid and column_id=@colid  
+          
+    return  
+end;";
+        }
+
+        /// <summary>
+        /// 删除-删除某个表的某列的所有约束
+        /// </summary>
+        /// <returns></returns>
+        public static string drop_mp_DropColConstraint()
+        {
+            return @"if OBJECT_ID(N'dbo.mp_DropColConstraint', N'P') is not null  
+    drop procedure dbo.mp_DropColConstraint;";
+        }
+
+        /// <summary>
+        /// 创建-删除某个表的某列的所有约束
+        /// </summary>
+        /// <returns></returns>
+        public static string create_mp_DropColConstraint()
+        {
+            return @"create procedure dbo.mp_DropColConstraint  
+    @TableName NVARCHAR(128),  
+    @ColumnName NVARCHAR(128)  
+as  
+begin  
+    if OBJECT_ID(N'#t', N'TB') is not null  
+        drop table #t  
+      
+    -- 查询主键约束、非空约束等  
+    select ROW_NUMBER() over(order by CONSTRAINT_NAME) id, CONSTRAINT_NAME into #t from INFORMATION_SCHEMA.CONSTRAINT_COLUMN_USAGE where TABLE_CATALOG=DB_NAME()  
+        and TABLE_NAME=@TableName and COLUMN_NAME=@ColumnName  
+          
+    -- 查询默认值约束  
+    declare @cdefault int, @cname varchar(128)  
+    select @cdefault=cdefault from sys.syscolumns where name=@ColumnName and id=OBJECT_ID(@TableName)  
+              
+    select @cname=name from sys.sysobjects where id=@cdefault  
+    if @cname is not null  
+        insert into #t select coalesce(max(id), 0)+1, @cname from #t      
+  
+    declare @i int, @imax int  
+    select @i=1, @imax=max(id) from #t  
+  
+    while @i <= @imax  
+    begin  
+        select @cname=CONSTRAINT_NAME from #t where id=@i  
+        exec('alter table ' + @tablename + ' drop constraint ' + @cname)  
+        set @i = @i + 1   
+    end  
+  
+    drop table #t  
+  
+end;";
+        }
+
+        /// <summary>
+        /// 删除-删除指定列的所有索引  
+        /// </summary>
+        /// <returns></returns>
+        public static string drop_mp_DropColumnIndexes()
+        {
+            return @"if OBJECT_ID(N'dbo.mp_DropColumnIndexes', N'P') is not null  
+    drop procedure dbo.mp_DropColumnIndexes;";
+        }
+
+        /// <summary>
+        /// 创建-删除指定列的所有索引   
+        /// </summary>
+        /// <returns></returns>
+        public static string create_mp_DropColumnIndexes()
+        {
+            return @"create procedure dbo.mp_DropColumnIndexes  
+    @TableName NVARCHAR(128),  
+    @ColumnName NVARCHAR(128)  
+as   
+begin  
+    if OBJECT_ID(N'#t', N'TB') is not null  
+        drop table #t  
+    create table #t  
+    (  
+        id int,       
+        name nvarchar(128)  
+    )  
+      
+    insert into #t select * from mfn_GetColumnIndexes(@TableName, @ColumnName)  
+      
+    -- 删除索引  
+    declare @i int, @imax int, @idxname nvarchar(128)  
+      
+    select @i=1, @imax=COALESCE(max(id), 0) from #t  
+    while @i<=@imax   
+    begin  
+        select @idxname=name from #t  
+        EXEC('drop index ' + @idxname + ' on ' + @tablename)  
+        set @i=@i+1  
+    end  
+      
+    drop table #t  
+end;";
+        }
+
+        /// <summary>
+        /// 删除-删除指定字段的所有约束和索引  
+        /// </summary>
+        /// <returns></returns>
+        public static string drop_mp_DropColConstraintAndIndex()
+        {
+            return @"if OBJECT_ID(N'dbo.mp_DropColConstraintAndIndex', N'P') is not null  
+    drop procedure dbo.mp_DropColConstraintAndIndex;";
+        }
+
+        /// <summary>
+        /// 创建-删除指定字段的所有约束和索引  
+        /// </summary>
+        /// <returns></returns>
+        public static string create_mp_DropColConstraintAndIndex()
+        {
+            return @"create procedure dbo.mp_DropColConstraintAndIndex  
+    @TableName NVARCHAR(128),  
+    @ColumnName NVARCHAR(128)  
+as  
+begin  
+    exec dbo.mp_DropColConstraint @TableName, @ColumnName  
+    exec dbo.mp_DropColumnIndexes @TableName, @ColumnName  
+end;";
+        }
 
         #endregion
 
@@ -648,7 +847,7 @@ AS
         internal static string getUpdStr<T>() where T : new()
         {
 
-            List<string> _List = UnToGen.getSqlFields<T>();
+            List<string> _List = UnToGen.getFieldNoAutoInc<T>();
             string UpdStr = "";
             for (int i = 0; i < _List.Count; i++)
             {
@@ -710,7 +909,7 @@ AS
             {
                 sb.Append("* ");
             }
-            sb.Append(" From " + typeof(T).Name + " ");
+            sb.Append(" From " + UnToGen.getTableName(typeof(T)) + " ");
             sb.Append(getSelectionSql<T>(selection, selectionArgs));
             if (groupBy != null && groupBy.Length > 0)
             {
@@ -765,7 +964,7 @@ AS
         internal static SqlParameter[] getSqlPmtA<T>(T t) where T : new()
         {
             List<SqlParameter> pars = new List<SqlParameter>();
-            List<string> list = UnToGen.getSqlFields<T>();
+            List<string> list = UnToGen.getFieldNoAutoInc<T>();
 
             Type Typet = typeof(T);
             for (int i = 0; i < list.Count; i++)
@@ -793,7 +992,7 @@ AS
         /// <returns></returns>
         internal static SqlParameter[] getSqlPmtA<T>(T t, string FieldList) where T : new()
         {
-            List<string> _List = UnToGen.getSqlFields<T>();
+            List<string> _List = UnToGen.getFieldNoAutoInc<T>();
             string[] FieldListA = FieldList.Split(new char[] { ',' });
             List<SqlParameter> pars = new List<SqlParameter>();
             Type Typet = typeof(T);

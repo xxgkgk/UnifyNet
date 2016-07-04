@@ -23,7 +23,7 @@ namespace UnDataBase
         private SqlConnection conn = null;
 
         // 事务对象
-        private SqlTransaction tran = null;
+        private int tranNum = 0;
 
         /// <summary>
         /// 获得连接对象
@@ -347,6 +347,39 @@ namespace UnDataBase
         }
 
         /// <summary>
+        /// 开始事务
+        /// </summary>
+        /// <returns></returns>
+        public SqlTransaction beginTransaction()
+        {
+            tranNum++;
+            return getConn().BeginTransaction();
+        }
+
+        /// <summary>
+        /// 提交结果
+        /// </summary>
+        public void commitTransaction(SqlTransaction tran)
+        {
+            tranNum--;
+            tran.Commit();
+            tran.Dispose();
+            close();
+        }
+
+        /// <summary>
+        /// 关闭连接
+        /// </summary>
+        private void close()
+        {
+            if (conn != null && tranNum == 0)
+            {
+                conn.Close();
+                //conn.Dispose();
+            }
+        }
+
+        /// <summary>
         /// 获取翻页Key参数
         /// </summary>
         /// <param name="keyName"></param>
@@ -430,33 +463,31 @@ namespace UnDataBase
         }
 
         /// <summary>
-        /// 开始事务
+        /// 删除某表某列所有约束和索引
         /// </summary>
+        /// <param name="tableName"></param>
+        /// <param name="columnName"></param>
         /// <returns></returns>
-        public void beginTransaction()
+        public bool dropColumnCI(string tableName, string columnName)
         {
-            tran = getConn().BeginTransaction();
-        }
-
-        /// <summary>
-        /// 提交结果
-        /// </summary>
-        public void commitTransaction()
-        {
-            tran.Commit();
-            tran.Dispose();
-            close();
-        }
-
-        /// <summary>
-        /// 关闭连接
-        /// </summary>
-        private void close()
-        {
-            if (conn != null && tran == null)
+            SqlParameter[] pmts = new SqlParameter[] {
+                new SqlParameter("@TableName", tableName),
+                new SqlParameter("@ColumnName", columnName),
+            };
+            try
             {
-                conn.Close();
-                //conn.Dispose();
+                using (SqlCommand Sqlcmd = new SqlCommand())
+                {
+                    setcmd(Sqlcmd, getConn(), null, CommandType.StoredProcedure, "mp_DropColConstraintAndIndex", pmts);
+                    Sqlcmd.ExecuteNonQuery();
+                    close();
+                    return true;
+                }
+            }
+            catch (Exception e)
+            {
+                writeLog("dropCI", e.ToString() + "\r\n" + "TableName:" + tableName + "\r\nColumnName:" + columnName);
+                return false;
             }
         }
     }
