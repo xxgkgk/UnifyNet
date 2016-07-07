@@ -242,9 +242,6 @@ namespace UnCommon.Tool
                 }
                 else
                 {
-                    Console.WriteLine(name+"***");
-
-                    
                 }
             }
             return strA;
@@ -336,19 +333,19 @@ namespace UnCommon.Tool
             {
                 source = Convert.ToString(source);
             }
-            else if (type.Equals(typeof(Int32)))
+            else if (type.Equals(typeof(Int32)) || type.Equals(typeof(Nullable<Int32>)))
             {
                 source = Convert.ToInt32(source);
             }
-            else if (type.Equals(typeof(Int64)))
+            else if (type.Equals(typeof(Int64)) || type.Equals(typeof(Nullable<Int64>)))
             {
                 source = Convert.ToInt64(source);
             }
-            else if (type.Equals(typeof(Boolean)))
+            else if (type.Equals(typeof(Boolean)) || type.Equals(typeof(Nullable<Boolean>)))
             {
                 source = Convert.ToBoolean(source);
             }
-            else if (type.Equals(typeof(DateTime)))
+            else if (type.Equals(typeof(DateTime)) || type.Equals(typeof(Nullable<DateTime>)))
             {
                 if (source == null)
                 {
@@ -359,15 +356,15 @@ namespace UnCommon.Tool
                     source = Convert.ToDateTime(source);
                 }
             }
-            else if (type.Equals(typeof(Decimal)))
+            else if (type.Equals(typeof(Decimal)) || type.Equals(typeof(Nullable<Decimal>)))
             {
                 source = Convert.ToDecimal(source);
             }
-            else if (type.Equals(typeof(Guid)))
+            else if (type.Equals(typeof(Guid)) || type.Equals(typeof(Nullable<Guid>)))
             {
                 source = new Guid(source.ToString());
             }
-            else if (type.Equals(typeof(Byte)))
+            else if (type.Equals(typeof(Byte)) || type.Equals(typeof(Nullable<Byte>)))
             {
                 source = Convert.ToByte(source);
             }
@@ -454,7 +451,7 @@ namespace UnCommon.Tool
                     }
                     catch (Exception e)
                     {
-                        UnFile.writeLog("drToT", e.ToString());
+                        UnFile.writeLog("drToT", strName + "\r\n" + e.ToString());
                     }
                 }
                 else if (UnToGen.isClass(pi))

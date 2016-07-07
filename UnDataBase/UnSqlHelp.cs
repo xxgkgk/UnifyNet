@@ -22,8 +22,11 @@ namespace UnDataBase
         // 连接对象
         private SqlConnection conn = null;
 
-        // 事务对象
-        private int tranNum = 0;
+        // 事务数组
+        private List<SqlTransaction> tranNum = new List<SqlTransaction>();
+
+        // 事务锁
+        private object tranLock = new object();
 
         /// <summary>
         /// 获得连接对象
@@ -352,8 +355,12 @@ namespace UnDataBase
         /// <returns></returns>
         public SqlTransaction beginTransaction()
         {
-            tranNum++;
-            return getConn().BeginTransaction();
+            var tran = getConn().BeginTransaction();
+            lock (tranLock)
+            {
+                tranNum.Add(tran);
+            }
+            return tran;
         }
 
         /// <summary>
@@ -361,10 +368,24 @@ namespace UnDataBase
         /// </summary>
         public void commitTransaction(SqlTransaction tran)
         {
-            tranNum--;
-            tran.Commit();
-            tran.Dispose();
-            close();
+            try
+            {
+                tran.Commit();
+            }
+            catch (Exception e)
+            {
+                tran.Rollback();
+                UnFile.writeLog("commitTransaction", e.ToString());
+            }
+            finally
+            {
+                tran.Dispose();
+                lock (tranLock)
+                {
+                    tranNum.Remove(tran);
+                }
+                close();
+            }
         }
 
         /// <summary>
@@ -372,10 +393,9 @@ namespace UnDataBase
         /// </summary>
         private void close()
         {
-            if (conn != null && tranNum == 0)
+            if (conn != null && tranNum.Count == 0)
             {
                 conn.Close();
-                //conn.Dispose();
             }
         }
 

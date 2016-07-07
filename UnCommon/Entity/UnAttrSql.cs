@@ -87,6 +87,7 @@ namespace UnCommon.Entity
         Clustered,
         Nonclustered,
         Unique,
+        UnionClustered,
         UnionNonclustered
     }
 

@@ -109,6 +109,14 @@ namespace UnDataBase
                         {
                             attr.fieldType = "uniqueidentifier";
                         }
+                        else if (type.Equals(typeof(Byte)) || type.Equals(typeof(Nullable<Byte>)))
+                        {
+                            attr.fieldType = "varbinary(1)";
+                        }
+                        else if (type.Equals(typeof(Byte[])))
+                        {
+                            attr.fieldType = "varbinary(8000)";
+                        }
                         else
                         {
 
@@ -150,13 +158,15 @@ namespace UnDataBase
             dicSql.Add("ind_Clustered", new StringBuilder());
             dicSql.Add("ind_Nonclustered", new StringBuilder());
             dicSql.Add("ind_Unique", new StringBuilder());
+            dicSql.Add("ind_UnionClustered", new StringBuilder());
             dicSql.Add("ind_UnionNonclustered", new StringBuilder());
 
             Dictionary<string, StringBuilder> dicNames = new Dictionary<string, StringBuilder>();
             dicNames.Add("con_PrimarykKey", new StringBuilder());
             dicNames.Add("ind_Clustered", new StringBuilder());
-            dicNames.Add("ind_UnionNonclustered", new StringBuilder());
             dicNames.Add("ind_Unique", new StringBuilder());
+            dicNames.Add("ind_UnionClustered", new StringBuilder());
+            dicNames.Add("ind_UnionNonclustered", new StringBuilder());
 
             for (int i = 0; i < length; i++)
             {
@@ -189,7 +199,7 @@ namespace UnDataBase
                         {
                             if (attr.foreignKeyValue != null)
                             {
-                                keyName = "CON_FK_" + tableName + "_" + attr.foreignKeyValue[0] + "_" + attr.foreignKeyValue[1];
+                                keyName = "CON_FK_" + tableName + "_" + name + "_" + attr.foreignKeyValue[0] + "_" + attr.foreignKeyValue[1];
                                 dicSql["con_ForeignKey"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Foreign Key (" + name + ") References " + attr.foreignKeyValue[0] + "(" + attr.foreignKeyValue[1] + ");");
                             }
                         }
@@ -233,6 +243,14 @@ namespace UnDataBase
                                     dicSql["ind_Unique"].Append("Create Unique Index " + keyName + " On " + tableName + "(");
                                 }
                                 dicNames["ind_Unique"].Append(name + ",");
+                                break;
+                            case IndexModel.UnionClustered:// 联合聚集索引
+                                keyName = "IND_UNCL_" + tableName + "_" + name;
+                                if (dicSql["ind_UnionClustered"].Length == 0)
+                                {
+                                    dicSql["ind_UnionClustered"].Append("Create Index " + keyName + " On " + tableName + "(");
+                                }
+                                dicNames["ind_UnionClustered"].Append(name + ",");
                                 break;
                             case IndexModel.UnionNonclustered:// 联合非聚集索引
                                 keyName = "IND_UNNO_" + tableName + "_" + name;
@@ -302,6 +320,7 @@ namespace UnDataBase
             dicSql.Add("ind_Clustered", new StringBuilder());
             dicSql.Add("ind_Nonclustered", new StringBuilder());
             dicSql.Add("ind_Unique", new StringBuilder());
+            dicSql.Add("ind_UnionClustered", new StringBuilder());
             dicSql.Add("ind_UnionNonclustered", new StringBuilder());
 
             for (int i = 0; i < length; i++)
@@ -332,7 +351,7 @@ namespace UnDataBase
                         {
                             if (attr.foreignKeyValue != null)
                             {
-                                keyName = "CON_FK_" + tableName + "_" + attr.foreignKeyValue[0] + "_" + attr.foreignKeyValue[1];
+                                keyName = "CON_FK_" + tableName + "_" + name + "_" + attr.foreignKeyValue[0] + "_" + attr.foreignKeyValue[1];
                                 dicSql["con_ForeignKey"].AppendLine(dropConstraints(ConstraintModel.ForeignKey, tableName, keyName).ToString());
                             }
                         }
@@ -368,6 +387,10 @@ namespace UnDataBase
                             case IndexModel.Unique:// 唯一索引
                                 keyName = "IND_UN_" + tableName + "_" + name;
                                 dicSql["ind_Unique"].Append(dropIndex(IndexModel.Unique, tableName, keyName));
+                                break;
+                            case IndexModel.UnionClustered:// 联合聚集索引
+                                keyName = "IND_UNCL_" + tableName + "_" + name;
+                                dicSql["ind_UnionClustered"].Append(dropIndex(IndexModel.UnionClustered, tableName, keyName));
                                 break;
                             case IndexModel.UnionNonclustered:// 联合非聚集索引
                                 keyName = "IND_UNNO_" + tableName + "_" + name;
@@ -430,6 +453,7 @@ namespace UnDataBase
                 case IndexModel.Unique:
                 case IndexModel.Clustered:
                 case IndexModel.Nonclustered:
+                case IndexModel.UnionClustered:
                 case IndexModel.UnionNonclustered:
                     sb.AppendLine("IF  EXISTS (SELECT * FROM sys.indexes WHERE object_id = OBJECT_ID(N'[dbo].[" + tableName + "]') AND name = N'" + keyName + "')");
                     sb.Append("DROP INDEX [" + keyName + "] ON [dbo].[" + tableName + "] WITH ( ONLINE = OFF )");

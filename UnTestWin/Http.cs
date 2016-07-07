@@ -60,8 +60,10 @@ namespace UnTestWin
         private void button3_Click(object sender, EventArgs e)
         {
             UnHttpClient http = new UnHttpClient("https://alipayapi.shaokaolaile.com/pay/order.ashx");
-            http.setIntTransfer(new transfer());
-            http.sendMsg("");
+            UnAttrRst rst = http.sendMsgSyn("");
+
+            //http.setIntTransfer(new transfer());
+            //http.sendMsg("");
         }
 
     }

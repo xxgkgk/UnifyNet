@@ -41,11 +41,21 @@ namespace UnCommon
         public string NonclusteredB { get; set; }
 
         // 联合索引A
+        [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionClustered)]
+        public string UnionClusteredA { get; set; }
+
+        // 联合索引B
+        [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionClustered)]
+        public string UnionClusteredB { get; set; }
+
+        // 联合非聚集索引A
         [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionNonclustered)]
         public string UnionNonclusteredA { get; set; }
 
-        // 联合索引B
+        // 联合非聚集索引B
         [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionNonclustered)]
         public string UnionNonclusteredB { get; set; }
+
+
     }
 }

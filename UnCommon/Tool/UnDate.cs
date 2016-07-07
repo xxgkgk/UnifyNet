@@ -72,6 +72,24 @@ namespace UnCommon.Tool
         {
             return ticksMSec() / (1000 * 60 * 60 * 24);
         }
+
+        // 时间戳(long)
+        public static long ticksSecToLong()
+        {
+            return Convert.ToInt64(ticksSec());
+        }
+
+        // 时间戳(int)
+        public static int ticksSecToInt()
+        {
+            return Convert.ToInt32(ticksSec());
+        }
+
+        // 当前短时间格式
+        public static string shortNowTime()
+        {
+            return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");
+        }
  
     }
 }

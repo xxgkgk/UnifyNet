@@ -142,12 +142,31 @@ namespace UnDataBase
         }
 
         /// <summary>
+        /// 获取数据库表字段
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private List<string> getDBTableColumns(Type t)
+        {
+            var list = new List<string>();
+            string sql = "Select * from syscolumns Where ID=OBJECT_ID('" + UnToGen.getTableName(t) + "')";
+            var dt = queryDT(sql, null);
+            foreach (DataRow item in dt.Rows)
+            {
+                list.Add(item["name"].ToString());
+            }
+            return list;
+        }
+
+        /// <summary>
         /// 更新表
         /// </summary>
         /// <param name="t"></param>
         public void updateTable(Type t)
         {
-
+            var listDB = getDBTableColumns(t);
+            var listET = UnToGen.getListField(t);
+            
         }
 
         #endregion
@@ -354,7 +373,6 @@ namespace UnDataBase
             return help.getDataTable(strSql);
         }
 
-
         /// <summary>
         /// 查询数据表
         /// </summary>
@@ -524,7 +542,8 @@ namespace UnDataBase
         /// <returns>返回所有递归ID</returns>
         public string recursiveID<T>(int ID) where T : new()
         {
-            string CodeName = "";
+            string tableName = UnToGen.getTableName(typeof(T));
+            string CodeName = "";;
             foreach (string str1 in UnToGen.getListField<T>())
             {
                 if (str1.Replace("Code", "") != str1)

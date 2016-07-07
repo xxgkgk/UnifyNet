@@ -59,7 +59,7 @@ namespace UnTestWin
             user.NonclusteredB = "NonclusteredB";
             user.TestUserGUID = Guid.NewGuid();
             user.TestUserUID = UnStrRan.getUID();
-            //cn.insert(user);
+            cn.insert(user);
 
             List<TestUser> list = cn.query<TestUser>(null, null, null, null);
             foreach(var item in list)
@@ -77,11 +77,11 @@ namespace UnTestWin
             det.LastTimeStamp = det.AddTimeStamp;
             det.TelAreaCode = "028";
             det.TelMobile = "18980826967";
-            det.TestUserDetailGUID = list[0].TestUserGUID;
+            det.TestUserDetailGUID = Guid.NewGuid();
             det.TestUserDetailUID = UnStrRan.getUID();
             det.TestUserGUID = list[0].TestUserGUID;
 
-            //cn.insert(det);
+            cn.insert(det);
 
 
             //cn.dropTable(typeof(TestUser));
