@@ -69,69 +69,147 @@ namespace UnDataBase
             for (int i = 0; i < length; i++)
             {
                 PropertyInfo item = properties[i];
-                string name = item.Name;
-                if (UnToGen.isField(item))
+                string str = getFieldTypeAndNull(item);
+                if (str != null)
                 {
-                    UnAttrSql attr = UnToGen.getAttrSql(item);
-                    if (attr == null)
-                    {
-                        attr = new UnAttrSql();
-                    }
-                    // 字段修饰
-                    if (attr.fieldType == null)
-                    {
-                        Type type = item.PropertyType;
-                        if (type.Equals(typeof(String)))
-                        {
-                            attr.fieldType = "varchar(8000)";
-                        }
-                        else if (type.Equals(typeof(Int32)) || type.Equals(typeof(Nullable<Int32>)))
-                        {
-                            attr.fieldType = "int";
-                        }
-                        else if (type.Equals(typeof(Int64)) || type.Equals(typeof(Nullable<Int64>)))
-                        {
-                            attr.fieldType = "bigint";
-                        }
-                        else if (type.Equals(typeof(Boolean)) || type.Equals(typeof(Nullable<Boolean>)))
-                        {
-                            attr.fieldType = "bit";
-                        }
-                        else if (type.Equals(typeof(DateTime)) || type.Equals(typeof(Nullable<DateTime>)))
-                        {
-                            attr.fieldType = "datetime";
-                        }
-                        else if (type.Equals(typeof(Decimal)) || type.Equals(typeof(Nullable<Decimal>)))
-                        {
-                            attr.fieldType = "decimal";
-                        }
-                        else if (type.Equals(typeof(Guid)) || type.Equals(typeof(Nullable<Guid>)))
-                        {
-                            attr.fieldType = "uniqueidentifier";
-                        }
-                        else if (type.Equals(typeof(Byte)) || type.Equals(typeof(Nullable<Byte>)))
-                        {
-                            attr.fieldType = "varbinary(1)";
-                        }
-                        else if (type.Equals(typeof(Byte[])))
-                        {
-                            attr.fieldType = "varbinary(8000)";
-                        }
-                        else
-                        {
-
-                        }
-                    }
-                    string nullStr = "NULL";
-                    if (!attr.fieldNULL)
-                    {
-                        nullStr = "NOT NULL";
-                    }
-                    sb.AppendLine("[" + name + "] " + attr.fieldType + " " + nullStr + ",");
+                    sb.AppendLine(getFieldTypeAndNull(item) + ",");
                 }
             }
             sb.AppendLine(");");
             return sb.ToString();
+        }
+
+        /// <summary>
+        /// 获得AttrSql,无则默认
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static UnAttrSql getAttrSqlDefault(PropertyInfo item)
+        {
+            string name = item.Name;
+            if (UnToGen.isField(item))
+            {
+                UnAttrSql attr = UnToGen.getAttrSql(item);
+                if (attr == null)
+                {
+                    attr = new UnAttrSql();
+                }
+                // 字段修饰
+                if (attr.fieldType == null)
+                {
+                    Type type = item.PropertyType;
+                    // string
+                    if (type.Equals(typeof(String)))
+                    {
+                        attr.fieldType = "varchar";
+                        return attr; 
+                    }
+                    // Int
+                    if (type.Equals(typeof(Int16)) || type.Equals(typeof(Nullable<Int16>)))
+                    {
+                        attr.fieldType = "smallint";
+                        return attr;
+                    }
+                    if (type.Equals(typeof(Int32)) || type.Equals(typeof(Nullable<Int32>)))
+                    {
+                        attr.fieldType = "int";
+                        return attr;
+                    }
+                    if (type.Equals(typeof(Int64)) || type.Equals(typeof(Nullable<Int64>)))
+                    {
+                        attr.fieldType = "bigint";
+                        return attr;
+                    }
+                    // UInt
+                    if (type.Equals(typeof(UInt16)) || type.Equals(typeof(Nullable<UInt16>)))
+                    {
+                        attr.fieldType = "smallint";
+                        return attr;
+                    }
+                    if (type.Equals(typeof(UInt32)) || type.Equals(typeof(Nullable<UInt32>)))
+                    {
+                        attr.fieldType = "int";
+                        return attr;
+                    }
+                    if (type.Equals(typeof(UInt64)) || type.Equals(typeof(Nullable<UInt64>)))
+                    {
+                        attr.fieldType = "bigint";
+                        return attr;
+                    }
+                    // 小数
+                    if (type.Equals(typeof(float)) || type.Equals(typeof(Nullable<float>)))
+                    {
+                        attr.fieldType = "float";
+                        return attr;
+                    }
+                    if (type.Equals(typeof(Decimal)) || type.Equals(typeof(Nullable<Decimal>)))
+                    {
+                        attr.fieldType = "money";
+                        return attr;
+                    }
+                    if (type.Equals(typeof(Double)) || type.Equals(typeof(Nullable<Double>)))
+                    {
+                        attr.fieldType = "float";
+                        return attr;
+                    }
+                    // 布尔值
+                    if (type.Equals(typeof(Boolean)) || type.Equals(typeof(Nullable<Boolean>)))
+                    {
+                        attr.fieldType = "bit";
+                        return attr;
+                    }
+                    // 时间
+                    else if (type.Equals(typeof(DateTime)) || type.Equals(typeof(Nullable<DateTime>)))
+                    {
+                        attr.fieldType = "datetime";
+                        return attr;
+                    }
+                    // GUID
+                    if (type.Equals(typeof(Guid)) || type.Equals(typeof(Nullable<Guid>)))
+                    {
+                        attr.fieldType = "uniqueidentifier";
+                        return attr;
+                    }
+                    // 字符字节
+                    if (type.Equals(typeof(Char)) || type.Equals(typeof(Nullable<Char>)))
+                    {
+                        attr.fieldType = "string";
+                        return attr;
+                    }
+                    if (type.Equals(typeof(Byte)) || type.Equals(typeof(Nullable<Byte>)))
+                    {
+                        attr.fieldType = "tinyint";
+                        return attr;
+                    }
+                    if (type.Equals(typeof(Byte[])))
+                    {
+                        attr.fieldType = "binary";
+                        return attr;
+                    }
+                }
+                return attr;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 获得字段类型+是否空值
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static string getFieldTypeAndNull(PropertyInfo item)
+        {
+            UnAttrSql attr = getAttrSqlDefault(item);
+            if (attr != null)
+            {
+                string nullStr = "NULL";
+                if (!attr.fieldNULL)
+                {
+                    nullStr = "NOT NULL";
+                }
+                return "[" + UnToGen.getFieldName(item) + "] " + attr.fieldType + " " + nullStr;
+            }
+            return null;
         }
 
         /// <summary>
@@ -187,7 +265,7 @@ namespace UnDataBase
                         // 主键
                         if (attr.isPrimaryKey)
                         {
-                            keyName = "CON_PK_" + tableName + "_" + name;
+                            keyName = "CON_" + tableName + "_PK_" + name;
                             if (dicSql["con_PrimarykKey"].Length == 0)
                             {
                                 dicSql["con_PrimarykKey"].Append("Alter Table " + tableName + " Add Constraint " + keyName + " Primary Key(");
@@ -199,33 +277,33 @@ namespace UnDataBase
                         {
                             if (attr.foreignKeyValue != null)
                             {
-                                keyName = "CON_FK_" + tableName + "_" + name + "_" + attr.foreignKeyValue[0] + "_" + attr.foreignKeyValue[1];
+                                keyName = "CON_" + tableName + "_FK_" + name + "_" + attr.foreignKeyValue[0] + "_" + attr.foreignKeyValue[1];
                                 dicSql["con_ForeignKey"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Foreign Key (" + name + ") References " + attr.foreignKeyValue[0] + "(" + attr.foreignKeyValue[1] + ");");
                             }
                         }
                         // 默认值
                         if (attr.fieldDefault != null)
                         {
-                            keyName = "CON_DE_" + tableName + "_" + name;
+                            keyName = "CON_" + tableName + "_DE_" + name;
                             dicSql["con_Default"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Default(" + attr.fieldDefault + ") For " + name + ";");
                         }
                         // 唯一
                         if (attr.isUnique)
                         {
-                            keyName = "CON_UN_" + tableName + "_" + name;
+                            keyName = "CON_" + tableName + "_UN_" + name;
                             dicSql["con_Default"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Unique(" + attr.uniqueValue + ") For " + name + ";");
                         }
                         // Check
                         if (attr.isCheck)
                         {
-                            keyName = "CON_CH_" + tableName + "_" + name;
+                            keyName = "CON_" + tableName + "_CH_" + name;
                             dicSql["con_Check"].AppendLine("Alter Table " + tableName + " Add Constraint " + keyName + " Check(" + attr.checkValue + ");");
                         }
                         // 索引
                         switch (attr.indexModel)
                         {
                             case IndexModel.Clustered:// 聚集索引
-                                keyName = "IND_CL_" + tableName + "_" + name;
+                                keyName = "IND_" + tableName + "_CL_" + name;
                                 if (dicSql["ind_Clustered"].Length == 0)
                                 {
                                     dicSql["ind_Clustered"].Append("Create Index " + keyName + " On " + tableName + "(");
@@ -233,11 +311,11 @@ namespace UnDataBase
                                 dicNames["ind_Clustered"].Append(name + ",");
                                 break;
                             case IndexModel.Nonclustered:// 非聚集索引
-                                keyName = "IND_NO_" + tableName + "_" + name;
+                                keyName = "IND_" + tableName + "_NO_" + name;
                                 dicSql["ind_Nonclustered"].Append("Create Nonclustered Index " + keyName + " On " + tableName + "(" + name + ")");
                                 break;
                             case IndexModel.Unique:// 唯一索引
-                                keyName = "IND_UN_" + tableName + "_" + name;
+                                keyName = "IND_" + tableName + "_UN_" + name;
                                 if (dicSql["ind_Unique"].Length == 0)
                                 {
                                     dicSql["ind_Unique"].Append("Create Unique Index " + keyName + " On " + tableName + "(");
@@ -245,7 +323,7 @@ namespace UnDataBase
                                 dicNames["ind_Unique"].Append(name + ",");
                                 break;
                             case IndexModel.UnionClustered:// 联合聚集索引
-                                keyName = "IND_UNCL_" + tableName + "_" + name;
+                                keyName = "IND_" + tableName + "_UNCL_" + name;
                                 if (dicSql["ind_UnionClustered"].Length == 0)
                                 {
                                     dicSql["ind_UnionClustered"].Append("Create Index " + keyName + " On " + tableName + "(");
@@ -253,7 +331,7 @@ namespace UnDataBase
                                 dicNames["ind_UnionClustered"].Append(name + ",");
                                 break;
                             case IndexModel.UnionNonclustered:// 联合非聚集索引
-                                keyName = "IND_UNNO_" + tableName + "_" + name;
+                                keyName = "IND_" + tableName + "_UNNO_" + name;
                                 if (dicSql["ind_UnionNonclustered"].Length == 0)
                                 {
                                     dicSql["ind_UnionNonclustered"].Append("Create Nonclustered Index " + keyName + " On " + tableName + "(");
@@ -283,6 +361,38 @@ namespace UnDataBase
                 }
             }
             return sb.ToString().Trim();
+        }
+
+        /// <summary>
+        /// 查询所有约束
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static string getAllConstraints(Type t)
+        {
+            string pre = "CON/_";
+            if (t != null)
+            {
+                pre += UnToGen.getTableName(t) + "/_";
+            }
+            string s = @"SELECT * FROM dbo.sysobjects WHERE name like '"+ pre + "%' escape '/'";
+            return s;
+        }
+
+        /// <summary>
+        /// 查询所有索引
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public static string getAllIndex(Type t)
+        {
+            string pre = "IND/_";
+            if (t != null)
+            {
+                pre += UnToGen.getTableName(t) + "/_";
+            }
+            string s = @"SELECT * FROM sys.indexes WHERE name like '" + pre + "%' escape '/'";
+            return s;
         }
 
         /// <summary>

@@ -96,7 +96,7 @@ namespace UnDataBase
         public void dropTable(Type t)
         {
             string s1 = UnSqlStr.dropTable(t);
-            Console.WriteLine(s1);
+            //Console.WriteLine(s1);
             help.exSql(s1);
         }
 
@@ -119,11 +119,30 @@ namespace UnDataBase
         /// <param name="t"></param>
         public void dropTableRelation(Type t)
         {
-            string s2 = UnSqlStr.dropTableRelation(t);
-            //Console.WriteLine(s2);
-            if (s2.Length > 0)
+            var sb = new StringBuilder();
+            var tableName = UnToGen.getTableName(t);
+            // 所有约束
+            var dt = help.getDataTable(UnSqlStr.getAllConstraints(t));
+            if (dt != null)
             {
-                help.exSql(s2);
+                foreach (DataRow item in dt.Rows)
+                {
+                    sb.AppendLine("Alter Table " + tableName + " Drop Constraint " + item["name"] + ";");
+                }
+            }
+            // 所有索引
+            dt = help.getDataTable(UnSqlStr.getAllIndex(t));
+            if (dt != null)
+            {
+                foreach (DataRow item in dt.Rows)
+                {
+                    sb.AppendLine("Drop Index " + item["name"] + " On " + tableName + ";");
+                }
+            }
+            if (sb.Length > 0)
+            {
+                //Console.WriteLine(sb.ToString());
+                help.exSql(sb.ToString());
             }
         }
 
@@ -131,7 +150,7 @@ namespace UnDataBase
         /// 清除表所有约束和索引
         /// </summary>
         /// <param name="t"></param>
-        public void dropTableRelationAll(Type t)
+        private void dropTableRelationAll(Type t)
         {
             string tableName = UnToGen.getTableName(t);
             var list = UnToGen.getListField(t);
@@ -151,11 +170,109 @@ namespace UnDataBase
             var list = new List<string>();
             string sql = "Select * from syscolumns Where ID=OBJECT_ID('" + UnToGen.getTableName(t) + "')";
             var dt = queryDT(sql, null);
-            foreach (DataRow item in dt.Rows)
+            if (dt != null)
             {
-                list.Add(item["name"].ToString());
+                foreach (DataRow item in dt.Rows)
+                {
+                    list.Add(item["name"].ToString());
+                }
             }
             return list;
+        }
+
+        /// <summary>
+        /// 添加字段
+        /// </summary>
+        /// <param name="t"></param>
+        public void addColumn(Type t)
+        {
+            StringBuilder sb = new StringBuilder();
+            var listDB = getDBTableColumns(t);
+            var listFP = UnToGen.getListFieldPropertyInfo(t);
+            string tableName = UnToGen.getTableName(t);
+            foreach (var item in listFP)
+            {
+                string fName = UnToGen.getFieldName(item);
+                if (listDB.Find(e => e == fName) == null)
+                {
+                    sb.AppendLine("Alter Table " + tableName + " Add " + UnSqlStr.getFieldTypeAndNull(item) + ";");
+                }
+            }
+            if (sb.Length > 0)
+            {
+                help.exSql(sb.ToString());
+                //Console.WriteLine(sb.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 删除字段
+        /// </summary>
+        /// <param name="t"></param>
+        public void dropColumn(Type t)
+        {
+            StringBuilder sb = new StringBuilder();
+            var listDB = getDBTableColumns(t);
+            var listFP = UnToGen.getListFieldPropertyInfo(t);
+            string tableName = UnToGen.getTableName(t);
+            foreach (var name in listDB)
+            {
+                bool isHave = false;
+                foreach (var item in listFP)
+                {
+                    string fName = UnToGen.getFieldName(item);
+                    if (name == fName)
+                    {
+                        isHave = true;
+                        break;
+                    }
+                }
+                // 如果不存在
+                if (!isHave)
+                {
+                    sb.AppendLine("Alter Table " + tableName + " Drop Column " + name + ";");
+                }
+            }
+            if (sb.Length > 0)
+            {
+                help.exSql(sb.ToString());
+                //Console.WriteLine(sb.ToString());
+            }
+        }
+
+        /// <summary>
+        /// 更改字段属性
+        /// </summary>
+        /// <param name="t"></param>
+        public void alterColumn(Type t)
+        {
+            StringBuilder sb = new StringBuilder();
+            var listDB = getDBTableColumns(t);
+            var listFP = UnToGen.getListFieldPropertyInfo(t);
+            string tableName = UnToGen.getTableName(t);
+            foreach (var name in listDB)
+            {
+                foreach (var item in listFP)
+                {
+                    string fName = UnToGen.getFieldName(item);
+                    var attr = UnToGen.getAttrSql(item);
+                    if (name == fName)
+                    {
+                        string fType = UnSqlStr.getFieldTypeAndNull(item);
+                        // 不能修改自增
+                        if (fType != null && fType.ToUpper().IndexOf("IDENTITY") < 0)
+                        {
+                            sb.AppendLine("Alter Table " + tableName + " Alter Column " + UnSqlStr.getFieldTypeAndNull(item) + ";");
+                        }
+                        break;
+                    }
+                }
+            }
+            if (sb.Length > 0)
+            {
+                help.exSql(sb.ToString());
+                //Console.WriteLine(sb.ToString());
+            }
         }
 
         /// <summary>
@@ -164,9 +281,75 @@ namespace UnDataBase
         /// <param name="t"></param>
         public void updateTable(Type t)
         {
-            var listDB = getDBTableColumns(t);
-            var listET = UnToGen.getListField(t);
-            
+            addColumn(t);
+            dropColumn(t);
+            alterColumn(t);
+        }
+
+        /// <summary>
+        /// 创建多个表
+        /// </summary>
+        /// <param name="t"></param>
+        public void createTableList(List<Type> list)
+        {
+            foreach (var item in list)
+            {
+                createTable(item);
+            }
+        }
+
+        /// <summary>
+        /// 清除多个表关系
+        /// </summary>
+        /// <param name="list"></param>
+        /// <param name="isACS"></param>
+        public void dropTableRelationList(List<Type> list, bool isACS)
+        {
+            if (!isACS)
+            {
+                list.Reverse();
+            }
+            foreach (var item in list)
+            {
+                dropTableRelation(item);
+            }
+            if (!isACS)
+            {
+                list.Reverse();
+            }
+        }
+
+        /// <summary>
+        /// 清除多个表关系(倒序)
+        /// </summary>
+        /// <param name="list"></param>
+        public void dropTableRelationList(List<Type> list)
+        {
+            dropTableRelationList(list, false);
+        }
+
+        /// <summary>
+        /// 更新多个表
+        /// </summary>
+        /// <param name="list"></param>
+        public void updateTableList(List<Type> list)
+        {
+            foreach (var item in list)
+            {
+                updateTable(item);
+            }
+        }
+
+        /// <summary>
+        /// 创建多个表关系
+        /// </summary>
+        /// <param name="list"></param>
+        public void createTableRelationList(List<Type> list)
+        {
+            foreach (var item in list)
+            {
+                createTableRelation(item);
+            }
         }
 
         #endregion
@@ -496,7 +679,7 @@ namespace UnDataBase
         /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage<T>(string columns, string where, string whereArgs, string order, int currentPage, int pageSize) where T : new()
         {
-            string keyName = UnToGen.getAutoNum(typeof(T),true);
+            string keyName = UnToGen.getAutoNum(typeof(T), true);
             string table = UnToGen.getTableName(typeof(T));
             string[] args = null;
             if (whereArgs != null && whereArgs.Length > 0)
@@ -527,7 +710,7 @@ namespace UnDataBase
         /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
         public UnSqlPage queryPage<T>(string columns, string order, int currentPage, int pageSize) where T : new()
         {
-            string keyName = UnToGen.getAutoNum(typeof(T),true);
+            string keyName = UnToGen.getAutoNum(typeof(T), true);
             string table = UnToGen.getTableName(typeof(T));
             UnSqlPage page = help.getPage(columns, keyName, table, null, order, currentPage, pageSize);
             page.TSource = UnToGen.dtToT<T>(page.DataSource);
@@ -543,7 +726,7 @@ namespace UnDataBase
         public string recursiveID<T>(int ID) where T : new()
         {
             string tableName = UnToGen.getTableName(typeof(T));
-            string CodeName = "";;
+            string CodeName = ""; ;
             foreach (string str1 in UnToGen.getListField<T>())
             {
                 if (str1.Replace("Code", "") != str1)
@@ -620,7 +803,7 @@ namespace UnDataBase
                 return null;
             }
         }
-            
+
         #endregion
 
         #region 修改数据
@@ -662,23 +845,6 @@ namespace UnDataBase
 
         #endregion
 
-        #region 事务
-        /// <summary>
-        /// 开始事务
-        /// </summary>
-        public SqlTransaction beginTransaction()
-        {
-            return help.beginTransaction();
-        }
 
-        /// <summary>
-        /// 提交事务
-        /// </summary>
-        /// <param name="tran"></param>
-        public void commitTransactio(SqlTransaction tran)
-        {
-            help.commitTransaction(tran);
-        }
-        #endregion 事务
     }
 }

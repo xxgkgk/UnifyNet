@@ -50,13 +50,7 @@ namespace UnCommon.Tool
             var pros = getListFieldPropertyInfo(t);
             foreach (var item in pros)
             {
-                string name = item.Name;
-                UnAttrSql attr = getAttrSql(item);
-                if (attr != null && attr.fieldName != null)
-                {
-                    name = attr.fieldName;
-                }
-
+                string name = UnToGen.getFieldName(item);
                 // 排除仅大小写不同的字段
                 bool isHave = false;
                 foreach (string p in list)
@@ -329,54 +323,81 @@ namespace UnCommon.Tool
         /// <returns></returns>
         public static object convertTo(Type type, object source)
         {
+            if (source == null || source is DBNull)
+            {
+                return null;
+            }
+            // string
             if (type.Equals(typeof(String)))
             {
-                source = Convert.ToString(source);
+                return Convert.ToString(source);
             }
-            else if (type.Equals(typeof(Int32)) || type.Equals(typeof(Nullable<Int32>)))
+            // Int
+            if (type.Equals(typeof(Int16)) || type.Equals(typeof(Nullable<Int16>)))
             {
-                source = Convert.ToInt32(source);
+                return Convert.ToInt16(source);
             }
-            else if (type.Equals(typeof(Int64)) || type.Equals(typeof(Nullable<Int64>)))
+            if (type.Equals(typeof(Int32)) || type.Equals(typeof(Nullable<Int32>)))
             {
-                source = Convert.ToInt64(source);
+                return Convert.ToInt32(source);
             }
-            else if (type.Equals(typeof(Boolean)) || type.Equals(typeof(Nullable<Boolean>)))
+            if (type.Equals(typeof(Int64)) || type.Equals(typeof(Nullable<Int64>)))
             {
-                source = Convert.ToBoolean(source);
+                return Convert.ToInt64(source);
             }
-            else if (type.Equals(typeof(DateTime)) || type.Equals(typeof(Nullable<DateTime>)))
+            // UInt
+            if (type.Equals(typeof(UInt16)) || type.Equals(typeof(Nullable<UInt16>)))
             {
-                if (source == null)
-                {
-                    source = DateTime.Now;
-                }
-                else
-                {
-                    source = Convert.ToDateTime(source);
-                }
+                return Convert.ToUInt16(source);
             }
-            else if (type.Equals(typeof(Decimal)) || type.Equals(typeof(Nullable<Decimal>)))
+            if (type.Equals(typeof(UInt32)) || type.Equals(typeof(Nullable<UInt32>)))
             {
-                source = Convert.ToDecimal(source);
+                return Convert.ToUInt32(source);
             }
-            else if (type.Equals(typeof(Guid)) || type.Equals(typeof(Nullable<Guid>)))
+            if (type.Equals(typeof(UInt64)) || type.Equals(typeof(Nullable<UInt64>)))
             {
-                source = new Guid(source.ToString());
+                return Convert.ToUInt64(source);
             }
-            else if (type.Equals(typeof(Byte)) || type.Equals(typeof(Nullable<Byte>)))
+            // 小数
+            if (type.Equals(typeof(float)) || type.Equals(typeof(Nullable<float>)))
             {
-                source = Convert.ToByte(source);
+                return Convert.ToSingle(source);
             }
-            else if (type.Equals(typeof(Byte[])))
+            if (type.Equals(typeof(Decimal)) || type.Equals(typeof(Nullable<Decimal>)))
             {
-                if (source != null)
-                {
-                    source = (Byte[])source;
-                }
+                return Convert.ToDecimal(source);
             }
-            else
+            if (type.Equals(typeof(Double)) || type.Equals(typeof(Nullable<Double>)))
             {
+                return Convert.ToDouble(source);
+            }
+            // 布尔值
+            if (type.Equals(typeof(Boolean)) || type.Equals(typeof(Nullable<Boolean>)))
+            {
+                return Convert.ToBoolean(source);
+            }
+            // 时间
+            if (type.Equals(typeof(DateTime)) || type.Equals(typeof(Nullable<DateTime>)))
+            {
+                return Convert.ToDateTime(source);
+            }
+            // GUID
+            if (type.Equals(typeof(Guid)) || type.Equals(typeof(Nullable<Guid>)))
+            {
+                return new Guid(source.ToString());
+            }
+            // 字符字节
+            if (type.Equals(typeof(Char)) || type.Equals(typeof(Nullable<Char>)))
+            {
+                return Convert.ToChar(source);
+            }
+            if (type.Equals(typeof(Byte)) || type.Equals(typeof(Nullable<Byte>)))
+            {
+                return Convert.ToByte(source);
+            }
+            if (type.Equals(typeof(Byte[])))
+            {
+                return (Byte[])source;
             }
             return source;
         }

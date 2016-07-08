@@ -29,8 +29,8 @@ namespace UnCommon
         public string Pass { get; set; }
 
         // 是否删除
-        [UnAttrSql(fieldNULL = false, fieldDefault = "0")]
-        public bool? IsDelete { get; set; }
+        //[UnAttrSql(fieldNULL = false, fieldDefault = "0")]
+        //public bool? IsDelete { get; set; }
 
         // 单列索引A
         [UnAttrSql(fieldType = "varchar(32)")]
@@ -56,6 +56,30 @@ namespace UnCommon
         [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionNonclustered)]
         public string UnionNonclusteredB { get; set; }
 
+        [UnAttrSql(fieldType = "varchar(65)",fieldDefault = "333")]
+        public string a { get; set; }
 
+        //[UnAttrSql(fieldNULL = false, fieldDefault = "0")]
+        //public int? b { get; set; }
+
+
+       // public Guid? c { get; set; }
+
+        //public float? d { get; set; }
+
+        //public Int16? e { get; set; }
+
+        //public decimal? f { get; set; }
+
+       // public Int64? g { get; set; }
+
+        //public Int16? h { get; set; }
+
+        //public Byte? i { get; set; }
+        //public byte? j { get; set; }
+
+        //public string k { get; set; }
+
+        //public string l { get; set; }
     }
 }

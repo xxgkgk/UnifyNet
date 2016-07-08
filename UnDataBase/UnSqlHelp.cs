@@ -316,6 +316,7 @@ namespace UnDataBase
                 string s = e.ToString() + "\r\n" + cmdText + "\r\n";
                 foreach (SqlParameter par in sqlPmtA)
                 {
+                    //s += par.ParameterName + " " + par.SqlDbType.GetType().Name + "：" + par.Value + "\r\n";
                     s += par.ParameterName + "：" + par.Value + "\r\n";
                 }
                 writeLog("GetExSc", s);
@@ -349,44 +350,6 @@ namespace UnDataBase
             }
         }
 
-        /// <summary>
-        /// 开始事务
-        /// </summary>
-        /// <returns></returns>
-        public SqlTransaction beginTransaction()
-        {
-            var tran = getConn().BeginTransaction();
-            lock (tranLock)
-            {
-                tranNum.Add(tran);
-            }
-            return tran;
-        }
-
-        /// <summary>
-        /// 提交结果
-        /// </summary>
-        public void commitTransaction(SqlTransaction tran)
-        {
-            try
-            {
-                tran.Commit();
-            }
-            catch (Exception e)
-            {
-                tran.Rollback();
-                UnFile.writeLog("commitTransaction", e.ToString());
-            }
-            finally
-            {
-                tran.Dispose();
-                lock (tranLock)
-                {
-                    tranNum.Remove(tran);
-                }
-                close();
-            }
-        }
 
         /// <summary>
         /// 关闭连接
