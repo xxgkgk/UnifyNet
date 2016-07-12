@@ -39,39 +39,18 @@ namespace UnDataBase
         /// <param name="dbName">连接的数据库</param>
         public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model)
         {
-            string constr;
+            string constr1 = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
+            string constr2 = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
             switch (model)
             {
                 case UnSqlConnectModel.Create:
                 case UnSqlConnectModel.ConnectOrCreate:
-                    constr = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
                     string crtstr = UnSqlStr.createDB(dbName, model);
-                    // 创建对象
-                    help = new UnSqlHelp(constr);
                     // 创建数据库
-                    help.exSql(crtstr);
+                    new UnSqlHelp(constr1).exSql(crtstr);
                     break;
             }
-            constr = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
-            help = new UnSqlHelp(constr);
-            // 翻页存储过程
-            help.exSql(UnSqlStr.drop_Prc_Pageing());
-            help.exSql(UnSqlStr.create_Prc_Pageing());
-            // 判断字段是否存在 
-            help.exSql(UnSqlStr.drop_mfn_IsColumnExists());
-            help.exSql(UnSqlStr.create_mfn_IsColumnExists());
-            // 查询某个字段的所有索引
-            help.exSql(UnSqlStr.drop_mfn_GetColumnIndexes());
-            help.exSql(UnSqlStr.create_mfn_GetColumnIndexes());
-            // 删除指定列的所有索引  
-            help.exSql(UnSqlStr.drop_mp_DropColumnIndexes());
-            help.exSql(UnSqlStr.create_mp_DropColumnIndexes());
-            // 删除某个表的某列的所有约束
-            help.exSql(UnSqlStr.drop_mp_DropColConstraint());
-            help.exSql(UnSqlStr.create_mp_DropColConstraint());
-            // 删除指定字段的所有约束和索引
-            help.exSql(UnSqlStr.drop_mp_DropColConstraintAndIndex());
-            help.exSql(UnSqlStr.create_mp_DropColConstraintAndIndex());
+            help = new UnSqlHelp(constr2);
         }
 
         #endregion
@@ -354,11 +333,31 @@ namespace UnDataBase
 
         #endregion
 
-        #region 基础SQL
+        #region 基础操作
 
-        private void dropTableCI(Type t)
+        /// <summary>
+        /// 更新基础配置
+        /// </summary>
+        public void updateBase()
         {
-            string s = @"";
+            // 翻页存储过程
+            help.exSql(UnSqlStr.drop_Pro_PageKeys());
+            help.exSql(UnSqlStr.create_Pro_PageKeys());
+            // 判断字段是否存在 
+            //help.exSql(UnSqlStr.drop_mfn_IsColumnExists());
+            //help.exSql(UnSqlStr.create_mfn_IsColumnExists());
+            // 查询某个字段的所有索引
+            //help.exSql(UnSqlStr.drop_mfn_GetColumnIndexes());
+            //help.exSql(UnSqlStr.create_mfn_GetColumnIndexes());
+            // 删除指定列的所有索引  
+            //help.exSql(UnSqlStr.drop_mp_DropColumnIndexes());
+            //help.exSql(UnSqlStr.create_mp_DropColumnIndexes());
+            // 删除某个表的某列的所有约束
+            //help.exSql(UnSqlStr.drop_mp_DropColConstraint());
+            //help.exSql(UnSqlStr.create_mp_DropColConstraint());
+            // 删除指定字段的所有约束和索引
+            //help.exSql(UnSqlStr.drop_mp_DropColConstraintAndIndex());
+            //help.exSql(UnSqlStr.create_mp_DropColConstraintAndIndex());
         }
 
         #endregion

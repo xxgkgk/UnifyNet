@@ -661,11 +661,11 @@ namespace UnDataBase
         /// 删除翻页存储过程
         /// </summary>
         /// <returns></returns>
-        public static string drop_Prc_Pageing()
+        public static string drop_Pro_PageKeys()
         {
             string s = @"/*删除翻页存储过程*/
-If Exists (Select * From sys.objects Where name = 'Prc_Pageing')
-    Drop Procedure Prc_Pageing;
+If Exists (Select * From sys.objects Where name = 'Pro_PageKeys')
+    Drop Procedure Pro_PageKeys;
 ";
             return s;
         }
@@ -674,50 +674,53 @@ If Exists (Select * From sys.objects Where name = 'Prc_Pageing')
         /// 创建翻页存储过程
         /// </summary>
         /// <returns></returns>
-        public static string create_Prc_Pageing()
+        public static string create_Pro_PageKeys()
         {
             string s = @"
-Create Procedure [dbo].[Prc_Pageing]
-	@strSql varchar(1000),
-	@CurrentPage int,
-	@PageSize int,
-	@TotalCount float OUTPUT,
-	@PageCount int OUTPUT,
-	@IDList varchar(500) OUTPUT
-AS
-	SET @TotalCount=0
-	SET @IDList='0'
-	/*建立表临时表*/
-	CREATE table #tt0(rid int NOT NULL IDENTITY(1,1), AutoID int)
-	/*动态SQL*/ 
-	DECLARE @str varchar(2000)
-	SET @str='INSERT INTO #tt0 '+@strSql
-	EXEC(@str)
-	/*总记录数*/
-	SELECT @TotalCount=Count(rid) from #tt0
-	SET @PageCount=CEILING(@TotalCount/@PageSize)
-	/*建立对应数据ID表变量*/
-	DECLARE @tt1 table(AutoID int)
-	INSERT INTO @tt1 SELECT AutoID FROM #tt0 Where rid>(@CurrentPage-1)*@PageSize And rid<@CurrentPage*@PageSize+1
-	/*释放表临时表*/
-	DROP table #tt0
+Create Procedure [dbo].[Pro_PageKeys]
+    @KeyName varchar(50),
+	@From varchar(6000),
+	@CurrentPage int = 0 OutPut,
+	@PageSize int = 0 OutPut,
+	@TotalNumber int = 0 OutPut,
+	@TotalPages int = 0 OutPut,
+	@Keys varchar(3000) OutPut
+As
+	-- 建立表临时表
+	Create Table #TmpTable0(Rid int Not Null IDENTITY(1,1), UniqueKey int)
+	-- 添加临时表数据
+	Exec('Insert Into #TmpTable0 Select ' + @KeyName+ ' As UniqueKey From ' + @From)
+	-- 总条数
+	Select @TotalNumber = Count(Rid) From #TmpTable0
+	-- 总页数
+	Set @TotalPages = Ceiling(Convert(decimal(20,2),@TotalNumber) / @PageSize )
+	-- 建立对应Key表变量
+	Declare @TmpTable1 Table(UniqueKey int)
+	Insert Into @TmpTable1 Select UniqueKey From #TmpTable0 Where Rid > (@CurrentPage-1) * @PageSize And Rid < @CurrentPage * @PageSize + 1
+	-- 释放表临时表
+	Drop Table #TmpTable0
 
-	/*建立游标*/
-	DECLARE cs cursor FOR SELECT AutoID FROM @tt1
-	/*打开游标*/
-	OPEN cs
-	/*读取游标第一条记录*/
-	DECLARE @csid varchar(8)
-	FETCH NEXT FROM cs INTO @csid
-	/*检查@@FETCH_STATUS的值，以便进行循环读取*/
-	WHILE @@FETCH_STATUS = 0
-	BEGIN
-		SET @IDList=@IDList+','+@csid 
-		FETCH  NEXT FROM cs INTO @csid 
-	END
-	/*关闭游标*/
-	CLOSE cs
-	DEALLOCATE cs
+	-- 建立游标
+	Declare cs Cursor For Select UniqueKey From @TmpTable1
+	-- 打开游标
+	Open cs
+	-- 读取游标第一条记录
+	Declare @csid varchar(8)
+	Fetch Next From cs Into @csid
+	-- 检查@@FETCH_STATUS的值，以便进行循环读取
+	While @@FETCH_STATUS = 0
+	Begin
+	    Begin
+			If LEN(@Keys) > 0
+				Set @Keys += ',' + @csid 
+			Else
+				Set @Keys = @csid 
+	    End
+		Fetch Next From cs Into @csid
+	End
+	-- 关闭游标
+	Close cs
+	Deallocate cs
 ;";
             return s;
         }

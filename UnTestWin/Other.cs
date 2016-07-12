@@ -17,6 +17,7 @@ using Jayrock.Json.Conversion;
 using UnCommon.Tool;
 using UnCommon.Files;
 using UnCommon.Extend;
+using System.Text.RegularExpressions;
 
 namespace UnTestWin
 {
@@ -70,31 +71,16 @@ namespace UnTestWin
 
         private void button2_Click(object sender, EventArgs e)
         {
-            //SortedDictionary<string, string> sPara = new SortedDictionary<string, string>();
-            //sPara.Add("name", "3334");
-            //string s = UnXMMPJson.tToJson(typeof(SortedDictionary<string, string>), sPara);
-            //string s = UnXMMPXml.tToXml(typeof(SortedDictionary<string, string>), sPara);
-            //Console.WriteLine(s);
-            string xml = "";
-            xml += "<xml>";
-            xml += "<a_1><![CDATA[234dd]]></a_1>";
-            xml += "<b_1>ddd</b_1>";
-            xml += "</xml>";
-
-
-            xml = xml.Replace("<xml>", "<parms>").Replace("</xml>", "</parms>");
-            xml = xml.Replace("<![CDATA[", "").Replace("]]>", "");
-            XmlDocument doc = new XmlDocument();
-            doc.LoadXml(xml);
-
-
-            string json = UnXMMPJson.tToJson(typeof(XmlDocument), doc);
-            Console.WriteLine(json);
-            //XmlDocument doc1 = (XmlDocument)UnXMMPJson.jsonToT(typeof(XmlDocument), json);
-            //Console.WriteLine(doc1.OuterXml);
-
-            // bool b = UnSqlStr.validSafe(sql);
-            //Console.WriteLine(b);
+            XmlData xd = new XmlData();
+            xd.ApiNote = new ApiNote();
+            xd.ApiNote.NoteMsg = "3434";
+            string xml = UnXMMPXml.tToXml(typeof(XmlData), xd);
+            Console.WriteLine(xml);
+            Regex reg = new Regex(@"<[^<]*\sp3:[^>]*>");
+            xml = reg.Replace(xml, "");
+            Console.WriteLine(xml);
+            xd = (XmlData)UnXMMPXml.xmlToT(typeof(XmlData), xml);
+            Console.WriteLine(xd.ApiNote.NoteMsg+"//");
         }
 
         private void button3_Click(object sender, EventArgs e)

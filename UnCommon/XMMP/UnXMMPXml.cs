@@ -4,6 +4,7 @@ using System.Data;
 using System.IO;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
 using UnCommon;
@@ -67,6 +68,10 @@ namespace UnCommon.XMMP
 
             sr.Dispose();
             stream.Dispose();
+
+            // 去掉 nil
+            Regex reg = new Regex(@"<[^<]*\sp3:[^>]*>");
+            str = reg.Replace(str, "");
 
             return str;
         }

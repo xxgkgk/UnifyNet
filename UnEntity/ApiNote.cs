@@ -13,10 +13,12 @@ namespace UnEntity
         /// <summary>
         /// 结果通知编号
         /// </summary>
-        public int NoteCode;
+        public int? NoteCode;
         /// <summary>
         /// 结果通知信息
         /// </summary>
         public string NoteMsg;
+
+        public DateTime? dt { get; set; }
     }
 }

@@ -138,10 +138,11 @@ namespace UnCommon.Tool
                     else
                     {
                         // 不能直接签名的泛型集合或数组转为JSON格式进行签名
-                        string json = UnXMMPJson.tToJson(item.PropertyType, value);
-                        if (json != "[]")
+                        //string str = UnXMMPJson.tToJson(item.PropertyType, value);
+                        string str = UnXMMPXml.tToXml(item.PropertyType, value);
+                        if (str != null && str != "[]")
                         {
-                            sort.Add(name, json);
+                            sort.Add(name, str);
                         }
                     }
                 }

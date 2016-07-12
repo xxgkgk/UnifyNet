@@ -32,10 +32,9 @@ namespace UnTestWin
             listT.Add(typeof(TestCardType));
             listT.Add(typeof(TestCard));
 
-            //var tran = cn.beginTransaction();
+            cn.updateBase();
             cn.createTableList(listT);
             cn.createTableRelationList(listT);
-            //cn.commitTransactio(tran);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -86,13 +85,11 @@ namespace UnTestWin
             listT.Add(typeof(TestCardType));
             listT.Add(typeof(TestCard));
 
-            //cn.beginTransaction();
+            cn.updateBase();
+            cn.createTableList(listT);
             cn.dropTableRelationList(listT);
             cn.updateTableList(listT);
             cn.createTableRelationList(listT);
-
-           
-            //cn.commitTransactio();
         }
     }
 }
