@@ -111,7 +111,7 @@ namespace UnCommon.Tool
         /// <typeparam name="T">泛型类型</typeparam>
         /// <param name="t">泛型对象</param>
         /// <returns></returns>
-        private SortedDictionary<string, string> getSignDictionary<T>(T t)
+        public SortedDictionary<string, string> getSignDictionary<T>(T t)
         {
             PropertyInfo[] properties = t.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             int length = properties.Length;
@@ -129,6 +129,7 @@ namespace UnCommon.Tool
                     }
                     else if (isSignClass(item))
                     {
+                       
                         var dics = getSignDictionary(value);
                         foreach (var dic in dics)
                         {
@@ -137,12 +138,15 @@ namespace UnCommon.Tool
                     }
                     else
                     {
+                       
                         // 不能直接签名的泛型集合或数组转为JSON格式进行签名
-                        //string str = UnXMMPJson.tToJson(item.PropertyType, value);
-                        string str = UnXMMPXml.tToXml(item.PropertyType, value);
-                        if (str != null && str != "[]")
+                        if (isSignArrayClass(item))
                         {
-                            sort.Add(name, str);
+                            string str = UnXMMPJson.tToJson(item.PropertyType, value);
+                            if (str != null && str != "[]")
+                            {
+                                sort.Add(name, str);
+                            }
                         }
                     }
                 }
@@ -212,6 +216,20 @@ namespace UnCommon.Tool
                 {
                     return true;
                 }
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// 是否签名数组
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        private bool isSignArrayClass(PropertyInfo item)
+        {
+            if (item.Name.IndexOf("ArrayOf") == 0)
+            {
+                return true;
             }
             return false;
         }

@@ -18,6 +18,8 @@ namespace UnEntity
         /// 方法
         /// </summary>
         public string Method { get; set; }
-    
+
+        public List<Test> ArrayOfTest { get; set; }
+
     }
 }

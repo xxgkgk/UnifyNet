@@ -10,7 +10,7 @@ namespace UnEntity
     public class XmlData
     {
         public string NonceStr { get; set; }
-        public string Sing { get; set; }
+        public string Sign { get; set; }
 
         public ApiBase ApiBase { get; set; }
         public ApiNote ApiNote { get; set; }
@@ -21,6 +21,8 @@ namespace UnEntity
         public List<WxPayOrder> ArrayOfWxPayOrder { get; set; }
 
         public List<string> listString { get; set; }
+
+        public List<ApiNote> ArrayOfApiNote { get; set; }
 
         //private XmlNode m_parameters = new XmlDocument().CreateNode(XmlNodeType.CDATA, "", "");
         ///// <summary>
@@ -38,5 +40,11 @@ namespace UnEntity
         //    }
         //}
 
+    }
+
+    public class Test
+    {
+        public int? a { get; set; }
+        public string b { get; set; }
     }
 }

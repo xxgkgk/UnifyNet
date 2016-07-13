@@ -42,31 +42,55 @@ namespace UnTestWin
             public ApiBase ApiBase = new ApiBase();
         }
 
+
+        public XmlData getXD()
+        {
+            XmlData xd = new XmlData();
+            xd.ApiBase = new ApiBase();
+            xd.ApiBase.ArrayOfTest = new List<Test>();
+            xd.ApiBase.Model = "adad";
+            xd.ApiBase.Method = "ADDD.ee";
+
+            xd.ArrayOfApiNote = new List<ApiNote>();
+
+            Test test = new Test();
+            test.a = 125;
+            test.b = "addd李";
+            Test test1 = new Test();
+            test1.a = 1251;
+            test1.b = "addd李1";
+            xd.ApiBase.ArrayOfTest.Add(test1);
+            xd.ApiBase.ArrayOfTest.Add(test);
+
+            ApiNote an = new ApiNote();
+            an.NoteCode = 1;
+            an.NoteMsg = "msg";
+
+            xd.ArrayOfApiNote.Add(an);
+            xd.ArrayOfApiNote.Add(an);
+
+            return xd;
+        }
+
+        
+
+
         private void button1_Click(object sender, EventArgs e)
         {
             UnSign unsign = new UnSign("123");
 
-            XmlData xd = new XmlData();
-            xd.ApiBase = new ApiBase();
-            xd.WxPayOrder = new WxPayOrder();
-            xd.WxPayOrder.Body = "dadfae";
-            xd.WxPayOrder.AppID = "dffee";
-            //xd.listString = new List<string>();
-            //xd.listString.Add("eee");
-          
-            //xd.ArrayOfWxPayOrder = new List<WxPayOrder>();
-            //xd.ArrayOfWxPayOrder.Add(xd.WxPayOrder);
+            XmlData xd = getXD();
 
-            xd.NonceStr = "34343";// UnStrRan.getStr(16, 32);
-            xd.ApiBase.Model = "WxPay";
-            xd.ApiBase.Method = "JsAPI";
+            SortedDictionary<string, string> sort = unsign.getSignDictionary(xd);
+            Console.WriteLine(sort.Count + "/");
 
-            string signstr = unsign.getSignString(xd);
+            string signstr = unsign.getSignString(sort);
+            Console.WriteLine(signstr + "/");
 
-            string s = unsign.sign(xd);
-            bool isSign = unsign.validSign(xd, s);
-            Console.WriteLine(signstr+"/"+s + "/" + isSign);
-            
+            xd.NonceStr = "123456";
+            xd.Sign = unsign.sign(xd);
+            Console.WriteLine(xd.Sign + "/");
+
         }
 
         private void button2_Click(object sender, EventArgs e)
