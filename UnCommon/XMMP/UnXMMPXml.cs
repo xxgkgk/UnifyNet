@@ -70,7 +70,7 @@ namespace UnCommon.XMMP
             stream.Dispose();
 
             // 去掉 nil
-            Regex reg = new Regex(@"<[^<]*\sp3:[^>]*>");
+            Regex reg = new Regex(@"<[^<]*\sp\d:[^>]*>");
             str = reg.Replace(str, "");
 
             return str;

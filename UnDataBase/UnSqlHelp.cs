@@ -22,6 +22,8 @@ namespace UnDataBase
         // 连接对象
         private SqlConnection conn = null;
 
+        private SqlCommand comd = null;
+
         // 事务数组
         private List<SqlTransaction> tranNum = new List<SqlTransaction>();
 

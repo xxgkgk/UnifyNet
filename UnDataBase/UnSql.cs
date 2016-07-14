@@ -14,19 +14,36 @@ namespace UnDataBase
         #region 私有变量
 
         // 数据库操作对象
-        private UnSqlHelp help = null;
+        private UnSqlHelpU help = null;
 
         #endregion
 
         #region 实例化
 
         /// <summary>
-        /// 实例化
+        /// 初始化
         /// </summary>
-        /// <param name="constr">连接字符串</param>
-        public UnSql(string constr)
+        /// <param name="ip"></param>
+        /// <param name="port"></param>
+        /// <param name="user"></param>
+        /// <param name="pass"></param>
+        /// <param name="dbName"></param>
+        /// <param name="model"></param>
+        /// <param name="trans"></param>
+        private void init(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans)
         {
-            help = new UnSqlHelp(constr);
+            string constr1 = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
+            string constr2 = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
+            switch (model)
+            {
+                case UnSqlConnectModel.Create:
+                case UnSqlConnectModel.ConnectOrCreate:
+                    string crtstr = UnSqlStr.createDB(dbName, model);
+                    // 创建数据库
+                    new UnSqlHelpU(constr1, false).exSql(crtstr);
+                    break;
+            }
+            help = new UnSqlHelpU(constr2, trans);
         }
 
         /// <summary>
@@ -37,20 +54,43 @@ namespace UnDataBase
         /// <param name="user">账号</param>
         /// <param name="pass">密码</param>
         /// <param name="dbName">连接的数据库</param>
+        /// <param name="model">连接类型</param>
         public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model)
         {
-            string constr1 = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
-            string constr2 = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
-            switch (model)
-            {
-                case UnSqlConnectModel.Create:
-                case UnSqlConnectModel.ConnectOrCreate:
-                    string crtstr = UnSqlStr.createDB(dbName, model);
-                    // 创建数据库
-                    new UnSqlHelp(constr1).exSql(crtstr);
-                    break;
-            }
-            help = new UnSqlHelp(constr2);
+            init(ip, port, user, pass, dbName, model, false);
+        }
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="ip">ip地址</param>
+        /// <param name="port">端口</param>
+        /// <param name="user">账号</param>
+        /// <param name="pass">密码</param>
+        /// <param name="dbName">连接的数据库</param>
+        /// <param name="model">连接类型</param>
+        /// <param name="trans">是否开启事务</param>
+        public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans)
+        {
+            init(ip, port, user, pass, dbName, model, trans);
+        }
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="constr">连接字符串</param>
+        public UnSql(string constr, bool trans)
+        {
+            help = new UnSqlHelpU(constr, trans);
+        }
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="constr">连接字符串</param>
+        public UnSql(string constr)
+        {
+            help = new UnSqlHelpU(constr);
         }
 
         #endregion
@@ -122,20 +162,6 @@ namespace UnDataBase
             {
                 //Console.WriteLine(sb.ToString());
                 help.exSql(sb.ToString());
-            }
-        }
-
-        /// <summary>
-        /// 清除表所有约束和索引
-        /// </summary>
-        /// <param name="t"></param>
-        private void dropTableRelationAll(Type t)
-        {
-            string tableName = UnToGen.getTableName(t);
-            var list = UnToGen.getListField(t);
-            foreach (var name in list)
-            {
-                help.dropColumnCI(tableName, name);
             }
         }
 
@@ -384,7 +410,7 @@ namespace UnDataBase
 
         #region 删除数据
 
-        public bool delete<T>(string selection, string selectionArgs) where T : new()
+        public int? delete<T>(string selection, string selectionArgs) where T : new()
         {
             StringBuilder strSql = new StringBuilder();
             strSql.Append("Delete " + UnToGen.getTableName(typeof(T)) + " ");
@@ -815,13 +841,11 @@ namespace UnDataBase
         /// <param name="fields"></param>
         /// <param name="strWhere"></param>
         /// <returns></returns>
-        public bool update<T>(T t, string columns, string selection, string selectionArgs) where T : new()
+        public int? update<T>(T t, string columns, string selection, string selectionArgs) where T : new()
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
-            bool b = false;
             string sql = "Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " " + UnSqlStr.getSelectionSql<T>(selection, selectionArgs);
-            b = help.exSql(sql, SqlPmtA);
-            return b;
+            return help.exSql(sql, SqlPmtA);
         }
 
         /// <summary>
@@ -833,17 +857,26 @@ namespace UnDataBase
         /// <param name="selection"></param>
         /// <param name="selectionArgs"></param>
         /// <returns></returns>
-        public bool update<T>(T t, string columns, string selection, string[] selectionArgs) where T : new()
+        public int? update<T>(T t, string columns, string selection, string[] selectionArgs) where T : new()
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
-            bool b = false;
             string sql = "Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " " + UnSqlStr.getSelectionSql<T>(selection, selectionArgs);
-            b = help.exSql(sql, SqlPmtA);
-            return b;
+            return help.exSql(sql, SqlPmtA);
         }
 
         #endregion
 
+        #region 提交事务
+
+        /// <summary>
+        /// 提交事务
+        /// </summary>
+        public void commit()
+        {
+            help.commit();
+        }
+
+        #endregion
 
     }
 }
