@@ -7,6 +7,7 @@ using System.Reflection;
 using System.Text;
 using UnCommon.Tool;
 using UnCommon.Entity;
+using UnCommon.Config;
 
 namespace UnDataBase
 {
@@ -949,7 +950,10 @@ end;";
             string AddStr2 = "";
             foreach (SqlParameter par in pars)
             {
-                AddStr1 += "[" + par.ParameterName + "],";
+                // 将便名转为字段名
+                string fname = toName(par.ParameterName);
+
+                AddStr1 += "[" + fname + "],";
                 AddStr2 += "@" + par.ParameterName + ",";
             }
             AddStr = "(" + AddStr1.TrimEnd(',') + ") Values " + "(" + AddStr2.TrimEnd(',') + ")";
@@ -970,7 +974,8 @@ end;";
             string UpdStr = null;
             foreach (SqlParameter par in Pars)
             {
-                UpdStr += "[" + par.ParameterName + "]=@" + par.ParameterName + ",";
+                string fname = toName(par.ParameterName);
+                UpdStr += "[" + fname + "]=@" + par.ParameterName + ",";
             }
             return UpdStr.TrimEnd(',');
         }
@@ -1093,6 +1098,31 @@ end;";
         #region 公用方法
 
         /// <summary>
+        /// 根据字段名产生便名
+        /// </summary>
+        /// <param name="fName">字段名</param>
+        /// <param name="pid">线程ID</param>
+        /// <returns></returns>
+        internal static string toByName(string fName,int pid)
+        {
+            // 按便名存,为了防止使用事务的时候,出现多个重名变量
+            return fName + "_" + pid;
+        }
+
+        /// <summary>
+        /// 便名转实名
+        /// </summary>
+        /// <param name="byName">参数名</param>
+        /// <returns></returns>
+        internal static string toName(string byName)
+        {
+            // 将便名转为字段名
+            int last = byName.LastIndexOf('_');
+            string fname = byName.Remove(last, byName.Length - last);
+            return fname;
+        }
+
+        /// <summary>
         /// 获得SqlPmt数组(T所有字段)
         /// </summary>
         /// <typeparam name="T">实体形参</typeparam>
@@ -1100,24 +1130,7 @@ end;";
         /// <returns></returns>
         internal static SqlParameter[] getSqlPmtA<T>(T t) where T : new()
         {
-            List<SqlParameter> pars = new List<SqlParameter>();
-            List<string> list = UnToGen.getFieldNoAutoInc<T>();
-
-            Type Typet = typeof(T);
-            for (int i = 0; i < list.Count; i++)
-            {
-                string strName = list[i];
-                PropertyInfo pro = Typet.GetProperty(strName);
-                Type type = pro.GetType();
-                object value = UnToGen.convertTo(type, pro.GetValue(t, null));
-                if (value != null)
-                {
-                    pars.Add(new SqlParameter(strName, value));
-                }
-            }
-            SqlParameter[] sp = new SqlParameter[pars.Count];
-            pars.CopyTo(sp);
-            return sp;
+            return getSqlPmtA(t, null);
         }
 
         /// <summary>
@@ -1129,21 +1142,29 @@ end;";
         /// <returns></returns>
         internal static SqlParameter[] getSqlPmtA<T>(T t, string FieldList) where T : new()
         {
-            List<string> _List = UnToGen.getFieldNoAutoInc<T>();
-            string[] FieldListA = FieldList.Split(new char[] { ',' });
             List<SqlParameter> pars = new List<SqlParameter>();
+            List<string> _List = UnToGen.getFieldNoAutoInc<T>();
+            int pid = UnInit.pid();
             Type Typet = typeof(T);
             for (int i = 0; i < _List.Count; i++)
             {
+                bool isTrue = false;
                 string strName = _List[i];
-                if (("," + FieldList + ",").IndexOf("," + strName + ",") >= 0)
+                // 如果不限制字段 或者 在限制字段内
+                if (FieldList == null || ("," + FieldList + ",").IndexOf("," + strName + ",") >= 0)
+                {
+                    isTrue = true;
+                }
+                if (isTrue)
                 {
                     PropertyInfo pro = Typet.GetProperty(strName);
                     Type type = pro.GetType();
                     object value = UnToGen.convertTo(type, pro.GetValue(t, null));
                     if (value != null)
                     {
-                        pars.Add(new SqlParameter(strName, value));
+                        // 按便名存,为了防止使用事务的时候,出现多个重名变量
+                        string byname = toByName(strName, pid);
+                        pars.Add(new SqlParameter(byname, value));
                     }
                 }
             }

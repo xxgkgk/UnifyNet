@@ -6,6 +6,7 @@ using System.Text;
 using System.Xml;
 using UnCommon.Tool;
 using UnCommon.Files;
+using UnCommon.Config;
 
 namespace UnDataBase
 {
@@ -410,12 +411,74 @@ namespace UnDataBase
 
         #region 删除数据
 
-        public int? delete<T>(string selection, string selectionArgs) where T : new()
+        /// <summary>
+        /// 转参数化条件
+        /// </summary>
+        /// <param name="selection">条件语句,如:ID = {0} Or Name = '{1}'</param>
+        /// <param name="selectionArgs">条件参数,如:1,admin</param>
+        /// <returns>返回object[2],0:条件语句,1:SqlParameter参数</returns>
+        private object[] toParsSelection(string selection, string[] selectionArgs)
         {
+            object[] objs = new object[2];
+            List<SqlParameter> list = new List<SqlParameter>();
+            // 参数序号
+            int i = 0;
+            // 参数便名PID
+            int pid = UnInit.pid();
+            if (selectionArgs != null)
+            {
+                foreach (string arg in selectionArgs)
+                {
+                    string name = "@p" + i;
+                    string byName = UnSqlStr.toByName(name, pid);
+                    selection = selection.Replace("'{" + i + "}'", byName);
+                    selection = selection.Replace("{" + i + "}", byName);
+                    SqlParameter par = new SqlParameter(byName, arg);
+                    list.Add(par);
+                    i++;
+                }
+            }
+            objs[0] = selection;
+            objs[1] = list.ToArray();
+            return objs;
+        }
+
+        /// <summary>
+        /// 删除数据(核心)
+        /// </summary>
+        /// <typeparam name="T">实体</typeparam>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <returns></returns>
+        public int? delete<T>(string selection, string[] selectionArgs) where T : new()
+        {
+            // 构造参数化查询
+            object[] objs = toParsSelection(selection, selectionArgs);
+
             StringBuilder strSql = new StringBuilder();
             strSql.Append("Delete " + UnToGen.getTableName(typeof(T)) + " ");
-            strSql.Append(UnSqlStr.getSelectionSql<T>(selection, selectionArgs));
-            return help.exSql(strSql.ToString());
+            string where = (string)objs[0];
+            if (where.Length > 0)
+            {
+                strSql.Append("Where " + where);
+            }
+            return help.exSql(strSql.ToString(), (SqlParameter[])objs[1]);
+        }
+
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <typeparam name="T">实体</typeparam>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <returns></returns>
+        public int? delete<T>(string selection, string selectionArgs) where T : new()
+        {
+            if (selectionArgs != null)
+            {
+                return delete<T>(selection, selectionArgs.Split(','));
+            }
+            return delete<T>(selection, (string[])null);
         }
 
         #endregion
@@ -440,7 +503,7 @@ namespace UnDataBase
         }
 
         /// <summary>
-        /// 获取实体
+        /// 参数化获取实体(核心)
         /// </summary>
         /// <typeparam name="T">实体</typeparam>
         /// <param name="columns">字段</param>
@@ -454,21 +517,10 @@ namespace UnDataBase
             string selection, string[] selectionArgs, string groupBy,
             string having, string orderBy) where T : new()
         {
-            List<SqlParameter> list = new List<SqlParameter>();
-            int i = 0;
-            if (selectionArgs != null)
-            {
-                foreach (string arg in selectionArgs)
-                {
-                    selection = selection.Replace("'{" + i + "}'", "@p" + i);
-                    selection = selection.Replace("{" + i + "}", "@p" + i);
-                    SqlParameter par = new SqlParameter("p" + i, arg);
-                    list.Add(par);
-                    i++;
-                }
-            }
-            string strSql = UnSqlStr.getQuerySql<T>(columns, selection, null, groupBy, having, orderBy);
-            return query<T>(strSql, list.ToArray());
+            // 构造参数化查询
+            object[] objs = toParsSelection(selection, selectionArgs);
+            string strSql = UnSqlStr.getQuerySql<T>(columns, (string)objs[0], null, groupBy, having, orderBy);
+            return query<T>(strSql, (SqlParameter[])objs[1]);
         }
 
         /// <summary>

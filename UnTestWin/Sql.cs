@@ -42,7 +42,7 @@ namespace UnTestWin
 
         private void button2_Click(object sender, EventArgs e)
         {
-            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", UnSqlConnectModel.Connect);
+            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", UnSqlConnectModel.Connect, true);
             TestUser user = new TestUser();
             user.UnionNonclusteredA = "indexA";
             //user.UnionNonclusteredB = "";
@@ -57,6 +57,18 @@ namespace UnTestWin
             //user.i = 1;
             //user.j = 255;
             cn.insert(user);
+            user.Name = "Name_" + UnStrRan.getStr(1, 10);
+            user.TestUserGUID = Guid.NewGuid();
+            user.TestUserUID = UnStrRan.getUID();
+            cn.insert(user);
+
+            user.Name = "Name_" + UnStrRan.getStr(1, 10);
+            //cn.update<TestUser>(user, "Name", "TestUserID = {0}", "2");
+            //cn.delete<TestUser>("TestUserID = {0} Or TestUserID = {1}", "11,16");
+            //cn.delete<TestUser>("TestUserID = {0} Or TestUserID = {1}", "12,15");
+            //List<TestUser> users = cn.query<TestUser>(null, "TestUserID = {0} Or TestUserID = {1}", "11,16", null);
+            //Console.WriteLine(users.Count+"%%");
+            cn.commit();
             //cn.queryDT("Select * From abc",null);
 
             TestUserDetail det = new TestUserDetail();

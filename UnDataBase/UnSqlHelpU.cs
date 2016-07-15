@@ -352,7 +352,7 @@ namespace UnDataBase
         public void close()
         {
             // cmd对象不存在则忽略
-            if (this.comd != null)
+            if (this.comd == null)
             {
                 return;
             }
