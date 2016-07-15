@@ -8,6 +8,7 @@ using System.Linq;
 using System.Text;
 using System.Windows.Forms;
 using UnCommon;
+using UnCommon.Config;
 using UnCommon.Encrypt;
 using UnCommon.Tool;
 using UnDataBase;
@@ -48,7 +49,10 @@ namespace UnTestWin
             //user.UnionNonclusteredB = "";
             //user.IsDelete = true;
             user.Name = "Name_" + UnStrRan.getStr(1, 10);
-            user.Pass = UnEncMD5.getMd5Hashs("1234562");
+            //user.Pass = UnEncMD5.getMd5Hashs(UnStrRan.getStr(1, 10));
+            cn.update<TestUser>(user, null, "TestUserID = {0}", "17");
+
+
             user.NonclusteredA = "NonclusteredA";
             user.NonclusteredB = "NonclusteredB";
             user.TestUserGUID = Guid.NewGuid();
@@ -56,14 +60,14 @@ namespace UnTestWin
             //user.e = 100;
             //user.i = 1;
             //user.j = 255;
-            cn.insert(user);
+            //cn.insert(user);
             user.Name = "Name_" + UnStrRan.getStr(1, 10);
             user.TestUserGUID = Guid.NewGuid();
             user.TestUserUID = UnStrRan.getUID();
-            cn.insert(user);
+            //cn.insert(user);
 
             user.Name = "Name_" + UnStrRan.getStr(1, 10);
-            //cn.update<TestUser>(user, "Name", "TestUserID = {0}", "2");
+          
             //cn.delete<TestUser>("TestUserID = {0} Or TestUserID = {1}", "11,16");
             //cn.delete<TestUser>("TestUserID = {0} Or TestUserID = {1}", "12,15");
             //List<TestUser> users = cn.query<TestUser>(null, "TestUserID = {0} Or TestUserID = {1}", "11,16", null);

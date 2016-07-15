@@ -12,10 +12,42 @@ namespace UnDataBase
 {
     public class UnSql
     {
-        #region 私有变量
+        #region 私有变量/方法
 
         // 数据库操作对象
         private UnSqlHelpU help = null;
+
+        /// <summary>
+        /// 转参数化条件
+        /// </summary>
+        /// <param name="selection">条件语句,如:ID = {0} Or Name = '{1}'</param>
+        /// <param name="selectionArgs">条件参数,如:1,admin</param>
+        /// <returns>返回object[2],0:条件语句,1:SqlParameter参数</returns>
+        private object[] toParsSelection(string selection, string[] selectionArgs)
+        {
+            object[] objs = new object[2];
+            List<SqlParameter> list = new List<SqlParameter>();
+            // 参数序号
+            int i = 0;
+            // 参数便名PID
+            int pid = UnInit.pid();
+            if (selectionArgs != null)
+            {
+                foreach (string arg in selectionArgs)
+                {
+                    string name = "@p" + i;
+                    string byName = UnSqlStr.toByName(name, pid);
+                    selection = selection.Replace("'{" + i + "}'", byName);
+                    selection = selection.Replace("{" + i + "}", byName);
+                    SqlParameter par = new SqlParameter(byName, arg);
+                    list.Add(par);
+                    i++;
+                }
+            }
+            objs[0] = selection;
+            objs[1] = list.ToArray();
+            return objs;
+        }
 
         #endregion
 
@@ -96,7 +128,7 @@ namespace UnDataBase
 
         #endregion
 
-        #region 表操作
+        #region 库/表/存储过程操作
 
         /// <summary>
         /// 创建表
@@ -358,12 +390,8 @@ namespace UnDataBase
             }
         }
 
-        #endregion
-
-        #region 基础操作
-
         /// <summary>
-        /// 更新基础配置
+        /// 更新基础存储过程/函数等
         /// </summary>
         public void updateBase()
         {
@@ -410,38 +438,6 @@ namespace UnDataBase
         #endregion
 
         #region 删除数据
-
-        /// <summary>
-        /// 转参数化条件
-        /// </summary>
-        /// <param name="selection">条件语句,如:ID = {0} Or Name = '{1}'</param>
-        /// <param name="selectionArgs">条件参数,如:1,admin</param>
-        /// <returns>返回object[2],0:条件语句,1:SqlParameter参数</returns>
-        private object[] toParsSelection(string selection, string[] selectionArgs)
-        {
-            object[] objs = new object[2];
-            List<SqlParameter> list = new List<SqlParameter>();
-            // 参数序号
-            int i = 0;
-            // 参数便名PID
-            int pid = UnInit.pid();
-            if (selectionArgs != null)
-            {
-                foreach (string arg in selectionArgs)
-                {
-                    string name = "@p" + i;
-                    string byName = UnSqlStr.toByName(name, pid);
-                    selection = selection.Replace("'{" + i + "}'", byName);
-                    selection = selection.Replace("{" + i + "}", byName);
-                    SqlParameter par = new SqlParameter(byName, arg);
-                    list.Add(par);
-                    i++;
-                }
-            }
-            objs[0] = selection;
-            objs[1] = list.ToArray();
-            return objs;
-        }
 
         /// <summary>
         /// 删除数据(核心)
@@ -604,7 +600,7 @@ namespace UnDataBase
         /// <param name="selectionArgs"></param>
         /// <param name="orderBy"></param>
         /// <returns></returns>
-        private T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy) where T : new()
+        public T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy) where T : new()
         {
             List<T> list = query<T>(columns, selection, selectionArgs, orderBy);
             if (list.Count > 0)
@@ -895,9 +891,12 @@ namespace UnDataBase
         /// <returns></returns>
         public int? update<T>(T t, string columns, string selection, string selectionArgs) where T : new()
         {
-            SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
-            string sql = "Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " " + UnSqlStr.getSelectionSql<T>(selection, selectionArgs);
-            return help.exSql(sql, SqlPmtA);
+            string[] args = null;
+            if (selectionArgs != null)
+            {
+                args = selectionArgs.Split(',');
+            }
+            return update<T>(t, columns, selection, args);
         }
 
         /// <summary>
@@ -911,9 +910,25 @@ namespace UnDataBase
         /// <returns></returns>
         public int? update<T>(T t, string columns, string selection, string[] selectionArgs) where T : new()
         {
+            // 实体属性参数化
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
-            string sql = "Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " " + UnSqlStr.getSelectionSql<T>(selection, selectionArgs);
-            return help.exSql(sql, SqlPmtA);
+            StringBuilder strSql = new StringBuilder();
+            strSql.Append("Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " ");
+
+            // 构造参数化查询
+            object[] objs = toParsSelection(selection, selectionArgs);
+            string where = (string)objs[0];
+            if (where.Length > 0)
+            {
+                strSql.Append("Where " + where);
+            }
+ 
+            // 属性参数和条件参数合并
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.AddRange(SqlPmtA);
+            list.AddRange((SqlParameter[])objs[1]);
+
+            return help.exSql(strSql.ToString(), list.ToArray());
         }
 
         #endregion
