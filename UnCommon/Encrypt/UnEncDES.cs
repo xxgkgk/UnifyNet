@@ -8,6 +8,9 @@ using UnCommon.Config;
 
 namespace UnCommon.Encrypt
 {
+    /// <summary>
+    /// DES
+    /// </summary>
     public class UnEncDES
     {
 

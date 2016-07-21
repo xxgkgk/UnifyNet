@@ -13,10 +13,17 @@ using UnCommon.Entity;
 
 namespace UnCommon.UDP
 {
+    /// <summary>
+    /// UDP传输帮助类
+    /// </summary>
     public class UnUdpHelp
     {
 
-        // 组装数据包
+        /// <summary>
+        /// 组装数据包
+        /// </summary>
+        /// <param name="ue"></param>
+        /// <returns></returns>
         public static byte[] assemblePackage(UnUdpEntity ue)
         {
             // 包体大小
@@ -110,7 +117,11 @@ namespace UnCommon.UDP
             return pack;
         }
 
-        // 解析数据包
+        /// <summary>
+        /// 解析数据包
+        /// </summary>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static UnUdpEntity analyzePackage(byte[] data)
         {
             // 包最小为512
@@ -206,65 +217,111 @@ namespace UnCommon.UDP
             return ue;
         }
 
-        // 解析数据包
+        /// <summary>
+        /// 解析数据包
+        /// </summary>
+        /// <param name="xml"></param>
+        /// <returns></returns>
         public static UnUdpEntity analyzePackage(string xml)
         {
             return (UnUdpEntity)UnXMMPXml.xmlToT(typeof(UnUdpEntity), xml);
         }
 
-        // 获得上传文件临时文件夹
+        /// <summary>
+        /// 获得上传文件临时文件夹
+        /// </summary>
+        /// <param name="md5"></param>
+        /// <returns></returns>
         public static string getUpFileTmpDirectory(string md5)
         {
             return UnFileEvent.tmp.fullPath() + "upFile/" + md5;
         }
 
-        // 获得配置文件路径
+        /// <summary>
+        /// 获得配置文件路径
+        /// </summary>
+        /// <param name="md5"></param>
+        /// <returns></returns>
         public static string getUpFileTmpConfigPath(string md5)
         {
             return getUpFileTmpDirectory(md5) + "/config.unify";
         }
 
-        // 获得接收文件路径
+        /// <summary>
+        /// 获得接收文件路径
+        /// </summary>
+        /// <param name="md5"></param>
+        /// <returns></returns>
         public static string getUpFileReceivePath(string md5)
         {
             return getUpFileTmpDirectory(md5) + "/tmp.unify";
         }
 
-        // 获得保存文件夹
+        /// <summary>
+        /// 获得保存文件夹
+        /// </summary>
+        /// <returns></returns>
         public static string getUpFileSaveDirectory()
         {
             return UnFileEvent.preference.fullPath() + "/upFile";
         }
 
+        /// <summary>
+        /// 获得上传文件保存地址
+        /// </summary>
+        /// <param name="HashCode"></param>
+        /// <param name="Extent"></param>
+        /// <returns></returns>
         public static string getUpFileSavePath(string HashCode, string Extent)
         {
             return getUpFileSaveDirectory() + "/" + HashCode + Extent;
         }
 
-        // DownFile-临时文件夹
+        /// <summary>
+        /// DownFile-临时文件夹
+        /// </summary>
+        /// <param name="md5"></param>
+        /// <returns></returns>
         public static string getDownFileTmpDirectory(string md5)
         {
             return UnFileEvent.tmp.fullPath() + "downFile/" + md5;
         }
 
-        // DownFile-获得配置文件路径
+        /// <summary>
+        /// DownFile-获得配置文件路径
+        /// </summary>
+        /// <param name="md5"></param>
+        /// <returns></returns>
         public static string getDownFileTmpConfigPath(string md5)
         {
             return getDownFileTmpDirectory(md5) + "/config.unify";
         }
 
-        // DownFile-获得接收文件路径
+        /// <summary>
+        /// DownFile-获得接收文件路径
+        /// </summary>
+        /// <param name="md5"></param>
+        /// <returns></returns>
         public static string getDownFileReceivePath(string md5)
         {
             return getDownFileTmpDirectory(md5) + "/tmp.unify";
         }
 
-        // DownFile-获得保存文件夹
+        /// <summary>
+        /// DownFile-获得保存文件夹
+        /// </summary>
+        /// <returns></returns>
         public static string getDownFileSaveDirectory()
         {
             return UnFileEvent.caches.fullPath() + "/downFile";
         }
 
+        /// <summary>
+        /// 获得下载保存地址
+        /// </summary>
+        /// <param name="HashCode"></param>
+        /// <param name="Extent"></param>
+        /// <returns></returns>
         public static string getDownFileSavePath(string HashCode, string Extent)
         {
             return getDownFileSaveDirectory() + "/" + HashCode + Extent;
@@ -272,7 +329,11 @@ namespace UnCommon.UDP
 
         private const string PortReleaseGuid = "8875BD8E-4D5B-11DE-B2F4-691756D89593";
 
-        // 查找可用udp端口
+        /// <summary>
+        /// 查找可用udp端口
+        /// </summary>
+        /// <param name="startPort"></param>
+        /// <returns></returns>
         public static int findUDPPort(int startPort)
         {
             int port = startPort;
@@ -313,7 +374,13 @@ namespace UnCommon.UDP
             }
         }
 
-        // 区间计算
+        /// <summary>
+        /// 区间计算
+        /// </summary>
+        /// <param name="start"></param>
+        /// <param name="tpn"></param>
+        /// <param name="interval"></param>
+        /// <returns></returns>
         public static long[] waitUps(long start, long tpn, int interval)
         {
             long[] ls = new long[2];

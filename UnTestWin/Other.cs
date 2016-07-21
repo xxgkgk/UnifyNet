@@ -56,9 +56,14 @@ namespace UnTestWin
             Test test = new Test();
             test.a = 125;
             test.b = "addd李";
+
             Test test1 = new Test();
-            test1.a = 1251;
+            test1.Testa = new Testa();
+            test1.Testa.a = "aaa0";
+            test1.Testa.d = "bbb0";
+
             test1.b = "addd李1";
+            test1.a = 1251;
             xd.ApiBase.ArrayOfTest.Add(test1);
             xd.ApiBase.ArrayOfTest.Add(test);
 

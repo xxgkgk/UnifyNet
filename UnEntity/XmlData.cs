@@ -42,9 +42,18 @@ namespace UnEntity
 
     }
 
+    public class Testa
+    {
+        public string d { get; set; }
+        public string a { get; set; }
+    }
+
     public class Test
     {
-        public int? a { get; set; }
         public string b { get; set; }
+        public int? a { get; set; }
+        public Testa Testa { get; set; }
+
+
     }
 }

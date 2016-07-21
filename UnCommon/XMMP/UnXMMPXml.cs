@@ -18,7 +18,12 @@ namespace UnCommon.XMMP
     public class UnXMMPXml
     {
 
-        // 反序列化
+        /// <summary>
+        /// 反序列化
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="xml"></param>
+        /// <returns></returns>
         public static object xmlToT(Type type, string xml)
         {
             try
@@ -35,14 +40,24 @@ namespace UnCommon.XMMP
             }
         }
 
-        // 反序列化
+        /// <summary>
+        /// 反序列化
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="stream"></param>
+        /// <returns></returns>
         public static object streamToT(Type type, Stream stream)
         {
             XmlSerializer xmldes = new XmlSerializer(type);
             return xmldes.Deserialize(stream);
         }
 
-        // 序列化
+        /// <summary>
+        /// 序列化
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static string tToXml(Type type, object obj)
         {
             MemoryStream stream = new MemoryStream();
@@ -76,7 +91,12 @@ namespace UnCommon.XMMP
             return str;
         }
 
-        // 无声明序列化
+        /// <summary>
+        /// 去掉声明的序列化
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="obj"></param>
+        /// <returns></returns>
         public static string tToXmlNoSm(Type type, object obj)
         {
             string xml = tToXml(type, obj);
@@ -87,7 +107,15 @@ namespace UnCommon.XMMP
             return xml;
         }
 
-        // 对象转xml
+        /// <summary>
+        /// 序列化
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rootName"></param>
+        /// <param name="tagName"></param>
+        /// <param name="listT"></param>
+        /// <param name="fields"></param>
+        /// <returns></returns>
         public static StringBuilder tToXml<T>(string rootName, string tagName, List<T> listT, string[] fields)
         {
             StringBuilder sb = new StringBuilder();
@@ -130,7 +158,15 @@ namespace UnCommon.XMMP
             return sb;
         }
 
-        // 对象转xml
+        /// <summary>
+        /// 序列化
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rootName"></param>
+        /// <param name="tagName"></param>
+        /// <param name="listT"></param>
+        /// <param name="fields"></param>
+        /// <returns></returns>
         public static StringBuilder tToXml<T>(string rootName, string tagName, List<T> listT, string fields)
         {
             string[] fs = null;
@@ -141,7 +177,15 @@ namespace UnCommon.XMMP
             return tToXml<T>(rootName, tagName, listT, fs);
         }
 
-        // 对象转xml
+        /// <summary>
+        /// 序列化
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="rootName"></param>
+        /// <param name="tagName"></param>
+        /// <param name="t"></param>
+        /// <param name="fields"></param>
+        /// <returns></returns>
         public static StringBuilder tToXml<T>(string rootName, string tagName, T t, string fields)
         {
             List<T> listT = new List<T>();
@@ -149,7 +193,13 @@ namespace UnCommon.XMMP
             return tToXml<T>(rootName, tagName, listT, fields);
         }
 
-        // 对象转XmlDocument
+        /// <summary>
+        /// 序列化
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <param name="fields"></param>
+        /// <returns></returns>
         public static XmlDocument tToXmlDoc<T>(List<T> list, string[] fields) where T : new()
         {
             XmlDocument xd = new XmlDocument();
@@ -187,13 +237,24 @@ namespace UnCommon.XMMP
             return xd;
         }
 
-        // 对象转XmlDocument
+        /// <summary>
+        /// 序列化
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list"></param>
+        /// <returns></returns>
         public static XmlDocument tToXmlDoc<T>(List<T> list) where T : new()
         {
             return tToXmlDoc(list, UnToGen.getFields<T>().Split(','));
         }
 
-        // xml转DataTable
+        /// <summary>
+        /// 反序列化
+        /// </summary>
+        /// <param name="xd"></param>
+        /// <param name="xPath"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         public static DataTable xmlToDT(XmlDocument xd, string xPath, string tableName)
         {
             // 根据第一个元素结构建立表结构
@@ -218,7 +279,14 @@ namespace UnCommon.XMMP
             return _DataTable;
         }
 
-        // xml转对象
+        /// <summary>
+        /// 反序列化
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xd"></param>
+        /// <param name="xpath"></param>
+        /// <param name="tableName"></param>
+        /// <returns></returns>
         public static List<T> xmlToT<T>(XmlDocument xd,string xpath, string tableName) where T : new()
         {
             List<T> ListModel = new List<T>();
@@ -228,7 +296,12 @@ namespace UnCommon.XMMP
             return ListModel;
         }
 
-        // xml转对象
+        /// <summary>
+        /// 反序列化
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="xd"></param>
+        /// <returns></returns>
         public static List<T> xmlToT<T>(XmlDocument xd) where T : new()
         {
             string tableName = new T().GetType().Name;
@@ -236,7 +309,11 @@ namespace UnCommon.XMMP
             return xmlToT<T>(xd, xpath, tableName);
         }
 
-        // 过滤非打印字符
+        /// <summary>
+        /// 过滤非打印字符
+        /// </summary>
+        /// <param name="tmp"></param>
+        /// <returns></returns>
         public static string replaceASCII(string tmp)
         {
             StringBuilder info = new StringBuilder();

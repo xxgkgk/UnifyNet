@@ -3,7 +3,9 @@ using UnCommon.Tool;
 
 namespace UnCommon.Entity
 {
-
+    /// <summary>
+    /// 统计类
+    /// </summary>
     public class UnAttrtStati
     {
         // 统计时间戳
@@ -22,18 +24,26 @@ namespace UnCommon.Entity
         private float _sendSpeed = 0;
         // 上行峰值
         private float _sendSpeedPeak = 0;
-        // 添加接收大小
+        /// <summary>
+        /// 添加接收大小
+        /// </summary>
+        /// <param name="l"></param>
         public void addReceiveLength(long l)
         {
             _receiveSum += l;
         }
-        // 添加发送大小
+        /// <summary>
+        /// 添加发送大小
+        /// </summary>
+        /// <param name="l"></param>
         public void addSendLength(long l)
         {
             _sendSum += l;
         }
 
-        // 计算
+        /// <summary>
+        /// 计算
+        /// </summary>
         private void calculate()
         {
             decimal space = UnDate.ticksSec() - ticks;
@@ -67,25 +77,37 @@ namespace UnCommon.Entity
             }
         }
 
-        // 获取接收速度
+        /// <summary>
+        /// 获取接收速度
+        /// </summary>
+        /// <returns></returns>
         public float getReceiveSpeed()
         {
             calculate();
             return _receiveSpeed;
         }
-        // 获取接收峰值
+        /// <summary>
+        /// 获取接收峰值
+        /// </summary>
+        /// <returns></returns>
         public float getReceiveSpeedPeak()
         {
             calculate();
             return _receiveSpeedPeak;
         }
-        // 获取上行速度
+        /// <summary>
+        /// 获取上行速度
+        /// </summary>
+        /// <returns></returns>
         public float getSendSpeed()
         {
             calculate();
             return _sendSpeed;
         }
-        // 获取上行峰值
+        /// <summary>
+        /// 获取上行峰值
+        /// </summary>
+        /// <returns></returns>
         public float getSendSpeedPeak()
         {
             calculate();
@@ -96,7 +118,10 @@ namespace UnCommon.Entity
         private int _upTaskNum = 0;
         // UpFile-任务数峰值
         private int _upTaskNumPeak = 0;
-        // UpFile-添加任务数
+        /// <summary>
+        /// UpFile-添加任务数
+        /// </summary>
+        /// <param name="n"></param>
         public void addUpTaskNum(int n)
         {
             _upTaskNum += n;
@@ -105,13 +130,19 @@ namespace UnCommon.Entity
                 _upTaskNumPeak = _upTaskNum;
             }
         }
-        // UpFile-获取当前任务数
+        /// <summary>
+        /// UpFile-获取当前任务数
+        /// </summary>
+        /// <returns></returns>
         public int getUpTaskNum()
         {
             calculate();
             return _upTaskNum;
         }
-        // UpFile-获取任务数峰值
+        /// <summary>
+        /// UpFile-获取任务数峰值
+        /// </summary>
+        /// <returns></returns>
         public int getUpTaskNumPeak()
         {
             calculate();
@@ -124,23 +155,35 @@ namespace UnCommon.Entity
         private float _receiveNumSpeed = 0;
         // 接收包速度峰值
         private float _receiveNumSpeedPeak = 0;
-        // 添加接收包数
+        /// <summary>
+        /// 添加接收包数
+        /// </summary>
+        /// <param name="n"></param>
         public void addReceiveNum(int n)
         {
             _receiveNum += n;
         }
-        // 获取当前包数
+        /// <summary>
+        /// 获取当前包数
+        /// </summary>
+        /// <returns></returns>
         public int getReceiveNum()
         {
             return _receiveNum;
         }
-        // 获取处理速度
+        /// <summary>
+        /// 获取处理速度
+        /// </summary>
+        /// <returns></returns>
         public float getReceiveNumSpeed()
         {
             calculate();
             return _receiveNumSpeed;
         }
-        // 获取处理峰值
+        /// <summary>
+        /// 获取处理峰值
+        /// </summary>
+        /// <returns></returns>
         public float getReceiveNumSpeedPeak()
         {
             calculate();
@@ -153,29 +196,44 @@ namespace UnCommon.Entity
         private float _proSpeed = 0;
         // 处理峰值
         private float _proSpeedPeak = 0;
-        // 添加处理大小
+
+        /// <summary>
+        /// 添加处理大小
+        /// </summary>
+        /// <param name="l"></param>
         public void addProLength(long l)
         {
             _proSum += l;
         }
-        // 获取处理速度
+        /// <summary>
+        /// 获取处理速度
+        /// </summary>
+        /// <returns></returns>
         public float getProSpeed()
         {
             calculate();
             return _proSpeed;
         }
-        // 获取处理峰值
+        /// <summary>
+        /// 获取处理峰值
+        /// </summary>
+        /// <returns></returns>
         public float getProSpeedPeak()
         {
             calculate();
             return _proSpeedPeak;
         }
 
-        // DownFile-任务数
+        /// <summary>
+        /// DownFile-任务数
+        /// </summary>
         private int _downTaskNum = 0;
         // DownFile-任务数峰值
         private int _downTaskNumPeak = 0;
-        // DownFile-添加任务数
+        /// <summary>
+        /// DownFile-添加任务数
+        /// </summary>
+        /// <param name="n"></param>
         public void addDownTaskNum(int n)
         {
             _downTaskNum += n;
@@ -184,13 +242,19 @@ namespace UnCommon.Entity
                 _downTaskNumPeak = _downTaskNum;
             }
         }
-        // DownFile-获取当前任务数
+        /// <summary>
+        /// DownFile-获取当前任务数
+        /// </summary>
+        /// <returns></returns>
         public int getDownTaskNum()
         {
             calculate();
             return _downTaskNum;
         }
-        // DownFile-获取任务数峰值
+        /// <summary>
+        /// DownFile-获取任务数峰值
+        /// </summary>
+        /// <returns></returns>
         public int getDownTaskNumPeak()
         {
             calculate();
@@ -198,9 +262,14 @@ namespace UnCommon.Entity
         }
         // DownFile-缓存数
         private int _downCacheNum = 0;
-        // DownFile-缓存数峰值
+        /// <summary>
+        /// DownFile-缓存数峰值
+        /// </summary>
         private int _downCacheNumPeak = 0;
-        // DownFile-添加缓存数
+        /// <summary>
+        /// DownFile-添加缓存数
+        /// </summary>
+        /// <param name="n"></param>
         public void addDownCacheNum(int n)
         {
             _downCacheNum += n;
@@ -213,12 +282,18 @@ namespace UnCommon.Entity
                 _downCacheNumPeak = _downCacheNum;
             }
         }
-        // DownFile-获取当前缓存数
+        /// <summary>
+        /// DownFile-获取当前缓存数
+        /// </summary>
+        /// <returns></returns>
         public int getDownCacheNum()
         {
             return _downCacheNum;
         }
-        // DownFile-获取缓存峰值
+        /// <summary>
+        /// DownFile-获取缓存峰值
+        /// </summary>
+        /// <returns></returns>
         public int getDownCacheNumPeak()
         {
             return _downCacheNumPeak;
@@ -227,7 +302,10 @@ namespace UnCommon.Entity
         private int _downFileNum = 0;
         // DownFile-缓存数峰值
         private int _downFileNumPeak = 0;
-        // DownFile-添加缓存数
+        /// <summary>
+        /// DownFile-添加缓存数
+        /// </summary>
+        /// <param name="n"></param>
         public void addDownFileNum(int n)
         {
             _downFileNum += n;
@@ -236,12 +314,18 @@ namespace UnCommon.Entity
                 _downFileNumPeak = _downFileNum;
             }
         }
-        // DownFile-获取当前缓存数
+        /// <summary>
+        /// DownFile-获取当前缓存数
+        /// </summary>
+        /// <returns></returns>
         public int getDownFileNum()
         {
             return _downFileNum;
         }
-        // DownFile-获取缓存峰值
+        /// <summary>
+        ///  DownFile-获取缓存峰值
+        /// </summary>
+        /// <returns></returns>
         public int getDownFileNumPeak()
         {
             return _downFileNumPeak;

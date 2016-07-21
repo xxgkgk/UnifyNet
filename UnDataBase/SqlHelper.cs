@@ -232,19 +232,13 @@ namespace UnDataBase
             }
         }
 
-        /// <summary>   
-        /// 执行指定连接字符串的存储过程,将对象数组的值赋给存储过程参数,   
-        /// 此方法需要在参数缓存方法中探索参数并生成参数.   
-        /// </summary>   
-        /// <remarks>   
-        /// 这个方法没有提供访问输出参数和返回值.   
-        /// 示例:    
-        ///  int result = ExecuteNonQuery(connString, "PublishOrders", 24, 36);   
-        /// </remarks>   
-        /// <param name="connectionString">一个有效的数据库连接字符串/param>   
-        /// <param name="spName">存储过程名称</param>   
-        /// <param name="parameterValues">分配到存储过程输入参数的对象数组</param>   
-        /// <returns>返回受影响的行数</returns>   
+        /// <summary>
+        /// 执行指定连接字符串的存储过程,将对象数组的值赋给存储过程参数,
+        /// </summary>
+        /// <param name="connectionString"></param>
+        /// <param name="spName"></param>
+        /// <param name="parameterValues"></param>
+        /// <returns></returns>
         public static int ExecuteNonQuery(string connectionString, string spName, params object[] parameterValues)
         {
             if (connectionString == null || connectionString.Length == 0) throw new ArgumentNullException("connectionString");
@@ -349,17 +343,13 @@ namespace UnDataBase
             }
         }
 
-        /// <summary>   
+        /// <summary>
         /// 执行带事务的SqlCommand.   
-        /// </summary>   
-        /// <remarks>   
-        /// 示例.:    
-        ///  int result = ExecuteNonQuery(trans, CommandType.StoredProcedure, "PublishOrders");   
-        /// </remarks>   
-        /// <param name="transaction">一个有效的数据库连接对象</param>   
-        /// <param name="commandType">命令类型(存储过程,命令文本或其它.)</param>   
-        /// <param name="commandText">存储过程名称或T-SQL语句</param>   
-        /// <returns>返回影响的行数/returns>   
+        /// </summary>
+        /// <param name="transaction"></param>
+        /// <param name="commandType"></param>
+        /// <param name="commandText"></param>
+        /// <returns></returns>
         public static int ExecuteNonQuery(SqlTransaction transaction, CommandType commandType, string commandText)
         {
             return ExecuteNonQuery(transaction, commandType, commandText, (SqlParameter[])null);

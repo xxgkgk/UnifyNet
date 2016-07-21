@@ -10,19 +10,31 @@ namespace UnCommon.HTTP
     /// </summary>
     public enum UnHttpUpEvent
     {
-        // 图片
+        /// <summary>
+        /// 图片
+        /// </summary>
         Image,
-        // 视频
+        /// <summary>
+        /// 视频
+        /// </summary>
         Audio,
-        // 文档
+        /// <summary>
+        /// 文档
+        /// </summary>
         Doc
 
     }
 
-    // 扩展
+    /// <summary>
+    /// 上传事件枚举
+    /// </summary>
     public static class UnExtHttpUpEvent
     {
-        // 文本
+        /// <summary>
+        /// 文本
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static string text(this UnHttpUpEvent t)
         {
             switch (t)

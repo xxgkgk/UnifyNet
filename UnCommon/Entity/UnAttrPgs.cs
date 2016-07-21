@@ -10,7 +10,9 @@ namespace UnCommon.Entity
     /// </summary>
     public class UnAttrPgs
     {
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
         public UnAttrPgs()
         {
         }

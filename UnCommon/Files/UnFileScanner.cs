@@ -6,6 +6,9 @@ using System.Runtime.InteropServices;
 using System.IO;
 using System.Security.Principal;
 
+/// <summary>
+/// 文件目录类
+/// </summary>
 public class UnFileScanner
 {
     private static IntPtr INVALID_HANDLE_VALUE = new IntPtr(-1);
@@ -145,7 +148,11 @@ public class UnFileScanner
 
     }
 
-    // 查找文件
+    /// <summary>
+    /// 查找文件
+    /// </summary>
+    /// <param name="szDriveLetter"></param>
+    /// <returns></returns>
     public IEnumerable<String> EnumerateFiles(string szDriveLetter)
     {
         try
@@ -250,6 +257,10 @@ public class UnFileScanner
         }
     }
 
+    /// <summary>
+    /// 是否系统管理员
+    /// </summary>
+    /// <returns></returns>
     public static bool IsAdministrator()
     {
         WindowsIdentity identity = WindowsIdentity.GetCurrent();

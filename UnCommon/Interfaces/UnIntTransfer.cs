@@ -6,15 +6,28 @@ using UnCommon.Entity;
 
 namespace UnCommon.Interfaces
 {
+    /// <summary>
+    /// 传输状态接口
+    /// </summary>
     public interface UnIntTransfer
     {
-        // 进度
+        /// <summary>
+        /// 进度
+        /// </summary>
+        /// <param name="pgs"></param>
         void progress(UnAttrPgs pgs);
 
-        // 成功
+        /// <summary>
+        /// 成功
+        /// </summary>
+        /// <param name="rst"></param>
+        /// <returns></returns>
         bool success(UnAttrRst rst);
 
-        // 失败
+        /// <summary>
+        /// 失败
+        /// </summary>
+        /// <param name="rst"></param>
         void error(UnAttrRst rst);
     }
 }

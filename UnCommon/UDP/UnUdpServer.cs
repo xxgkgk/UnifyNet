@@ -14,6 +14,9 @@ using UnCommon.XMMP;
 
 namespace UnCommon.UDP
 {
+    /// <summary>
+    /// UDP服务端
+    /// </summary>
     public class UnUdpServer
     {
         // udp线程控制
@@ -31,7 +34,10 @@ namespace UnCommon.UDP
         // 事件接口
         private UnIntUdpServer intServer = null;
 
-        // 设置事件接口
+        /// <summary>
+        /// 设置事件接口
+        /// </summary>
+        /// <param name="ss"></param>
         public void setIntSocketServer(UnIntUdpServer ss)
         {
             this.intServer = ss;
@@ -40,13 +46,19 @@ namespace UnCommon.UDP
         // 统计
         private UnAttrtStati ss = new UnAttrtStati();
 
-        // 获得即时统计
+        /// <summary>
+        /// 获得即时统计
+        /// </summary>
+        /// <returns></returns>
         public UnAttrtStati getStati()
         {
             return ss;
         }
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="udpPort"></param>
         public UnUdpServer(int udpPort)
         {
             udpSocket = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
@@ -54,7 +66,9 @@ namespace UnCommon.UDP
             udpSocket.Bind(point);
         }
 
-        // 开始
+        /// <summary>
+        /// 开始
+        /// </summary>
         public void start()
         {
             isTrue = true;
@@ -63,7 +77,9 @@ namespace UnCommon.UDP
             new Thread(downFileTimerHandle).Start();
         }
 
-        // 关闭
+        /// <summary>
+        /// 关闭
+        /// </summary>
         public void close()
         {
             isTrue = false;
@@ -88,7 +104,7 @@ namespace UnCommon.UDP
                     udpListenHandle_log = true;
                     udpAllDone.WaitOne();
                 }
-                catch (Exception ex)
+                catch
                 {
                     if (udpListenHandle_log)
                     {
@@ -128,7 +144,7 @@ namespace UnCommon.UDP
                 }
                 udpBeginReceiveFromBack_log = true;
             }
-            catch (Exception ex)
+            catch 
             {
                 if (udpBeginReceiveFromBack_log)
                 {
@@ -152,7 +168,7 @@ namespace UnCommon.UDP
                 ao.socket.EndSendTo(ar);
                 udpBeginSendToBack_log = true;
             }
-            catch (Exception e)
+            catch
             {
                 if (udpBeginSendToBack_log)
                 {
@@ -213,7 +229,10 @@ namespace UnCommon.UDP
             return data;
         }
 
-        // 设置滑动窗口区间
+        /// <summary>
+        /// 设置滑动窗口区间
+        /// </summary>
+        /// <param name="itv"></param>
         public void setInterval(int itv)
         {
             this.interval = itv;
@@ -487,19 +506,28 @@ namespace UnCommon.UDP
         // DownFile-缓存锁
         private static object cacheLock = new object();
 
-        // DownFile-设置分包大小
+        /// <summary>
+        /// DownFile-设置分包大小
+        /// </summary>
+        /// <param name="subSize"></param>
         public void setDownSubSize(int subSize)
         {
             subSize_down = subSize;
         }
 
-        // DownFile-设置缓存队列大小
+        /// <summary>
+        /// DownFile-设置缓存队列大小
+        /// </summary>
+        /// <param name="queueSize"></param>
         public void setCacheQueueSize(int queueSize)
         {
             this.cacheQueueSize = queueSize;
         }
 
-        // DownFile-设置缓存过期时间(秒)
+        /// <summary>
+        /// DownFile-设置缓存过期时间(秒)
+        /// </summary>
+        /// <param name="timeOut"></param>
         public void setCacheTimeOut(int timeOut)
         {
             this.cacheTimeOut = timeOut;

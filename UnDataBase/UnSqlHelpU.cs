@@ -9,6 +9,9 @@ using UnCommon.Files;
 
 namespace UnDataBase
 {
+    /// <summary>
+    /// SQL帮助类
+    /// </summary>
     public class UnSqlHelpU
     {
 
@@ -21,6 +24,7 @@ namespace UnDataBase
         /// 实例化
         /// </summary>
         /// <param name="constr"></param>
+        /// <param name="istrans"></param>
         public UnSqlHelpU(string constr, bool istrans)
         {
             cs = constr;
@@ -73,7 +77,7 @@ namespace UnDataBase
         /// 执行带参数SQL
         /// </summary>
         /// <param name="cmdText">cmd命令</param>
-        /// <param name="sqlPmtA">参数</param>
+        /// <param name="parms">参数</param>
         /// <returns>返回受影响的行数</returns>
         public int? exSql(string cmdText, SqlParameter[] parms)
         {
@@ -192,7 +196,7 @@ namespace UnDataBase
         /// 执行SQL并返回第一行第一列值
         /// </summary>
         /// <param name="cmdText">cmd命令</param>
-        /// <param name="sqlPmtA">参数</param>
+        /// <param name="parms">参数</param>
         /// <returns>返回第一行第一列值</returns>
         public object getExSc(string cmdText, SqlParameter[] parms)
         {
@@ -225,7 +229,7 @@ namespace UnDataBase
         /// </summary>
         /// <param name="cmdText"></param>
         /// <param name="cmdType"></param>
-        /// <param name="sqlPmtA"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
         public IEnumerator outPutParameter(string cmdText, CommandType cmdType, SqlParameter[] parms)
         {
@@ -370,10 +374,10 @@ namespace UnDataBase
         /// <summary>
         /// 记录错误日志
         /// </summary>
-        /// <param name="pre">前缀</param>
-        /// <param name="ex">异常对象</param>
-        /// <param name="cmdText">cmd命令</param>
-        /// <param name="sqlPmtA">参数</param>
+        /// <param name="pre"></param>
+        /// <param name="ex"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="parms"></param>
         private void writeLog(string pre, Exception ex, string cmdText, SqlParameter[] parms)
         {
             if (this.comd.Transaction != null)

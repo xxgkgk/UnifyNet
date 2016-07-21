@@ -16,6 +16,9 @@ using System.IO;
 
 namespace UnCommon.UDP
 {
+    /// <summary>
+    /// UDP客户端
+    /// </summary>
     public class UnUdpClient
     {
         // 数据包对象
@@ -33,7 +36,9 @@ namespace UnCommon.UDP
         // udp线程控制
         private AutoResetEvent udpAllDone = new AutoResetEvent(false);
 
-        // udp端口
+        /// <summary>
+        /// udp端口
+        /// </summary>
         public int udpPort = 0;
 
         // udp主机
@@ -64,7 +69,10 @@ namespace UnCommon.UDP
         // 监听接口
         private UnIntTransfer intTransfer = null;
 
-        // 设置监听接口
+        /// <summary>
+        /// 设置监听接口
+        /// </summary>
+        /// <param name="tran"></param>
         public void setIntTransfer(UnIntTransfer tran)
         {
             this.intTransfer = tran;
@@ -77,7 +85,11 @@ namespace UnCommon.UDP
         private UnAttrtStati ss = new UnAttrtStati();
 
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="host"></param>
+        /// <param name="port"></param>
         public UnUdpClient(string host, int port)
         {
             this.udpPort = port;
@@ -88,13 +100,19 @@ namespace UnCommon.UDP
             this._pid = UnInit.pid();
         }
 
-        // 线程ID
+        /// <summary>
+        /// 线程ID
+        /// </summary>
+        /// <returns></returns>
         public int pid()
         {
             return _pid;
         }
 
-        // 暂停
+        /// <summary>
+        /// 暂停
+        /// </summary>
+        /// <param name="b"></param>
         public void setPause(bool b)
         {
             this._isPause = b;
@@ -105,13 +123,19 @@ namespace UnCommon.UDP
             }
         }
 
-        // 获取暂停状态
+        /// <summary>
+        /// 获取暂停状态
+        /// </summary>
+        /// <returns></returns>
         public bool isPause()
         {
             return _isPause;
         }
 
-        // 设置超时时间
+        /// <summary>
+        /// 设置超时时间
+        /// </summary>
+        /// <param name="time"></param>
         public void setTimeOut(int time)
         {
             if (time < resendTime)
@@ -121,7 +145,9 @@ namespace UnCommon.UDP
             this.timeOut = time;
         }
 
-        // 关闭
+        /// <summary>
+        /// 关闭
+        /// </summary>
         public void close()
         {
             _isFinish = true;
@@ -257,7 +283,10 @@ namespace UnCommon.UDP
         }
 
 
-        // UpFile
+        /// <summary>
+        /// UpFile
+        /// </summary>
+        /// <param name="filePath"></param>
         public void upFile(string filePath)
         {
             if (_isFinish)
@@ -275,7 +304,10 @@ namespace UnCommon.UDP
         // UpFile-上传文件分包大小
         private int subSize_up = 1357;
 
-        // UpFile-设置分包大小
+        /// <summary>
+        /// UpFile-设置分包大小
+        /// </summary>
+        /// <param name="subSize"></param>
         public void setUpSubSize(int subSize)
         {
             this.subSize_up = subSize;
@@ -533,7 +565,10 @@ namespace UnCommon.UDP
         }
 
 
-        // DownFile
+        /// <summary>
+        /// DownFile
+        /// </summary>
+        /// <param name="downCode"></param>
         public void downFile(string downCode)
         {
             if (_isFinish)
@@ -569,21 +604,32 @@ namespace UnCommon.UDP
         // DownFile-允许掉包最小值
         private float dbPerMin = 0.01F;
 
-        // DownFile-设置休眠区间(毫秒)
+        /// <summary>
+        /// DownFile-设置休眠区间(毫秒)
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
         public void setDownSleepInterval(int min, int max)
         {
             downSleepMin = min;
             downSleepMax = max;
         }
 
-        // DownFile-设置掉包区间
+        /// <summary>
+        /// DownFile-设置掉包区间
+        /// </summary>
+        /// <param name="min"></param>
+        /// <param name="max"></param>
         public void setDropRateInterval(float min, float max)
         {
             dbPerMin = min;
             dbPerMax = max;
         }
 
-        // DownFile-获取掉包率
+        /// <summary>
+        /// DownFile-获取掉包率
+        /// </summary>
+        /// <returns></returns>
         public float getDropRate()
         {
             return dbPer;

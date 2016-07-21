@@ -8,13 +8,26 @@ using UnCommon.UDP;
 
 namespace UnCommon.Delegates
 {
+    /// <summary>
+    /// 客户端传输接口
+    /// </summary>
     public class UnTraClient
     {
-        // 进度
+        /// <summary>
+        /// 进度
+        /// </summary>
+        /// <param name="pgs"></param>
         public delegate void progressDelegate(UnAttrPgs pgs);
-        // 成功
+        /// <summary>
+        /// 成功
+        /// </summary>
+        /// <param name="rst"></param>
+        /// <returns></returns>
         public delegate bool successDelegate(UnAttrRst rst);
-        // 错误
+        /// <summary>
+        /// 错误
+        /// </summary>
+        /// <param name="rst"></param>
         public delegate void errorDelegate(UnAttrRst rst);
     }
 }

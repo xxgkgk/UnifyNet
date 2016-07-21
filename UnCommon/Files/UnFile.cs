@@ -69,7 +69,11 @@ namespace UnCommon.Files
             return fi;
         }
 
-        // 新建目录
+        /// <summary>
+        /// 新建目录
+        /// </summary>
+        /// <param name="unfc"></param>
+        /// <returns></returns>
         public static bool createDirectory(UnFileEvent unfc)
         {
             DirectoryInfo di = new DirectoryInfo(unfc.fullPath());
@@ -273,7 +277,7 @@ namespace UnCommon.Files
         /// <summary>
         /// 获取文件扩展名组
         /// </summary>
-        /// <param name="fs"></param>
+        /// <param name="fileName"></param>
         /// <returns></returns>
         public static List<string> expandedFormFile(string fileName)
         {
@@ -492,7 +496,13 @@ namespace UnCommon.Files
             return fa;
         }
 
-        // 移动文件
+        /// <summary>
+        /// 移动文件
+        /// </summary>
+        /// <param name="oldPath"></param>
+        /// <param name="newPath"></param>
+        /// <param name="isCorver"></param>
+        /// <returns></returns>
         public static bool move(string oldPath, string newPath, bool isCorver)
         {
             FileInfo oldFile = new FileInfo(oldPath);

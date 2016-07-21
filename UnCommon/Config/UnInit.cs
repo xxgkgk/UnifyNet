@@ -23,7 +23,10 @@ namespace UnCommon.Config
         // 编码格式
         private static Encoding _Encoding = Encoding.UTF8;
 
-        // 产生一个不重复的PID
+        /// <summary>
+        /// 产生一个不重复的PID
+        /// </summary>
+        /// <returns></returns>
         public static int pid()
         {
             if (_pid == int.MaxValue)
@@ -34,16 +37,22 @@ namespace UnCommon.Config
             return _pid;
         }
 
-        // 设置根目录
-        public static void setHomeDirectory(string s)
+        /// <summary>
+        /// 设置根目录
+        /// </summary>
+        /// <param name="path">目录</param>
+        public static void setHomeDirectory(string path)
         {
             if (_home == null)
             {
-                _home = s;
+                _home = path;
             }
         }
 
-        // 返回根目录
+        /// <summary>
+        /// 返回根目录
+        /// </summary>
+        /// <returns></returns>
         public static string getHomeDirectory()
         {
             if (_home == null)
@@ -54,7 +63,10 @@ namespace UnCommon.Config
             return _home;
         }
 
-        // 设置des密钥
+        /// <summary>
+        /// 设置des密钥
+        /// </summary>
+        /// <param name="s"></param>
         public static void setDESKey(string s)
         {
             if (_DESKey == null && (s.Length % 8) == 0)
@@ -63,31 +75,46 @@ namespace UnCommon.Config
             }
         }
 
-        // 返回des密钥
+        /// <summary>
+        /// 返回des密钥
+        /// </summary>
+        /// <returns></returns>
         public static string getDESKey()
         {
             return _DESKey;
         }
 
-        // 设置编码集
+        /// <summary>
+        /// 设置编码集
+        /// </summary>
+        /// <param name="code"></param>
         public static void setEncoding(Encoding code)
         {
             _Encoding = code;
         }
 
-        // 返回编码集
+        /// <summary>
+        /// 返回编码集
+        /// </summary>
+        /// <returns></returns>
         public static Encoding getEncoding()
         {
             return _Encoding;
         }
 
-        // 设置版本号
+        /// <summary>
+        /// 设置版本号
+        /// </summary>
+        /// <param name="version"></param>
         public static void setVersion(int version)
         {
             _version = version;
         }
 
-        // 获取版本号
+        /// <summary>
+        /// 获取版本号
+        /// </summary>
+        /// <returns></returns>
         public static int getVersion()
         {
             return _version;

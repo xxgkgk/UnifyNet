@@ -5,9 +5,15 @@ using System.Text;
 using UnCommon.Extend;
 using System.Reflection;
 using UnCommon.XMMP;
+using Newtonsoft.Json.Linq;
+using Newtonsoft.Json;
+using System.Collections;
 
 namespace UnCommon.Tool
 {
+    /// <summary>
+    /// 签名工具
+    /// </summary>
     public class UnSign
     {
         /// <summary>
@@ -15,7 +21,13 @@ namespace UnCommon.Tool
         /// </summary>
         public enum UnSingType
         {
+            /// <summary>
+            /// MD5
+            /// </summary>
             MD5,
+            /// <summary>
+            /// SHA1
+            /// </summary>
             SHA1
         }
 
@@ -57,6 +69,7 @@ namespace UnCommon.Tool
         public string sign(string str)
         {
             // 拼接上密钥
+            str = str.ToLower();
             str = str + "&key=" + _key;
             switch (_type)
             {
@@ -108,18 +121,20 @@ namespace UnCommon.Tool
         /// <summary>
         /// 取出所有签名排序的属性字典(包括继承）
         /// </summary>
-        /// <typeparam name="T">泛型类型</typeparam>
+        /// <typeparam name="T">泛型</typeparam>
         /// <param name="t">泛型对象</param>
+        /// <param name="treeName">根名</param>
         /// <returns></returns>
-        public SortedDictionary<string, string> getSignDictionary<T>(T t)
+        public SortedDictionary<string, string> getSignDictionary<T>(T t, string treeName)
         {
+            treeName += "" + t.GetType().Name;
             PropertyInfo[] properties = t.GetType().GetProperties(BindingFlags.Instance | BindingFlags.Public);
             int length = properties.Length;
             SortedDictionary<string, string> sort = new SortedDictionary<string, string>();
             for (int i = 0; i < length; i++)
             {
                 PropertyInfo item = properties[i];
-                string name = item.Name;
+                string name = treeName + "" + item.Name;
                 object value = item.GetValue(t, null);
                 if (value != null)
                 {
@@ -129,8 +144,7 @@ namespace UnCommon.Tool
                     }
                     else if (isSignClass(item))
                     {
-                       
-                        var dics = getSignDictionary(value);
+                        var dics = getSignDictionary(value, treeName);
                         foreach (var dic in dics)
                         {
                             sort.Add(dic.Key, dic.Value);
@@ -138,20 +152,39 @@ namespace UnCommon.Tool
                     }
                     else
                     {
-                       
                         // 不能直接签名的泛型集合或数组转为JSON格式进行签名
                         if (isSignArrayClass(item))
                         {
-                            string str = UnXMMPJson.tToJson(item.PropertyType, value);
-                            if (str != null && str != "[]")
+                           
+                            Console.WriteLine(item.Name + "//");
+                            int arrayNum = 0;
+                            foreach (object o in (value as IEnumerable))
                             {
-                                sort.Add(name, str);
+                                // 数组自循环加1
+                                string arrayName = name + "" + arrayNum.ToString();
+                                arrayNum++;
+                                var dics1 = getSignDictionary(o, arrayName);
+                                foreach (var dic in dics1)
+                                {
+                                    sort.Add(dic.Key, dic.Value);
+                                }
                             }
                         }
                     }
                 }
             }
             return sort;
+        }
+
+        /// <summary>
+        /// 取出所有签名排序的属性字典(包括继承）
+        /// </summary>
+        /// <typeparam name="T">泛型类型</typeparam>
+        /// <param name="t">泛型对象</param>
+        /// <returns></returns>
+        public SortedDictionary<string, string> getSignDictionary<T>(T t)
+        {
+            return getSignDictionary(t, null);
         }
 
         /// <summary>
@@ -166,7 +199,7 @@ namespace UnCommon.Tool
         }
 
         /// <summary>
-        /// 获得签名字符串
+        /// 获得签名串
         /// </summary>
         /// <param name="sort"></param>
         /// <returns></returns>

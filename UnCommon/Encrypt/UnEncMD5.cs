@@ -14,13 +14,22 @@ namespace UnCommon.Encrypt
     /// </summary>
     public class UnEncMD5
     {
-        // 获取文件MD5
+        /// <summary>
+        /// 获取文件MD5
+        /// </summary>
+        /// <param name="f"></param>
+        /// <returns></returns>
         public static string getMd5Hash(FileInfo f)
         {
             return getMd5Hash(f.FullName, 0);
         }
 
-        // 获取文件MD5
+        /// <summary>
+        /// 获取文件MD5
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="type"></param>
+        /// <returns></returns>
         public static string getMd5Hash(string filePath, int type)
         {
             string smd5 = filePath;
@@ -51,13 +60,17 @@ namespace UnCommon.Encrypt
                     return getMd5Hash(body);
                 }
             }
-            catch (Exception e)
+            catch 
             {
                 return getMd5Hash(filePath);
             }
         }
 
-        // 字符串MD5
+        /// <summary>
+        /// 字符串MD5
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string getMd5Hash(string s)
         {
             //实例化一个md5对像
@@ -75,7 +88,11 @@ namespace UnCommon.Encrypt
             return sBuilder.ToString();
         }
 
-        // 多次密码
+        /// <summary>
+        /// 二次加密
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string getMd5Hashs(string s)
         {
             string s1 = getMd5Hash(s);
@@ -83,7 +100,11 @@ namespace UnCommon.Encrypt
             return s1;
         }
 
-        // 字节组md5
+        /// <summary>
+        /// 字节组md5
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static string getMd5Hash(byte[] t)
         {
             return getMd5Hash(UnTo.byteToIntStr(t));

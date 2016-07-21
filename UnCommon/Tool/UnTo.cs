@@ -13,7 +13,11 @@ namespace UnCommon.Tool
     /// </summary>
     public class UnTo
     {
-        // Stream转byte
+        /// <summary>
+        /// Stream转byte
+        /// </summary>
+        /// <param name="stream"></param>
+        /// <returns></returns>
         public static byte[] streamToByte(Stream stream)
         {
             byte[] bytes = new byte[stream.Length];
@@ -22,13 +26,21 @@ namespace UnCommon.Tool
             return bytes;
         }
 
-        // Stream转string
+        /// <summary>
+        /// Stream转string
+        /// </summary>
+        /// <param name="i"></param>
+        /// <returns></returns>
         public static string streamToString(Stream i)
         {
             return UnInit.getEncoding().GetString(streamToByte(i));
         }
 
-        // byte转int组
+        /// <summary>
+        /// byte转int组
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
         public static int[] byteToInt(byte[] bytes)
         {
             int[] ints = new int[bytes.Length];
@@ -41,7 +53,11 @@ namespace UnCommon.Tool
             return ints;
         }
 
-        // byte转int字符串组
+        /// <summary>
+        /// byte转int字符串组
+        /// </summary>
+        /// <param name="bytes"></param>
+        /// <returns></returns>
         public static string byteToIntStr(byte[] bytes)
         {
             string str = "";
@@ -53,7 +69,11 @@ namespace UnCommon.Tool
             return str;
         }
 
-        // 字符串转为UniCode码字符串  
+        /// <summary>
+        /// 字符串转为UniCode码字符串
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
         public static string stringToUnicode(string s)
         {
             char[] charbuffers = s.ToCharArray();
@@ -67,7 +87,11 @@ namespace UnCommon.Tool
             return sb.ToString();
         }
 
-        // Unicode字符串转为正常字符串
+        /// <summary>
+        /// Unicode字符串转为正常字符串
+        /// </summary>
+        /// <param name="srcText"></param>
+        /// <returns></returns>
         public static string unicodeToString(string srcText)
         {
             string dst = "";

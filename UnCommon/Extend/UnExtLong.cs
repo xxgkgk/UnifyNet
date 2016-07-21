@@ -10,6 +10,11 @@ namespace UnCommon.Extend
     /// </summary>
     public static class UnExtLong
     {
+        /// <summary>
+        /// 返回DOUBLE类型
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static double toDouble(this long t)
         {
             return (double)t;

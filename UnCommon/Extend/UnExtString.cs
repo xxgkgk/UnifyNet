@@ -54,7 +54,7 @@ namespace UnCommon.Extend
         /// <summary>
         /// 16位加密
         /// </summary>
-        /// <param name="ConvertString"></param>
+        /// <param name="input"></param>
         /// <returns></returns>
         public static string md5Hash16(this string input)
         {
@@ -181,7 +181,7 @@ namespace UnCommon.Extend
         /// <summary>
         /// 字节数
         /// </summary>
-        /// <param name="input"></param>
+        /// <param name="t"></param>
         /// <returns></returns>
         public static int byteLength(this string t)
         {

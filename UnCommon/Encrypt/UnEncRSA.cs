@@ -6,6 +6,9 @@ using System.Security.Cryptography;
 
 namespace UnCommon.Encrypt
 {
+    /// <summary>
+    /// RSA
+    /// </summary>
     public class UnEncRSA
     {
         /// <summary>

@@ -526,8 +526,9 @@ namespace UnDataBase
         /// <summary>
         /// 删除约束SQL
         /// </summary>
-        /// <param name="tableName">表名</param>
-        /// <param name="keyName">约束名</param>
+        /// <param name="model"></param>
+        /// <param name="tableName"></param>
+        /// <param name="keyName"></param>
         /// <returns></returns>
         private static StringBuilder dropConstraints(ConstraintModel model,string tableName, string keyName)
         {
@@ -553,8 +554,9 @@ namespace UnDataBase
         /// <summary>
         /// 删除索引SQL
         /// </summary>
-        /// <param name="tableName">表名</param>
-        /// <param name="keyName">约束名</param>
+        /// <param name="model"></param>
+        /// <param name="tableName"></param>
+        /// <param name="keyName"></param>
         /// <returns></returns>
         private static StringBuilder dropIndex(IndexModel model, string tableName, string keyName)
         {
@@ -941,7 +943,7 @@ end;";
         /// Add字段组合(T)
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="_T"></param>
+        /// <param name="pars"></param>
         /// <returns></returns>
         internal static string getAddStr<T>(SqlParameter[] pars) where T : new()
         {
@@ -966,8 +968,7 @@ end;";
         /// <summary>
         /// Upd字段组合(FieldList)
         /// </summary>
-        /// <param name="FieldList">字段名组</param>
-        /// /// <param name="KeyID">自动编号名</param>
+        /// <param name="Pars"></param>
         /// <returns></returns>
         internal static string getUpdStr(SqlParameter[] Pars)
         {
@@ -983,8 +984,7 @@ end;";
         /// <summary>
         /// Upd字段组合(T)
         /// </summary>
-        /// <typeparam name="T">实体形参</typeparam>
-        /// <param name="_T">实体实例</param>
+        /// <typeparam name="T"></typeparam>
         /// <returns></returns>
         internal static string getUpdStr<T>() where T : new()
         {
@@ -1125,8 +1125,8 @@ end;";
         /// <summary>
         /// 获得SqlPmt数组(T所有字段)
         /// </summary>
-        /// <typeparam name="T">实体形参</typeparam>
-        /// <param name="_T">实例</param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
         /// <returns></returns>
         internal static SqlParameter[] getSqlPmtA<T>(T t) where T : new()
         {
@@ -1137,7 +1137,7 @@ end;";
         /// 获得SqlPmt数组(FieldList)
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="_T"></param>
+        /// <param name="t"></param>
         /// <param name="FieldList"></param>
         /// <returns></returns>
         internal static SqlParameter[] getSqlPmtA<T>(T t, string FieldList) where T : new()
@@ -1177,12 +1177,8 @@ end;";
         /// 条件语句
         /// </summary>
         /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
         /// <param name="selection"></param>
         /// <param name="selectionArgs"></param>
-        /// <param name="groupBy"></param>
-        /// <param name="having"></param>
-        /// <param name="orderBy"></param>
         /// <returns></returns>
         public static string getSelectionSql<T>(string selection, string[] selectionArgs)
         {
@@ -1202,6 +1198,13 @@ end;";
             return sb.ToString();
         }
 
+        /// <summary>
+        /// 条件语句
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
+        /// <returns></returns>
         public static string getSelectionSql<T>(string selection, string selectionArgs)
         {
             string[] sls = null;

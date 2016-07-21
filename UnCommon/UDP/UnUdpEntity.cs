@@ -13,14 +13,23 @@ using System.Net;
 
 namespace UnCommon.UDP
 {
+    /// <summary>
+    /// UDP分包实体
+    /// </summary>
     public class UnUdpEntity
     {
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
         public UnUdpEntity()
         { 
         }
 
-        // 实例化(文件分包)
+        /// <summary>
+        /// 实例化(文件分包)
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <param name="subSize"></param>
         public UnUdpEntity(string filePath, int subSize)
         {
             UnFileInfo uf = new UnFileInfo(filePath);
@@ -37,7 +46,10 @@ namespace UnCommon.UDP
             this.TotalSize = uf.length;
         }
 
-        // 实例化(消息分包)
+        /// <summary>
+        /// 实例化(消息分包)
+        /// </summary>
+        /// <param name="msg"></param>
         public UnUdpEntity(byte[] msg)
         {
             this.FullName = null;
@@ -50,7 +62,11 @@ namespace UnCommon.UDP
             this.SubSize = msg.Length;
         }
 
-        // 实例化(下载)
+        /// <summary>
+        /// 实例化(下载)
+        /// </summary>
+        /// <param name="code"></param>
+        /// <param name="isDown"></param>
         public UnUdpEntity(string code, bool isDown)
         {
             this.PackData = UnInit.getEncoding().GetBytes(code);
@@ -58,64 +74,114 @@ namespace UnCommon.UDP
             this.PackSize = this.PackData.Length;
         }
 
-        // 事件
+        /// <summary>
+        /// 事件
+        /// </summary>
         public string Event { get; set; }
-        // 区间值
+        /// <summary>
+        /// 区间值
+        /// </summary>
         public long IntMin { get; set; }
-        // 区间值
+        /// <summary>
+        /// 区间值
+        /// </summary>
         public long IntMax { get; set; }
-        // 已传包数
+        /// <summary>
+        /// 已传包数
+        /// </summary>
         public long UpCount { get; set; }
-        // 扩展名
+        /// <summary>
+        /// 扩展名
+        /// </summary>
         public string Extent { get; set; }
-        // HashCode
+        /// <summary>
+        /// HashCode
+        /// </summary>
         public string HashCode { get; set; }
-        // 分包大小
+        /// <summary>
+        /// 分包大小
+        /// </summary>
         public int SubSize { get; set; }
-        // 总包数
+        /// <summary>
+        /// 总包数
+        /// </summary>
         public long TotalPacks { get; set; }
-        // 总大小
+        /// <summary>
+        /// 总大小
+        /// </summary>
         public long TotalSize { get; set; }
-        // 包编号
+        /// <summary>
+        /// 包编号
+        /// </summary>
         public long PackNo { get; set; }
-        // 包偏移量
+        /// <summary>
+        /// 包偏移量
+        /// </summary>
         public long PackOffset { get; set; }
-        // 包内容大小
+        /// <summary>
+        /// 包内容大小
+        /// </summary>
         public int PackSize { get; set; }
-        // 包md5
+        /// <summary>
+        /// 包md5
+        /// </summary>
         public string PackMD5 { get; set; }
-        // 状态(-2:文件过大,-1:文件类型错误,0:上传中,1:上传成功,2:极速秒传)
+        /// <summary>
+        /// 状态(-2:文件过大,-1:文件类型错误,0:上传中,1:上传成功,2:极速秒传)
+        /// </summary>
         public int State { get; set; }
-        // 原文件名(不含扩展名)
+        /// <summary>
+        /// 原文件名(不含扩展名)
+        /// </summary>
         public string OgnName { get; set; }
 
-        // 头大小
+        /// <summary>
+        /// 头大小
+        /// </summary>
         public int HeadSize { get; set; }
-        // 包内容
+        /// <summary>
+        /// 包内容
+        /// </summary>
         public byte[] PackData { get; set; }
-        // 临时路径
+        /// <summary>
+        /// 临时路径
+        /// </summary>
         public string TmpPath { get; set; }
 
-        // 文件路径
+        /// <summary>
+        /// 文件路径
+        /// </summary>
         public string FullName { get; set; }
 
-        // 终结点
+        /// <summary>
+        /// 终结点
+        /// </summary>
         public EndPoint Point { get; set; }
 
-        // 唤醒时间
+        /// <summary>
+        /// 唤醒时间
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public decimal WakeTimeStamp = 0;
-        // 是否发送
+        /// <summary>
+        /// 是否发送
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public bool isSend = false;
-        // 已接收包
+        /// <summary>
+        /// 已接收包
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public List<long> isReceived = new List<long>();
 
-        // UpFile获取包
+        /// <summary>
+        /// UpFile获取包
+        /// </summary>
+        /// <param name="_pn"></param>
+        /// <returns></returns>
         private UnUdpEntity getUpFilePackage(long _pn)
         {
             UnUdpEntity ue = new UnUdpEntity();
@@ -144,7 +210,11 @@ namespace UnCommon.UDP
             return ue;
         }
 
-        // UpFile获取发送包
+        /// <summary>
+        /// UpFile获取发送包
+        /// </summary>
+        /// <param name="_pn"></param>
+        /// <returns></returns>
         public byte[] getUpFileSendPackage(long _pn)
         {
             UnUdpEntity ue = getUpFilePackage(_pn);
@@ -152,7 +222,11 @@ namespace UnCommon.UDP
             return UnUdpHelp.assemblePackage(ue);
         }
 
-        // UpFile获取查询包
+        /// <summary>
+        /// UpFile获取查询包
+        /// </summary>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public byte[] getUpFileQueryPackage(int state)
         {
             UnUdpEntity ue = getUpFilePackage(0);
@@ -161,14 +235,21 @@ namespace UnCommon.UDP
             return UnUdpHelp.assemblePackage(ue);
         }
 
-        // Msg获取发送包
+        /// <summary>
+        /// Msg获取发送包
+        /// </summary>
+        /// <returns></returns>
         public byte[] getMsgSendPackage()
         {
             this.Event = UnUdpEveEnum.msgPackage.getText();
             return UnUdpHelp.assemblePackage(this);
         }
 
-        // DownFile获取发送包
+        /// <summary>
+        /// DownFile获取发送包
+        /// </summary>
+        /// <param name="_pn"></param>
+        /// <returns></returns>
         public byte[] getDownFileSendPackage(long _pn)
         {
             UnUdpEntity ue = new UnUdpEntity();
@@ -180,7 +261,11 @@ namespace UnCommon.UDP
             return UnUdpHelp.assemblePackage(ue);
         }
 
-        // DownFile获取查询包
+        /// <summary>
+        /// DownFile获取查询包
+        /// </summary>
+        /// <param name="startNo"></param>
+        /// <returns></returns>
         public byte[] getDownFileQueryPackage(long startNo)
         {
             UnUdpEntity ue = getUpFilePackage(0);
@@ -191,7 +276,11 @@ namespace UnCommon.UDP
             return UnUdpHelp.assemblePackage(ue);
         }
 
-        // UpFile获取发送包
+        /// <summary>
+        /// UpFile获取发送包
+        /// </summary>
+        /// <param name="_pn"></param>
+        /// <returns></returns>
         public byte[] getDownFileBackPackage(long _pn)
         {
             UnUdpEntity ue = getUpFilePackage(_pn);

@@ -9,18 +9,32 @@ using UnCommon.Tool;
 
 namespace UnCommon.Files
 {
+    /// <summary>
+    /// 文件信息类
+    /// </summary>
     public class UnFileInfo
     {
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
         public UnFileInfo() { }
-      
-        // 实例化
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="path"></param>
         public UnFileInfo(string path)
         {
             initt(path, null, null, null);
         }
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="path"></param>
+        /// <param name="allowSize"></param>
+        /// <param name="allowType"></param>
+        /// <param name="timeOutMsec"></param>
         public UnFileInfo(string path, long? allowSize, string allowType, long? timeOutMsec)
         {
             initt(path, allowSize, allowType, timeOutMsec);
@@ -90,70 +104,106 @@ namespace UnCommon.Files
             }
         }
 
-        // 基本信息
+        /// <summary>
+        /// 基本信息
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public FileInfo baseInfo = null;
 
-        // 是否存在
+        /// <summary>
+        /// 是否存在
+        /// </summary>
         public bool exists = false;
 
-        // 文件大小
+        /// <summary>
+        /// 文件大小
+        /// </summary>
         public long length = 0;
 
-        // 文件创建时间
+        /// <summary>
+        /// 文件创建时间
+        /// </summary>
         public DateTime creationTime { get; set; }
 
-        // 最后修改时间
+        /// <summary>
+        /// 最后修改时间
+        /// </summary>
         public DateTime lastWirteTime { get; set; }
 
-        // 父文件夹
+        /// <summary>
+        /// 父文件夹
+        /// </summary>
         public string parentFloder { get; set; }
 
-        // 完整路径
+        /// <summary>
+        /// 完整路径
+        /// </summary>
         public string fullName { get; set; }
 
-        // 临时路径
+        /// <summary>
+        /// 临时路径
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public string fullNameTmp;
 
-        // 目录路径
+        /// <summary>
+        /// 目录路径
+        /// </summary>
         public string directoryName { get; set; }
 
-        // 文件名
+        /// <summary>
+        /// 文件名
+        /// </summary>
         public string name { get; set; }
 
-        // 扩展名
+        /// <summary>
+        /// 扩展名
+        /// </summary>
         public string extens { get; set; }
 
-        // md5标识
+        /// <summary>
+        /// md5标识
+        /// </summary>
         public string md5 { get; set; }
 
-        // mime
+        /// <summary>
+        /// mime
+        /// </summary>
         public string mimeType { get; set; }
 
-        // 文件过大
+        /// <summary>
+        /// 文件过大
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public bool isTooLarge = false;
 
-        // 文件名错误
+        /// <summary>
+        /// 文件名错误
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public bool isWrongName = false;
 
-        // 错误扩展名
+        /// <summary>
+        /// 错误扩展名
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public bool isWrongExtens = false;
 
-        // 错误类型
+        /// <summary>
+        /// 错误类型
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public bool isWrongType = false;
 
-        // 是否过期
+        /// <summary>
+        /// 是否过期
+        /// </summary>
         [NonSerialized]
         [XmlIgnore]
         public bool isLate = false;

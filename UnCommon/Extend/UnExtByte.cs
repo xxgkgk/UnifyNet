@@ -62,7 +62,7 @@ namespace UnCommon.Extend
         /// 从开始到指定位置之间的索引
         /// </summary>
         /// <param name="t"></param>
-        /// <param name="searchBytes"></param>
+        /// <param name="i"></param>
         /// <returns></returns>
         public static byte[] subByteToIndex(this byte[] t, int i)
         {
@@ -113,7 +113,7 @@ namespace UnCommon.Extend
                 Buffer.BlockCopy(t, i, data, 0, count);
                 return data;
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -139,7 +139,7 @@ namespace UnCommon.Extend
                 Buffer.BlockCopy(t, i + searchBytes.Length, data, 0, count);
                 return data;
             }
-            catch(Exception e)
+            catch
             {
                 return null;
             }
@@ -199,9 +199,9 @@ namespace UnCommon.Extend
         /// <summary>
         /// 两个匹配项之间的索引
         /// </summary>
-        /// <param name="t">被执行查找的Byte[]</param>
-        /// <param name="beginBytes">第一个匹配项</param>
-        /// <param name="endBytes">第二个匹配项</param>
+        /// <param name="t"></param>
+        /// <param name="beginString"></param>
+        /// <param name="endString"></param>
         /// <returns></returns>
         public static string subStringBetween(this byte[] t, string beginString, string endString)
         {

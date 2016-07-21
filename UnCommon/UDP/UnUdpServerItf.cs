@@ -7,15 +7,38 @@ using UnCommon.Entity;
 
 namespace UnCommon.UDP
 {
+    /// <summary>
+    /// UDP服务端接口
+    /// </summary>
     public interface UnUdpServerItf
     {
-        // 上传开始
+        /// <summary>
+        /// 上传开始
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         UnAttrRst upStart(EndPoint point, UnUdpEntity entity);
-        // 上传成功
+        /// <summary>
+        /// 上传成功
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         UnAttrRst upSuccess(EndPoint point, UnUdpEntity entity);
-        // 收到消息
+        /// <summary>
+        /// 收到消息
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         UnAttrRst msgReceived(EndPoint point, UnUdpEntity entity);
-        // 下载码解析
+        /// <summary>
+        /// 下载码解析
+        /// </summary>
+        /// <param name="point"></param>
+        /// <param name="entity"></param>
+        /// <returns></returns>
         UnAttrRst downCodeAnalyze(EndPoint point, UnUdpEntity entity);
     }
 }

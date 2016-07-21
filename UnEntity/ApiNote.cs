@@ -13,11 +13,11 @@ namespace UnEntity
         /// <summary>
         /// 结果通知编号
         /// </summary>
-        public int? NoteCode;
+        public int? NoteCode { get; set; }
         /// <summary>
         /// 结果通知信息
         /// </summary>
-        public string NoteMsg;
+        public string NoteMsg { get; set; }
 
         public DateTime? dt { get; set; }
     }

@@ -9,6 +9,9 @@ using UnCommon.Config;
 
 namespace UnCommon.Encrypt
 {
+    /// <summary>
+    /// 签名类
+    /// </summary>
     public class UnEncSign
     {
         /// <summary>

@@ -83,11 +83,29 @@ namespace UnCommon.Entity
     /// </summary>
     public enum IndexModel
     {
+        /// <summary>
+        /// 无
+        /// </summary>
         None,
+        /// <summary>
+        /// 聚集索引
+        /// </summary>
         Clustered,
+        /// <summary>
+        /// 非聚集索引
+        /// </summary>
         Nonclustered,
+        /// <summary>
+        /// 唯一索引
+        /// </summary>
         Unique,
+        /// <summary>
+        /// 联合聚集索引
+        /// </summary>
         UnionClustered,
+        /// <summary>
+        /// 联合非聚集索引
+        /// </summary>
         UnionNonclustered
     }
 
@@ -96,11 +114,30 @@ namespace UnCommon.Entity
     /// </summary>
     public enum ConstraintModel
     {
+        /// <summary>
+        /// 无
+        /// </summary>
         None,
+        /// <summary>
+        /// 主键
+        /// </summary>
         PrimaryKey,
+        /// <summary>
+        /// 唯一
+        /// </summary>
         Unique,
+        /// <summary>
+        /// 默认
+        /// </summary>
         Default,
+        /// <summary>
+        /// 检查
+        /// </summary>
         Check,
+        /// <summary>
+        /// 外键
+        /// </summary>
         ForeignKey
     }
+
 }

@@ -89,7 +89,7 @@ namespace UnCommon.Tool
         /// <summary>
         /// 获取自定义属性
         /// </summary>
-        /// <param name="t"></param>
+        /// <param name="item">特性</param>
         /// <returns></returns>
         public static UnAttrSql getAttrSql(PropertyInfo item)
         {
@@ -169,11 +169,11 @@ namespace UnCommon.Tool
             return getListField(typeof(T));
         }
 
-
         /// <summary>
         /// 获得首位自动编号名
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="addPre"></param>
         /// <returns></returns>
         public static string getAutoNum(Type t,bool addPre)
         {
@@ -463,7 +463,8 @@ namespace UnCommon.Tool
                     {
                         foreach (DataColumn dc in dr.Table.Columns)
                         {
-                            if (dc.ColumnName.Equals(strName))
+                            // 忽略大小写
+                            if (dc.ColumnName.ToLower().Equals(strName.ToLower()))
                             {
                                 t.GetType().GetProperty(strName).SetValue(t, UnToGen.convertTo(pi.PropertyType, dr[strName]), null);
                                 break;

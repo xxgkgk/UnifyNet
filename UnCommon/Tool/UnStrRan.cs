@@ -71,9 +71,27 @@ namespace UnCommon.Tool
             return rand.Next(min, max);
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <returns></returns>
         public static string getUID()
         {
             return DateTime.Now.ToString("yyyyMMddHHmmss") + UnInit.pid();
+        }
+
+        /// <summary>
+        /// 获取自增ID
+        /// </summary>
+        /// <returns></returns>
+        public static long getID()
+        {
+            long l = UnDate.ticksSecToLong() + UnInit.pid();
+            if (l > long.MaxValue)
+            {
+                l = long.MaxValue;
+            }
+            return l;
         }
 
         /// <summary>

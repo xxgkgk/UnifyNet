@@ -8,9 +8,15 @@ using UnCommon.Files;
 
 namespace UnDataBase
 {
+    /// <summary>
+    /// SQL操作对象帮助类
+    /// </summary>
     public class UnSqlHelp
     {
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="constr"></param>
         public UnSqlHelp(string constr)
         {
             this.cS = constr;
@@ -21,8 +27,6 @@ namespace UnDataBase
 
         // 连接对象
         private SqlConnection conn = null;
-
-        private SqlCommand comd = null;
 
         // 事务数组
         private List<SqlTransaction> tranNum = new List<SqlTransaction>();
@@ -409,9 +413,11 @@ namespace UnDataBase
         /// <summary>
         /// 获取翻页数据
         /// </summary>
-        /// <param name="keyName"></param>
         /// <param name="columns"></param>
-        /// <param name="from"></param>
+        /// <param name="keyName"></param>
+        /// <param name="table"></param>
+        /// <param name="where"></param>
+        /// <param name="order"></param>
         /// <param name="currentPage"></param>
         /// <param name="pageSize"></param>
         /// <returns></returns>

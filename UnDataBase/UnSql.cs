@@ -10,6 +10,9 @@ using UnCommon.Config;
 
 namespace UnDataBase
 {
+    /// <summary>
+    /// SQL操作类
+    /// </summary>
     public class UnSql
     {
         #region 私有变量/方法
@@ -111,7 +114,8 @@ namespace UnDataBase
         /// <summary>
         /// 实例化
         /// </summary>
-        /// <param name="constr">连接字符串</param>
+        /// <param name="constr"></param>
+        /// <param name="trans"></param>
         public UnSql(string constr, bool trans)
         {
             help = new UnSqlHelpU(constr, trans);
@@ -231,6 +235,7 @@ namespace UnDataBase
             foreach (var item in listFP)
             {
                 string fName = UnToGen.getFieldName(item);
+                // 数据库字段不分大小写
                 if (listDB.Find(e => e == fName) == null)
                 {
                     sb.AppendLine("Alter Table " + tableName + " Add " + UnSqlStr.getFieldTypeAndNull(item) + ";");
@@ -319,15 +324,15 @@ namespace UnDataBase
         /// <param name="t"></param>
         public void updateTable(Type t)
         {
-            addColumn(t);
             dropColumn(t);
+            addColumn(t);
             alterColumn(t);
         }
 
         /// <summary>
         /// 创建多个表
         /// </summary>
-        /// <param name="t"></param>
+        /// <param name="list">要创建的表数组</param>
         public void createTableList(List<Type> list)
         {
             foreach (var item in list)
@@ -415,6 +420,16 @@ namespace UnDataBase
             //help.exSql(UnSqlStr.create_mp_DropColConstraintAndIndex());
         }
 
+        /// <summary>
+        /// 执行语句
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public int? exSql(string sql)
+        {
+            return help.exSql(sql);
+        }
+
         #endregion
 
         #region 添加数据
@@ -484,8 +499,9 @@ namespace UnDataBase
         /// <summary>
         /// 查询实体(核心方法)
         /// </summary>
-        /// <typeparam name="T">实体</typeparam>
-        /// <param name="strSql">sql语句</param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="strSql"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
         private List<T> query<T>(string strSql, SqlParameter[] parms) where T : new()
         {
@@ -547,11 +563,12 @@ namespace UnDataBase
         /// <summary>
         /// 一般查询语句
         /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
-        /// <param name="columns">属性</param>
-        /// <param name="selection">条件语句</param>
-        /// <param name="selectionArgs">条件参数</param>
-        /// <param name="orderBy">排序</param>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="columns"></param>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="isArray"></param>
         /// <returns></returns>
         public List<T> query<T>(string columns, string selection, string[] selectionArgs, string orderBy, bool isArray) where T : new()
         {
@@ -830,9 +847,9 @@ namespace UnDataBase
         /// <summary>
         /// 查询第一行第一个值
         /// </summary>
-        /// <param name="sql">sql</param>
-        /// <param name="parms"参数></param>
-        /// <returns>无数据则返回NULL</returns>
+        /// <param name="sql"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
         public object queryScalar(String sql, SqlParameter[] parms)
         {
             DataTable dt = queryDT(sql, parms);
@@ -846,15 +863,16 @@ namespace UnDataBase
         /// <summary>
         /// 查询第一行第一个值并转为Int
         /// </summary>
-        /// <param name="sql">sql</param>
-        /// <param name="parms"参数></param>
+        /// <param name="sql"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
         public int? queryScalarToInt(String sql, SqlParameter[] parms)
         {
             try
             {
                 return Convert.ToInt32(queryScalar(sql, parms));
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -863,15 +881,16 @@ namespace UnDataBase
         /// <summary>
         /// 查询第一行第一个值并转为Stringt
         /// </summary>
-        /// <param name="sql">sql</param>
-        /// <param name="parms"参数></param>
+        /// <param name="sql"></param>
+        /// <param name="parms"></param>
+        /// <returns></returns>
         public String queryScalarToString(String sql, SqlParameter[] parms)
         {
             try
             {
                 return queryScalar(sql, parms).ToString();
             }
-            catch (Exception e)
+            catch
             {
                 return null;
             }
@@ -886,8 +905,9 @@ namespace UnDataBase
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="t"></param>
-        /// <param name="fields"></param>
-        /// <param name="strWhere"></param>
+        /// <param name="columns"></param>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
         /// <returns></returns>
         public int? update<T>(T t, string columns, string selection, string selectionArgs) where T : new()
         {

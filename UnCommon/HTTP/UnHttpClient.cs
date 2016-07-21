@@ -45,26 +45,42 @@ namespace UnCommon.HTTP
         // 过期时间
         private int _timeOut = 5000;
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="url"></param>
         public UnHttpClient(string url)
         {
             init(url, -1, null);
         }
 
-        // 实例化 cert证书
+        /// <summary>
+        /// 实例化 cert证书
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="cerPath"></param>
         public UnHttpClient(string url, string cerPath)
         {
             init(url, -1, cerPath);
         }
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="packPath"></param>
+        /// <param name="packPass"></param>
         public UnHttpClient(string url, string packPath, string packPass)
         {
             init(url, -1, packPath);
             this._cerPass = packPass;
         }
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="cacheTimeOut"></param>
         public UnHttpClient(string url, int cacheTimeOut)
         {
             init(url, cacheTimeOut, null);
@@ -311,7 +327,10 @@ namespace UnCommon.HTTP
             }
         }
 
-        // 设置过期时间
+        /// <summary>
+        /// 设置过期时间
+        /// </summary>
+        /// <param name="timeOut"></param>
         public void setTimeOut(int timeOut)
         {
             if (timeOut < 1000)
@@ -321,21 +340,32 @@ namespace UnCommon.HTTP
             _timeOut = timeOut;
         }
 
-        // 发送消息(同步)
+        /// <summary>
+        /// 发送消息(同步)
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public UnAttrRst sendMsgSyn(string msg)
         {
             this._msg = msg + "";
             return send();
         }
 
-        // 发送消息
+        /// <summary>
+        /// 发送消息
+        /// </summary>
+        /// <param name="msg"></param>
         public void sendMsg(string msg)
         {
             this._msg = msg + "";
             new Thread(sendAsyn).Start();
         }
 
-        // 上传文件
+        /// <summary>
+        /// 上传文件
+        /// </summary>
+        /// <param name="fileName"></param>
+        /// <param name="eve"></param>
         public void upFile(string fileName, UnHttpUpEvent eve)
         {
             this._fileName = fileName;
@@ -343,13 +373,18 @@ namespace UnCommon.HTTP
             new Thread(up).Start();
         }
 
-        // 下载文件
+        /// <summary>
+        /// 下载文件
+        /// </summary>
         public void downFile()
         {
             downFile(false);
         }
 
-        // 下载文件(最长缓存)
+        /// <summary>
+        /// 下载文件(最长缓存)
+        /// </summary>
+        /// <param name="maxChche"></param>
         public void downFile(bool maxChche)
         {
             if (maxChche)
@@ -364,7 +399,10 @@ namespace UnCommon.HTTP
         // 传输接口
         private UnIntTransfer transfer = null;
 
-        // 设置传输接口实例
+        /// <summary>
+        /// 设置传输接口实例
+        /// </summary>
+        /// <param name="t"></param>
         public void setIntTransfer(UnIntTransfer t)
         {
             this.transfer = t;

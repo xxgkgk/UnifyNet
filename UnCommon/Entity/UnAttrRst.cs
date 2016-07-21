@@ -12,7 +12,9 @@ namespace UnCommon.Entity
     /// </summary>
     public class UnAttrRst
     {
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
         public UnAttrRst()
         { 
 

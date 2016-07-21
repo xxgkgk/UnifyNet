@@ -45,7 +45,12 @@ namespace UnCommon.HTTP
             return request;
         }
 
-        // 创建GET方式的HTTP请求
+        /// <summary>
+        /// 创建GET方式的HTTP请求
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="timeout"></param>
+        /// <returns></returns>
         public static HttpWebRequest creageGet(string url, int? timeout)
         {
             return creageGet(url, timeout, null, null);
@@ -139,13 +144,29 @@ namespace UnCommon.HTTP
             return request;
         }
 
-        // 创建POST方式的HTTP请求  
+        /// <summary>
+        /// 创建POST方式的HTTP请求 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="timeout"></param>
+        /// <param name="contentType"></param>
+        /// <param name="eve"></param>
+        /// <returns></returns>
         public static HttpWebRequest createPost(string url, int? timeout, string contentType, string eve)
         {
             return createPost(url, timeout, contentType, eve, null, null, null,null);
         }
 
-        // 创建POST方式的HTTP请求  
+        /// <summary>
+        /// 创建POST方式的HTTP请求 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="timeout"></param>
+        /// <param name="contentType"></param>
+        /// <param name="eve"></param>
+        /// <param name="cerPath"></param>
+        /// <param name="cerPass"></param>
+        /// <returns></returns>
         public static HttpWebRequest createPost(string url, int? timeout, string contentType, string eve, string cerPath,string cerPass)
         {
             return createPost(url, timeout, contentType, eve, null, null, cerPath, cerPass);
@@ -165,7 +186,11 @@ namespace UnCommon.HTTP
             return true;
         }
 
-        // 返回数据流
+        /// <summary>
+        /// 返回数据流
+        /// </summary>
+        /// <param name="response"></param>
+        /// <returns></returns>
         public static byte[] getResponseData(HttpWebResponse response)
         {
             try
