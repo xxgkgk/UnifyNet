@@ -6,6 +6,7 @@ using System.Data.SqlClient;
 using System.Drawing;
 using System.Linq;
 using System.Text;
+using System.Threading;
 using System.Windows.Forms;
 using UnCommon;
 using UnCommon.Config;
@@ -23,7 +24,7 @@ namespace UnTestWin
             InitializeComponent();
         }
 
-        
+
         //UnSql cn = null;
         private void button1_Click(object sender, EventArgs e)
         {
@@ -67,7 +68,7 @@ namespace UnTestWin
             //cn.insert(user);
 
             user.Name = "Name_" + UnStrRan.getStr(1, 10);
-          
+
             //cn.delete<TestUser>("TestUserID = {0} Or TestUserID = {1}", "11,16");
             //cn.delete<TestUser>("TestUserID = {0} Or TestUserID = {1}", "12,15");
             //List<TestUser> users = cn.query<TestUser>(null, "TestUserID = {0} Or TestUserID = {1}", "11,16", null);
@@ -120,7 +121,7 @@ namespace UnTestWin
 
         private void button4_Click(object sender, EventArgs e)
         {
-            UnSqlHelpU sql = new UnSqlHelpU("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;",false);
+            UnSqlHelpU sql = new UnSqlHelpU("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false);
             //UnSqlHelpU sql1 = new UnSqlHelpU("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false);
             //int? i = getSql(false).exSql("Select * From Test1");
             //getSql(false).getDataTable("Select * From Test1");
@@ -138,6 +139,35 @@ namespace UnTestWin
             {
                 Console.WriteLine(item.Name + "/");
             }
+        }
+
+        private void button6_Click(object sender, EventArgs e)
+        {
+            for (int i = 0; i < 100000; i++)
+            {
+                new Thread(insertUser).Start();
+                int j = i % 1000;
+                if (j == 0)
+                {
+                    Console.WriteLine(i);
+                }
+            }
+        }
+
+        void insertUser()
+        {
+            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", UnSqlConnectModel.Connect, true);
+            TestUser user = new TestUser();
+            user.UnionNonclusteredA = "indexA";
+            user.Name = "Name_" + UnStrRan.getShortGUID();
+            user.Pass = UnEncMD5.getMd5Hashs(UnStrRan.getStr(1, 10));
+            user.NonclusteredA = "NonclusteredA";
+            user.NonclusteredB = "NonclusteredB";
+            user.TestUserGUID = Guid.NewGuid();
+            user.TestUserUID = UnStrRan.getUID();
+            cn.insert(user);
+            cn.update<TestUser>(user, null, "TestUserGUID = '{0}'", user.TestUserGUID.ToString());
+            cn.commit();
         }
     }
 }

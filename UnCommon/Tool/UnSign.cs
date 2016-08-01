@@ -42,6 +42,11 @@ namespace UnCommon.Tool
         private string _key = "";
 
         /// <summary>
+        /// 标记
+        /// </summary>
+        private string _tag = "$";
+
+        /// <summary>
         /// 实例化
         /// </summary>
         /// <param name="key">密钥</param>
@@ -100,6 +105,64 @@ namespace UnCommon.Tool
         public string sign<T>(T t)
         {
             return sign(getSignDictionary(t));
+        }
+
+        /// <summary>
+        /// 字符串添加签名
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public string addSign(string str)
+        {
+            return sign(str) + _tag + str;
+        }
+
+        /// <summary>
+        /// 移除签名
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public string removeSign(string str)
+        {
+            int i = str.IndexOf(_tag);
+            string str1 = str.Substring(i + 1);
+            return str1;
+        }
+
+        /// <summary>
+        /// 取出签名
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public string getSign(string str)
+        {
+            int i = str.IndexOf(_tag);
+            if (i < 0)
+            {
+                i = 0;
+            }
+            string sign0 = str.Substring(0, i);
+            return sign0;
+        }
+
+        /// <summary>
+        /// 验证签名
+        /// </summary>
+        /// <param name="signStr">已经签名的字符串</param>
+        /// <returns></returns>
+        public bool validSign(string signStr)
+        {
+            // 源串
+            string str1 = removeSign(signStr);
+            // 原签名
+            string sign0 = getSign(signStr);
+            // 验证签名
+            string sign1 = sign(str1);
+            if (sign0 == sign1)
+            {
+                return true;
+            }
+            return false;
         }
 
         /// <summary>

@@ -11,8 +11,16 @@ namespace Web.Admin.Master
 {
     public partial class Site : System.Web.UI.MasterPage
     {
+        /// <summary>
+        /// 管理员状态
+        /// </summary>
         private int alState = 0;
 
+        /// <summary>
+        /// 页面加载
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         protected void Page_Load(object sender, EventArgs e)
         {
             object sobj = Session["alState"];

@@ -1063,6 +1063,10 @@ end;";
             }
             if (orderBy != null && orderBy.Length > 0)
             {
+                if (orderBy.ToLower().IndexOf("order") < 0)
+                {
+                    orderBy = "Order By " + orderBy;
+                }
                 sb.Append(" " + orderBy);
             }
             return sb.ToString();

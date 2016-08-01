@@ -304,6 +304,13 @@ namespace UnDataBase
             {
                 where = "1 = 1";
             }
+            if (!String.IsNullOrWhiteSpace(order))
+            {
+                if (order.ToLower().IndexOf("order") < 0)
+                {
+                    order = "Order By " + order;
+                }
+            }
             string from = table + " Where " + where + " " + order;
             SqlParameterCollection pmts = this.getPageKeys(keyName, from, currentPage, pageSize);
             if (pmts == null)

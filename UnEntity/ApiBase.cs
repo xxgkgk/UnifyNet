@@ -19,7 +19,11 @@ namespace UnEntity
         /// </summary>
         public string Method { get; set; }
 
+        public Guid? guid{ get; set; }
+
         public List<Test> ArrayOfTest { get; set; }
+
+        public string IsTest { get; set; }
 
     }
 }

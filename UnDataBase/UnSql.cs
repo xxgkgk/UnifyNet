@@ -437,17 +437,39 @@ namespace UnDataBase
         /// <summary>
         /// 添加一条记录
         /// </summary>
-        /// <typeparam name="T"></typeparam>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="t">泛型对象</param>
+        /// <param name="isXactAbort">是否嵌套事务</param>
         /// <returns></returns>
-        public long insert<T>(T t) where T : new()
+        public long insert<T>(T t, bool isXactAbort) where T : new()
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t);
             StringBuilder strSql = new StringBuilder();
+            if (isXactAbort)
+            {
+                strSql.Append("Set xact_abort ON;");
+            }
             strSql.Append("Insert Into " + UnToGen.getTableName(typeof(T)) + " ");
             strSql.Append(UnSqlStr.getAddStr<T>(SqlPmtA));
-            strSql.Append(" Select SCOPE_IDENTITY() As KeyID");
-            long KeyID = Convert.ToInt64(help.getExSc(strSql.ToString(), SqlPmtA));
-            return KeyID;
+            if (!isXactAbort)
+            {
+                strSql.Append(" Select SCOPE_IDENTITY() As KeyID");
+                long KeyID = Convert.ToInt64(help.getExSc(strSql.ToString(), SqlPmtA));
+                return KeyID;
+            }
+            help.getExSc(strSql.ToString(), SqlPmtA);
+            return 0;
+        }
+
+        /// <summary>
+        /// 添加一条记录
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        public long insert<T>(T t) where T : new()
+        {
+            return insert(t, false);
         }
 
         #endregion
@@ -460,13 +482,18 @@ namespace UnDataBase
         /// <typeparam name="T">实体</typeparam>
         /// <param name="selection">条件</param>
         /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否嵌套事务</param>
         /// <returns></returns>
-        public int? delete<T>(string selection, string[] selectionArgs) where T : new()
+        public int? delete<T>(string selection, string[] selectionArgs, bool isXactAbort) where T : new()
         {
             // 构造参数化查询
             object[] objs = toParsSelection(selection, selectionArgs);
 
             StringBuilder strSql = new StringBuilder();
+            if (isXactAbort)
+            {
+                strSql.Append("Set xact_abort ON;");
+            }
             strSql.Append("Delete " + UnToGen.getTableName(typeof(T)) + " ");
             string where = (string)objs[0];
             if (where.Length > 0)
@@ -482,14 +509,31 @@ namespace UnDataBase
         /// <typeparam name="T">实体</typeparam>
         /// <param name="selection">条件</param>
         /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否嵌套事务</param>
+        /// <returns></returns>
+        public int? delete<T>(string selection, string selectionArgs, bool isXactAbort) where T : new()
+        {
+            if (selectionArgs != null)
+            {
+                return delete<T>(selection, selectionArgs.Split(','), isXactAbort);
+            }
+            return delete<T>(selection, (string[])null, isXactAbort);
+        }
+
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <typeparam name="T">实体</typeparam>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
         /// <returns></returns>
         public int? delete<T>(string selection, string selectionArgs) where T : new()
         {
             if (selectionArgs != null)
             {
-                return delete<T>(selection, selectionArgs.Split(','));
+                return delete<T>(selection, selectionArgs.Split(','), false);
             }
-            return delete<T>(selection, (string[])null);
+            return delete<T>(selection, (string[])null, false);
         }
 
         #endregion
@@ -908,15 +952,33 @@ namespace UnDataBase
         /// <param name="columns"></param>
         /// <param name="selection"></param>
         /// <param name="selectionArgs"></param>
+        /// <param name="isXactAbort"></param>
         /// <returns></returns>
-        public int? update<T>(T t, string columns, string selection, string selectionArgs) where T : new()
+        public int? update<T>(T t, string columns, string selection, string[] selectionArgs, bool isXactAbort) where T : new()
         {
-            string[] args = null;
-            if (selectionArgs != null)
+            // 实体属性参数化
+            SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
+            StringBuilder strSql = new StringBuilder();
+            if (isXactAbort)
             {
-                args = selectionArgs.Split(',');
+                strSql.Append("Set xact_abort ON;");
             }
-            return update<T>(t, columns, selection, args);
+            strSql.Append("Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " ");
+
+            // 构造参数化查询
+            object[] objs = toParsSelection(selection, selectionArgs);
+            string where = (string)objs[0];
+            if (where.Length > 0)
+            {
+                strSql.Append("Where " + where);
+            }
+
+            // 属性参数和条件参数合并
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.AddRange(SqlPmtA);
+            list.AddRange((SqlParameter[])objs[1]);
+
+            return help.exSql(strSql.ToString(), list.ToArray());
         }
 
         /// <summary>
@@ -930,25 +992,46 @@ namespace UnDataBase
         /// <returns></returns>
         public int? update<T>(T t, string columns, string selection, string[] selectionArgs) where T : new()
         {
-            // 实体属性参数化
-            SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
-            StringBuilder strSql = new StringBuilder();
-            strSql.Append("Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " ");
+            return update(t, columns, selection, selectionArgs, false);
+        }
 
-            // 构造参数化查询
-            object[] objs = toParsSelection(selection, selectionArgs);
-            string where = (string)objs[0];
-            if (where.Length > 0)
+        /// <summary>
+        /// 条件修改
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="columns"></param>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
+        /// <param name="isXactAbort"></param>
+        /// <returns></returns>
+        public int? update<T>(T t, string columns, string selection, string selectionArgs, bool isXactAbort) where T : new()
+        {
+            string[] args = null;
+            if (selectionArgs != null)
             {
-                strSql.Append("Where " + where);
+                args = selectionArgs.Split(',');
             }
- 
-            // 属性参数和条件参数合并
-            List<SqlParameter> list = new List<SqlParameter>();
-            list.AddRange(SqlPmtA);
-            list.AddRange((SqlParameter[])objs[1]);
+            return update<T>(t, columns, selection, args, isXactAbort);
+        }
 
-            return help.exSql(strSql.ToString(), list.ToArray());
+        /// <summary>
+        /// 条件修改
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="columns"></param>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
+        /// <returns></returns>
+        public int? update<T>(T t, string columns, string selection, string selectionArgs) where T : new()
+        {
+            string[] args = null;
+            if (selectionArgs != null)
+            {
+                args = selectionArgs.Split(',');
+            }
+            return update<T>(t, columns, selection, args, false);
         }
 
         #endregion

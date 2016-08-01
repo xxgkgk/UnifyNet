@@ -18,6 +18,8 @@ using UnCommon.Tool;
 using UnCommon.Files;
 using UnCommon.Extend;
 using System.Text.RegularExpressions;
+using UnCommon.HTTP;
+using UnCommon.Entity;
 
 namespace UnTestWin
 {
@@ -50,6 +52,7 @@ namespace UnTestWin
             xd.ApiBase.ArrayOfTest = new List<Test>();
             xd.ApiBase.Model = "adad";
             xd.ApiBase.Method = "ADDD.ee";
+            xd.ApiBase.IsTest = "Y";
 
             xd.ArrayOfApiNote = new List<ApiNote>();
 
@@ -82,9 +85,26 @@ namespace UnTestWin
 
         private void button1_Click(object sender, EventArgs e)
         {
-            UnSign unsign = new UnSign("123");
+            UnSign unsign = new UnSign("hesdjaslf54asj1fkl10jaslfjslsdlj");
+            //UnSign unsign = new UnSign("123");
 
             XmlData xd = getXD();
+            string xml = UnXMMPXml.tToXml(xd.GetType(), xd);
+
+            string addsign = unsign.addSign(xml);
+
+
+            UnHttpClient http = new UnHttpClient("http://192.168.100.108:81/Handler1.ashx");
+            String addSign = unsign.addSign(xml);
+
+            bool b = unsign.validSign(addSign);
+            Console.WriteLine("validSign:" + b + "");
+            UnAttrRst rst = http.sendMsgSyn(addSign);
+            if (rst.code > 0)
+            {
+                Console.WriteLine("back:" + rst.back + "");
+            }
+            return;
 
             SortedDictionary<string, string> sort = unsign.getSignDictionary(xd);
             Console.WriteLine(sort.Count + "/");

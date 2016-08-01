@@ -21,7 +21,7 @@ namespace UnCommon
         public Guid? TestUserGUID { get; set; }
 
         // 用户名
-        [UnAttrSql(fieldType = "varchar(16)", fieldNULL = false, indexModel = IndexModel.Unique)]
+        [UnAttrSql(fieldType = "varchar(32)", fieldNULL = false, indexModel = IndexModel.Unique)]
         public string Name { get; set; }
 
         // 用户密码,MD5*2
