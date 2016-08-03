@@ -14,17 +14,32 @@ namespace UnDataBase
     /// </summary>
     public class UnSqlHelpU
     {
+        #region 私有变量 
 
+        /// <summary>
+        /// 业务操作对象
+        /// </summary>
         private SqlCommand comd = null;
 
+        /// <summary>
+        /// 连接字符串
+        /// </summary>
         private string cs = null;
+
+        /// <summary>
+        /// 是否事务
+        /// </summary>
         private bool isTrans = false;
+
+        #endregion
+
+        #region 实例化
 
         /// <summary>
         /// 实例化
         /// </summary>
-        /// <param name="constr"></param>
-        /// <param name="istrans"></param>
+        /// <param name="constr">连接字符串</param>
+        /// <param name="istrans">是否事务</param>
         public UnSqlHelpU(string constr, bool istrans)
         {
             cs = constr;
@@ -35,12 +50,16 @@ namespace UnDataBase
         /// <summary>
         /// 实例化
         /// </summary>
-        /// <param name="constr"></param>
+        /// <param name="constr">连接字符串</param>
         public UnSqlHelpU(string constr)
         {
             cs = constr;
             isTrans = false;
         }
+
+        #endregion
+
+        #region 私有方法
 
         /// <summary>
         /// 获得cmd对象
@@ -72,6 +91,82 @@ namespace UnDataBase
             }
             return comd;
         }
+
+        /// <summary>
+        /// 执行SQL并返回输出参数
+        /// </summary>
+        /// <param name="cmdText">cmd命令</param>
+        /// <param name="cmdType">cmd类型</param>
+        /// <param name="parms">参数</param>
+        /// <returns></returns>
+        private IEnumerator outPutParameter(string cmdText, CommandType cmdType, SqlParameter[] parms)
+        {
+            try
+            {
+                SqlCommand Sqlcmd = getCmd(CommandType.Text, cmdText, parms);
+                Sqlcmd.ExecuteScalar();
+                close();
+                return Sqlcmd.Parameters.GetEnumerator();
+            }
+            catch (Exception e)
+            {
+                writeLog("getExSc", e, cmdText, parms);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// 记录错误日志
+        /// </summary>
+        /// <param name="pre"></param>
+        /// <param name="ex"></param>
+        /// <param name="cmdText"></param>
+        /// <param name="parms"></param>
+        private void writeLog(string pre, Exception ex, string cmdText, SqlParameter[] parms)
+        {
+            if (this.comd.Transaction != null)
+            {
+                this.comd.Transaction.Rollback();
+                this.comd.Transaction = null;
+            }
+            close();
+            string s = ex.ToString() + "\r\n" + cmdText + "\r\n";
+            if (parms != null)
+            {
+                foreach (SqlParameter par in parms)
+                {
+                    //s += par.ParameterName + " " + par.SqlDbType.GetType().Name + "：" + par.Value + "\r\n";
+                    s += par.ParameterName + "：" + par.Value + "\r\n";
+                }
+            }
+
+            UnFile.writeLog(pre, s);
+        }
+
+        /// <summary>
+        /// 关闭对象
+        /// </summary>
+        public void close()
+        {
+            // cmd对象不存在则忽略
+            if (this.comd == null)
+            {
+                return;
+            }
+            // 有事务则忽略
+            if (this.comd.Transaction != null)
+            {
+                return;
+            }
+            //Console.WriteLine("关闭连接");
+            this.comd.Connection.Dispose();
+            this.comd.Dispose();
+            this.comd = null;
+        }
+
+        #endregion
+
+        #region 执行SQL
 
         /// <summary>
         /// 执行带参数SQL
@@ -106,6 +201,10 @@ namespace UnDataBase
             return exSql(cmdText, null);
         }
 
+        #endregion
+
+        #region 查询表值
+
         /// <summary>
         /// 获取DataReader
         /// </summary>
@@ -128,7 +227,7 @@ namespace UnDataBase
         }
 
         /// <summary>
-        /// 参数化查询
+        /// 获取DataSet(参数化)
         /// </summary>
         /// <param name="cmdText">cmd命令</param>
         /// <param name="parms">参数</param>
@@ -177,7 +276,7 @@ namespace UnDataBase
         }
 
         /// <summary>
-        /// 参数化查询
+        /// 获取DataTable(参数化)
         /// </summary>
         /// <param name="cmdText">cmd命令</param>
         /// <param name="parms">参数</param>
@@ -191,6 +290,10 @@ namespace UnDataBase
             }
             return null;
         }
+
+        #endregion
+
+        #region 查询第1行第1列
 
         /// <summary>
         /// 执行SQL并返回第一行第一列值
@@ -224,28 +327,9 @@ namespace UnDataBase
             return getExSc(cmdText, null);
         }
 
-        /// <summary>
-        /// 执行SQL并返回输出参数
-        /// </summary>
-        /// <param name="cmdText"></param>
-        /// <param name="cmdType"></param>
-        /// <param name="parms"></param>
-        /// <returns></returns>
-        public IEnumerator outPutParameter(string cmdText, CommandType cmdType, SqlParameter[] parms)
-        {
-            try
-            {
-                SqlCommand Sqlcmd = getCmd(CommandType.Text, cmdText, parms);
-                Sqlcmd.ExecuteScalar();
-                close();
-                return Sqlcmd.Parameters.GetEnumerator();
-            }
-            catch (Exception e)
-            {
-                writeLog("getExSc", e, cmdText, parms);
-                return null;
-            }
-        }
+        #endregion
+
+        #region 查询翻页
 
         /// <summary>
         /// 获取翻页键值列
@@ -255,7 +339,7 @@ namespace UnDataBase
         /// <param name="currentPage">查询的页码</param>
         /// <param name="pageSize">每页条数</param>
         /// <returns>返回页键值列</returns>
-        public SqlParameterCollection getPageKeys(string keyName, string from, int currentPage, int pageSize)
+        private SqlParameterCollection getPageKeys(string keyName, string from, int currentPage, int pageSize)
         {
             SqlParameter[] parms = new SqlParameter[] {
                 new SqlParameter("@KeyName", keyName),
@@ -337,6 +421,10 @@ namespace UnDataBase
             return page;
         }
 
+        #endregion
+
+        #region 提交事务
+
         /// <summary>
         /// 提交事务
         /// </summary>
@@ -357,54 +445,6 @@ namespace UnDataBase
             close();
         }
 
-        /// <summary>
-        /// 关闭对象
-        /// </summary>
-        public void close()
-        {
-            // cmd对象不存在则忽略
-            if (this.comd == null)
-            {
-                return;
-            }
-            // 有事务则忽略
-            if (this.comd.Transaction != null)
-            {
-                return;
-            }
-            //Console.WriteLine("关闭连接");
-            this.comd.Connection.Dispose();
-            this.comd.Dispose();
-            this.comd = null;
-        }
-
-        /// <summary>
-        /// 记录错误日志
-        /// </summary>
-        /// <param name="pre"></param>
-        /// <param name="ex"></param>
-        /// <param name="cmdText"></param>
-        /// <param name="parms"></param>
-        private void writeLog(string pre, Exception ex, string cmdText, SqlParameter[] parms)
-        {
-            if (this.comd.Transaction != null)
-            {
-                this.comd.Transaction.Rollback();
-                this.comd.Transaction = null;
-            }
-            close();
-            string s = ex.ToString() + "\r\n" + cmdText + "\r\n";
-            if (parms != null)
-            {
-                foreach (SqlParameter par in parms)
-                {
-                    //s += par.ParameterName + " " + par.SqlDbType.GetType().Name + "：" + par.Value + "\r\n";
-                    s += par.ParameterName + "：" + par.Value + "\r\n";
-                }
-            }
-
-            UnFile.writeLog(pre, s);
-        }
-      
+        #endregion;
     }
 }

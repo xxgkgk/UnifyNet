@@ -1016,17 +1016,18 @@ end;";
         /// <summary>
         /// 组合sql
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="groupBy"></param>
-        /// <param name="having"></param>
-        /// <param name="orderBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">查询字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="groupBy">group</param>
+        /// <param name="having">having</param>
+        /// <param name="orderBy">order</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
         /// <returns></returns>
         public static string getQuerySql<T>(string[] columns,
             string selection, string[] selectionArgs, string groupBy,
-            string having, string orderBy)
+            string having, string orderBy,bool isLinkedServer)
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("Select ");
@@ -1051,7 +1052,7 @@ end;";
             {
                 sb.Append("* ");
             }
-            sb.Append(" From " + UnToGen.getTableName(typeof(T)) + " ");
+            sb.Append(" From " + UnToGen.getTableName(typeof(T), isLinkedServer) + " ");
             sb.Append(getSelectionSql<T>(selection, selectionArgs));
             if (groupBy != null && groupBy.Length > 0)
             {

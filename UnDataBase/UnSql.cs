@@ -59,13 +59,13 @@ namespace UnDataBase
         /// <summary>
         /// 初始化
         /// </summary>
-        /// <param name="ip"></param>
-        /// <param name="port"></param>
-        /// <param name="user"></param>
-        /// <param name="pass"></param>
-        /// <param name="dbName"></param>
-        /// <param name="model"></param>
-        /// <param name="trans"></param>
+        /// <param name="ip">IP</param>
+        /// <param name="port">端口</param>
+        /// <param name="user">账户</param>
+        /// <param name="pass">密码</param>
+        /// <param name="dbName">数据库名</param>
+        /// <param name="model">连接模式</param>
+        /// <param name="trans">是否事务</param>
         private void init(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans)
         {
             string constr1 = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
@@ -137,43 +137,46 @@ namespace UnDataBase
         /// <summary>
         /// 创建表
         /// </summary>
-        /// <param name="t"></param>
-        public void createTable(Type t)
+        /// <param name="t">类型</param>
+        /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
+        public int? createTable(Type t)
         {
             string s1 = UnSqlStr.createTableBase(t);
-            //Console.WriteLine(s1);
-            help.exSql(s1);
+            return help.exSql(s1);
         }
 
         /// <summary>
         /// 删除表
         /// </summary>
-        /// <param name="t"></param>
-        public void dropTable(Type t)
+        /// <param name="t">类型</param>
+        /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
+        public int? dropTable(Type t)
         {
             string s1 = UnSqlStr.dropTable(t);
-            //Console.WriteLine(s1);
-            help.exSql(s1);
+            return help.exSql(s1);
         }
 
         /// <summary>
         /// 创建表关系
         /// </summary>
-        public void createTableRelation(Type t)
+        /// <param name="t">类型</param>
+        /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
+        public int? createTableRelation(Type t)
         {
             string s1 = UnSqlStr.createTableRelation(t);
-            //Console.WriteLine(s1);
             if (s1.Length > 0)
             {
-                help.exSql(s1);
+                return help.exSql(s1);
             }
+            return -1;
         }
 
         /// <summary>
         /// 清除表关系
         /// </summary>
-        /// <param name="t"></param>
-        public void dropTableRelation(Type t)
+        /// <param name="t">类型</param>
+        /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
+        public int? dropTableRelation(Type t)
         {
             var sb = new StringBuilder();
             var tableName = UnToGen.getTableName(t);
@@ -197,15 +200,15 @@ namespace UnDataBase
             }
             if (sb.Length > 0)
             {
-                //Console.WriteLine(sb.ToString());
-                help.exSql(sb.ToString());
+                return help.exSql(sb.ToString());
             }
+            return -1;
         }
 
         /// <summary>
         /// 获取数据库表字段
         /// </summary>
-        /// <param name="t"></param>
+        /// <param name="t">类型</param>
         /// <returns></returns>
         private List<string> getDBTableColumns(Type t)
         {
@@ -225,8 +228,9 @@ namespace UnDataBase
         /// <summary>
         /// 添加字段
         /// </summary>
-        /// <param name="t"></param>
-        public void addColumn(Type t)
+        /// <param name="t">类型</param>
+        /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
+        public int? addColumn(Type t)
         {
             StringBuilder sb = new StringBuilder();
             var listDB = getDBTableColumns(t);
@@ -243,16 +247,17 @@ namespace UnDataBase
             }
             if (sb.Length > 0)
             {
-                help.exSql(sb.ToString());
-                //Console.WriteLine(sb.ToString());
+                return help.exSql(sb.ToString());
             }
+            return -1;
         }
 
         /// <summary>
         /// 删除字段
         /// </summary>
-        /// <param name="t"></param>
-        public void dropColumn(Type t)
+        /// <param name="t">类型</param>
+        /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
+        public int? dropColumn(Type t)
         {
             StringBuilder sb = new StringBuilder();
             var listDB = getDBTableColumns(t);
@@ -278,16 +283,17 @@ namespace UnDataBase
             }
             if (sb.Length > 0)
             {
-                help.exSql(sb.ToString());
-                //Console.WriteLine(sb.ToString());
+                return help.exSql(sb.ToString());
             }
+            return -1;
         }
 
         /// <summary>
         /// 更改字段属性
         /// </summary>
-        /// <param name="t"></param>
-        public void alterColumn(Type t)
+        /// <param name="t">类型</param>
+        /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
+        public int? alterColumn(Type t)
         {
             StringBuilder sb = new StringBuilder();
             var listDB = getDBTableColumns(t);
@@ -313,40 +319,62 @@ namespace UnDataBase
             }
             if (sb.Length > 0)
             {
-                help.exSql(sb.ToString());
-                //Console.WriteLine(sb.ToString());
+                return help.exSql(sb.ToString());
             }
+            return -1;
         }
 
         /// <summary>
         /// 更新表
         /// </summary>
-        /// <param name="t"></param>
-        public void updateTable(Type t)
+        /// <param name="t">类型</param>
+        /// <returns>是否成功</returns>
+        public bool updateTable(Type t)
         {
-            dropColumn(t);
-            addColumn(t);
-            alterColumn(t);
+            int? rst = null;
+            rst = dropColumn(t);
+            if (rst == null)
+            {
+                return false;
+            }
+            rst = addColumn(t);
+            if (rst == null)
+            {
+                return false;
+            }
+            rst = alterColumn(t);
+            if (rst == null)
+            {
+                return false;
+            }
+            return true;
         }
 
         /// <summary>
         /// 创建多个表
         /// </summary>
         /// <param name="list">要创建的表数组</param>
-        public void createTableList(List<Type> list)
+        /// <returns>是否全部成功</returns>
+        public bool createTableList(List<Type> list)
         {
             foreach (var item in list)
             {
-                createTable(item);
+                int? rst = createTable(item);
+                if (rst == null)
+                {
+                    return false;
+                }
             }
+            return true;
         }
 
         /// <summary>
         /// 清除多个表关系
         /// </summary>
-        /// <param name="list"></param>
-        /// <param name="isACS"></param>
-        public void dropTableRelationList(List<Type> list, bool isACS)
+        /// <param name="list">要删除表关系的表数组</param>
+        /// <param name="isACS">是否正序</param>
+        /// <returns>是否全部成功</returns>
+        public bool dropTableRelationList(List<Type> list, bool isACS)
         {
             if (!isACS)
             {
@@ -354,55 +382,78 @@ namespace UnDataBase
             }
             foreach (var item in list)
             {
-                dropTableRelation(item);
+                int? rst = dropTableRelation(item);
+                if (rst == null)
+                {
+                    return false;
+                }
             }
             if (!isACS)
             {
                 list.Reverse();
             }
+            return true;
         }
 
         /// <summary>
         /// 清除多个表关系(倒序)
         /// </summary>
-        /// <param name="list"></param>
-        public void dropTableRelationList(List<Type> list)
+        /// <param name="list">要删除表关系的表数组</param>
+        /// <returns>是否全部成功</returns>
+        public bool dropTableRelationList(List<Type> list)
         {
-            dropTableRelationList(list, false);
+            return dropTableRelationList(list, false);
         }
 
         /// <summary>
         /// 更新多个表
         /// </summary>
-        /// <param name="list"></param>
-        public void updateTableList(List<Type> list)
+        /// <param name="list">要更新的表数组</param>
+        /// <returns>是否全部成功</returns>
+        public bool updateTableList(List<Type> list)
         {
             foreach (var item in list)
             {
-                updateTable(item);
+                if (!updateTable(item))
+                {
+                    return false;
+                }
             }
+            return true;
         }
 
         /// <summary>
         /// 创建多个表关系
         /// </summary>
         /// <param name="list"></param>
-        public void createTableRelationList(List<Type> list)
+        /// <returns>是否全部成功</returns>
+        public bool createTableRelationList(List<Type> list)
         {
             foreach (var item in list)
             {
-                createTableRelation(item);
+                if (createTableRelation(item) == null)
+                {
+                    return false;
+                }
             }
+            return true;
         }
 
         /// <summary>
         /// 更新基础存储过程/函数等
         /// </summary>
-        public void updateBase()
+        /// <returns>是否全部成功</returns>
+        public bool updateBase()
         {
             // 翻页存储过程
-            help.exSql(UnSqlStr.drop_Pro_PageKeys());
-            help.exSql(UnSqlStr.create_Pro_PageKeys());
+            if (help.exSql(UnSqlStr.drop_Pro_PageKeys()) == null)
+            {
+                return false;
+            }
+            if (help.exSql(UnSqlStr.create_Pro_PageKeys()) == null)
+            {
+                return false;
+            }
             // 判断字段是否存在 
             //help.exSql(UnSqlStr.drop_mfn_IsColumnExists());
             //help.exSql(UnSqlStr.create_mfn_IsColumnExists());
@@ -418,6 +469,7 @@ namespace UnDataBase
             // 删除指定字段的所有约束和索引
             //help.exSql(UnSqlStr.drop_mp_DropColConstraintAndIndex());
             //help.exSql(UnSqlStr.create_mp_DropColConstraintAndIndex());
+            return true;
         }
 
         /// <summary>
@@ -449,15 +501,24 @@ namespace UnDataBase
             {
                 strSql.Append("Set xact_abort ON;");
             }
-            strSql.Append("Insert Into " + UnToGen.getTableName(typeof(T)) + " ");
+            strSql.Append("Insert Into " + UnToGen.getTableName(typeof(T), isXactAbort) + " ");
             strSql.Append(UnSqlStr.getAddStr<T>(SqlPmtA));
+            object obj = null;
             if (!isXactAbort)
             {
                 strSql.Append(" Select SCOPE_IDENTITY() As KeyID");
-                long KeyID = Convert.ToInt64(help.getExSc(strSql.ToString(), SqlPmtA));
-                return KeyID;
+                obj = help.getExSc(strSql.ToString(), SqlPmtA);
+                if (obj == null)
+                {
+                    return -1;
+                }
+                return Convert.ToInt64(obj);
             }
-            help.getExSc(strSql.ToString(), SqlPmtA);
+            obj = help.getExSc(strSql.ToString(), SqlPmtA);
+            if (obj == null)
+            {
+                return -1;
+            }
             return 0;
         }
 
@@ -494,7 +555,7 @@ namespace UnDataBase
             {
                 strSql.Append("Set xact_abort ON;");
             }
-            strSql.Append("Delete " + UnToGen.getTableName(typeof(T)) + " ");
+            strSql.Append("Delete " + UnToGen.getTableName(typeof(T), isXactAbort) + " ");
             string where = (string)objs[0];
             if (where.Length > 0)
             {
@@ -568,27 +629,49 @@ namespace UnDataBase
         /// <param name="groupBy">分组</param>
         /// <param name="having"></param>
         /// <param name="orderBy">排序</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
         /// <returns></returns>
         private List<T> query<T>(string[] columns,
             string selection, string[] selectionArgs, string groupBy,
-            string having, string orderBy) where T : new()
+            string having, string orderBy,bool isLinkedServer) where T : new()
         {
             // 构造参数化查询
             object[] objs = toParsSelection(selection, selectionArgs);
-            string strSql = UnSqlStr.getQuerySql<T>(columns, (string)objs[0], null, groupBy, having, orderBy);
+            string strSql = UnSqlStr.getQuerySql<T>(columns, (string)objs[0], null, groupBy, having, orderBy, isLinkedServer);
             return query<T>(strSql, (SqlParameter[])objs[1]);
+        }
+
+        /// <summary>
+        /// 参数化获取实体
+        /// </summary>
+        /// <typeparam name="T">实体</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件-Where ID={0}</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="groupBy">分组</param>
+        /// <param name="having"></param>
+        /// <param name="orderBy">排序</param>
+        /// <returns></returns>
+        private List<T> query<T>(string[] columns,
+           string selection, string[] selectionArgs, string groupBy,
+           string having, string orderBy) where T : new()
+        {
+            return query<T>(columns,
+           selection, selectionArgs, groupBy,
+            having, orderBy, false);
         }
 
         /// <summary>
         /// 一般查询语句
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="orderBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
         /// <returns></returns>
-        public List<T> query<T>(string columns, string selection, string selectionArgs, string orderBy) where T : new()
+        public List<T> query<T>(string columns, string selection, string selectionArgs, string orderBy, bool isLinkedServer) where T : new()
         {
             string[] cs = null;
             string[] ss = null;
@@ -601,18 +684,32 @@ namespace UnDataBase
             {
                 ss = selectionArgs.Split(',');
             }
-            return query<T>(cs, selection, ss, null, null, orderBy);
+            return query<T>(cs, selection, ss, null, null, orderBy, isLinkedServer);
         }
 
         /// <summary>
         /// 一般查询语句
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="orderBy"></param>
-        /// <param name="isArray"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
+        /// <returns></returns>
+        public List<T> query<T>(string columns, string selection, string selectionArgs, string orderBy) where T : new()
+        {
+            return query<T>(columns, selection, selectionArgs, orderBy, false);
+        }
+
+        /// <summary>
+        /// 一般查询语句
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
+        /// <param name="isArray">参数是否为数组</param>
         /// <returns></returns>
         public List<T> query<T>(string columns, string selection, string[] selectionArgs, string orderBy, bool isArray) where T : new()
         {
@@ -627,13 +724,13 @@ namespace UnDataBase
         /// <summary>
         /// 获取实体
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="groupBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="groupBy">分组</param>
         /// <param name="having"></param>
-        /// <param name="orderBy"></param>
+        /// <param name="orderBy">排序</param>
         /// <returns></returns>
         public List<T> query<T>(string columns,
         string selection, string selectionArgs, string groupBy,
@@ -655,11 +752,31 @@ namespace UnDataBase
         /// <summary>
         /// 获取实体
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="orderBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <returns></returns>
+        public T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy, bool isLinkedServer) where T : new()
+        {
+            List<T> list = query<T>(columns, selection, selectionArgs, orderBy);
+            if (list.Count > 0)
+            {
+                return list[0];
+            }
+            return default(T);
+        }
+
+        /// <summary>
+        /// 获取实体
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
         /// <returns></returns>
         public T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy) where T : new()
         {
@@ -671,35 +788,37 @@ namespace UnDataBase
             return default(T);
         }
 
+
+
         /// <summary>
         /// 查询数据表
         /// </summary>
-        /// <typeparam name="T">实体</typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="groupBy"></param>
-        /// <param name="having"></param>
-        /// <param name="orderBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="groupBy">分组</param>
+        /// <param name="having">having</param>
+        /// <param name="orderBy">排序</param>
         /// <returns></returns>
         private DataTable queryDT<T>(string[] columns,
       string selection, string[] selectionArgs, string groupBy,
       string having, string orderBy) where T : new()
         {
-            string strSql = UnSqlStr.getQuerySql<T>(columns, selection, selectionArgs, groupBy, having, orderBy);
+            string strSql = UnSqlStr.getQuerySql<T>(columns, selection, selectionArgs, groupBy, having, orderBy, false);
             return help.getDataTable(strSql);
         }
 
         /// <summary>
         /// 查询数据表
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="groupBy"></param>
-        /// <param name="having"></param>
-        /// <param name="orderBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="groupBy">分组</param>
+        /// <param name="having">having</param>
+        /// <param name="orderBy">排序</param>
         /// <returns></returns>
         public DataTable queryDT<T>(string columns,
         string selection, string selectionArgs, string groupBy,
@@ -721,11 +840,11 @@ namespace UnDataBase
         /// <summary>
         /// 一般查询语句
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="orderBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
         /// <returns></returns>
         public DataTable queryDT<T>(string columns, string selection, string selectionArgs, string orderBy) where T : new()
         {
@@ -746,11 +865,11 @@ namespace UnDataBase
         /// <summary>
         /// 获取实体
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="orderBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
         /// <returns></returns>
         public DataRow queryDTSingle<T>(string columns, string selection, string selectionArgs, string orderBy) where T : new()
         {
@@ -945,7 +1064,7 @@ namespace UnDataBase
         #region 修改数据
 
         /// <summary>
-        /// 条件修改
+        /// 条件修改(核心)
         /// </summary>
         /// <typeparam name="T"></typeparam>
         /// <param name="t"></param>
@@ -963,7 +1082,7 @@ namespace UnDataBase
             {
                 strSql.Append("Set xact_abort ON;");
             }
-            strSql.Append("Update " + UnToGen.getTableName(typeof(T)) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " ");
+            strSql.Append("Update " + UnToGen.getTableName(typeof(T), isXactAbort) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " ");
 
             // 构造参数化查询
             object[] objs = toParsSelection(selection, selectionArgs);

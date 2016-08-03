@@ -76,6 +76,11 @@ namespace UnCommon.Entity
         /// 索引类型,
         /// </summary>
         public IndexModel indexModel = IndexModel.None;
+
+        /// <summary>
+        /// 链接服务器表名
+        /// </summary>
+        public string linkedServerTableName;
     }
 
     /// <summary>

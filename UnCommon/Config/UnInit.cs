@@ -8,19 +8,29 @@ namespace UnCommon.Config
     /// </summary>
     public class UnInit
     {
-        // 版本
+        /// <summary>
+        /// 版本
+        /// </summary>
         private static int _version = 2;
 
-        // pid值
+        /// <summary>
+        /// pid值
+        /// </summary>
         private static int _pid = 0;
 
-        // 根目录 
+        /// <summary>
+        /// 根目录
+        /// </summary>
         private static string _home = null;
 
-        // des密钥
+        /// <summary>
+        /// des密钥
+        /// </summary>
         private static string _DESKey = "5addc_$%";
 
-        // 编码格式
+        /// <summary>
+        /// 编码格式
+        /// </summary>
         private static Encoding _Encoding = Encoding.UTF8;
 
         /// <summary>

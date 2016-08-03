@@ -6,6 +6,8 @@ using System.Reflection;
 using System.Data;
 using UnCommon.Files;
 using UnCommon.Entity;
+using System.Configuration;
+using UnCommon.Config;
 
 namespace UnCommon.Tool
 {
@@ -106,15 +108,41 @@ namespace UnCommon.Tool
         /// 获取表名(核心)
         /// </summary>
         /// <param name="t"></param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <returns></returns>
+        public static string getTableName(Type t, bool isLinkedServer)
+        {
+            UnAttrSql attr = getAttrSql(t);
+            if (attr != null)
+            {
+                if (!isLinkedServer || attr.tableName != null)
+                {
+                    return attr.tableName;
+                }
+                if (isLinkedServer || attr.linkedServerTableName != null)
+                {
+                    return attr.linkedServerTableName;
+                }
+            }
+            if (isLinkedServer)
+            {
+                string lsp = ConfigurationManager.AppSettings[UnKeyName.LinkedServerPrefix];
+                if (!String.IsNullOrWhiteSpace(lsp))
+                {
+                    return lsp + t.Name;
+                }
+            }
+            return t.Name;
+        }
+
+        /// <summary>
+        /// 获取表名
+        /// </summary>
+        /// <param name="t"></param>
         /// <returns></returns>
         public static string getTableName(Type t)
         {
-            UnAttrSql attr = getAttrSql(t);
-            if (attr != null && attr.tableName != null)
-            {
-                return attr.tableName;
-            }
-            return t.Name;
+            return getTableName(t, false);
         }
 
         /// <summary>
