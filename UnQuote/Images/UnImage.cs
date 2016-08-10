@@ -8,6 +8,9 @@ using System.Drawing.Drawing2D;
 
 namespace UnQuote.Images
 {
+    /// <summary>
+    /// 图片类
+    /// </summary>
     public class UnImage
     {
 

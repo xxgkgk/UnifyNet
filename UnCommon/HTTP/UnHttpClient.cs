@@ -1,18 +1,12 @@
-﻿using System.Net;
-using System.Net.Sockets;
-using System.Text;
-using System;
+﻿using System;
 using System.IO;
+using System.Net;
+using System.Text;
 using System.Threading;
-using System.Security.Cryptography.X509Certificates;
-using System.Net.Security;
-using System.Collections.Generic;
-using System.Web;
 using UnCommon.Config;
-using UnCommon.Files;
 using UnCommon.Entity;
 using UnCommon.Extend;
-using UnCommon.Delegates;
+using UnCommon.Files;
 using UnCommon.Interfaces;
 
 
@@ -23,6 +17,7 @@ namespace UnCommon.HTTP
     /// </summary>
     public class UnHttpClient
     {
+        #region 私有变量
 
         // 进程ID
         private int _pid;
@@ -44,6 +39,10 @@ namespace UnCommon.HTTP
         private Encoding en = UnInit.getEncoding();
         // 过期时间
         private int _timeOut = 5000;
+
+        #endregion
+
+        #region 实例化
 
         /// <summary>
         /// 实例化
@@ -86,7 +85,12 @@ namespace UnCommon.HTTP
             init(url, cacheTimeOut, null);
         }
 
-        // 初始化
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="url">地址</param>
+        /// <param name="cacheTimeOut">缓存时间</param>
+        /// <param name="cerPath">安全证书</param>
         private void init(string url, int cacheTimeOut,string cerPath)
         {
             this._url = url;
@@ -95,7 +99,14 @@ namespace UnCommon.HTTP
             this._pid = UnInit.pid();
         }
 
-        // 发送
+        #endregion
+
+        #region 核心方法
+
+        /// <summary>
+        ///  发送
+        /// </summary>
+        /// <returns>返回结果</returns>
         private UnAttrRst send()
         {
             UnAttrRst rst = new UnAttrRst();
@@ -140,28 +151,29 @@ namespace UnCommon.HTTP
                 }
 
                 // 下载数据
-                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-                byte[] back = UnHttpHelp.getResponseData(response);
-
-                pgs.pid = _pid;
-                pgs.totalLength = back.Length;
-                pgs.length = back.Length;
-                this.tryProgress(pgs);
-
-                rst.pid = _pid;
-                rst.code = 1;
-                rst.msg = "提交成功";
-                rst.back = en.GetString(back);
-                rst.data = rst.back;
-                bool b = this.trySuccess(rst);
-                if (_cacheTimeOut > 0 && b)
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
                 {
-                    Console.WriteLine(f.fullName);
-                    UnFile.createDirectory(UnFileEvent.caches);
-                    using (FileStream inf_fs = new FileStream(f.fullName, FileMode.Create))
+                    byte[] back = UnHttpHelp.getResponseData(response);
+
+                    pgs.pid = _pid;
+                    pgs.totalLength = back.Length;
+                    pgs.length = back.Length;
+                    this.tryProgress(pgs);
+
+                    rst.pid = _pid;
+                    rst.code = 1;
+                    rst.msg = "提交成功";
+                    rst.back = en.GetString(back);
+                    rst.data = rst.back;
+                    bool b = this.trySuccess(rst);
+                    if (_cacheTimeOut > 0 && b)
                     {
-                        inf_fs.Seek(0, SeekOrigin.Begin);
-                        inf_fs.Write(back, 0, (int)back.Length);
+                        UnFile.createDirectory(UnFileEvent.caches);
+                        using (FileStream inf_fs = new FileStream(f.fullName, FileMode.Create))
+                        {
+                            inf_fs.Seek(0, SeekOrigin.Begin);
+                            inf_fs.Write(back, 0, (int)back.Length);
+                        }
                     }
                 }
             }
@@ -175,13 +187,17 @@ namespace UnCommon.HTTP
             return rst;
         }
 
-        // 异步提交
+        /// <summary>
+        /// 异步提交
+        /// </summary>
         private void sendAsyn()
         {
             send();
         }
 
-        // 上传
+        /// <summary>
+        /// 上传
+        /// </summary>
         private void up()
         {
             HttpWebRequest request = UnHttpHelp.createPost(_url, _timeOut, null, _eve.text());
@@ -220,15 +236,17 @@ namespace UnCommon.HTTP
             // 开始传输
             try
             {
-                HttpWebResponse response = request.GetResponse() as HttpWebResponse;
-                byte[] back = UnHttpHelp.getResponseData(response);
-                UnAttrRst rst = new UnAttrRst();
-                rst.pid = _pid;
-                rst.code = 1;
-                rst.msg = "通讯成功";
-                rst.back = en.GetString(back);
-                rst.data = rst.back;
-                bool _bool = this.trySuccess(rst);
+                using (HttpWebResponse response = request.GetResponse() as HttpWebResponse)
+                {
+                    byte[] back = UnHttpHelp.getResponseData(response);
+                    UnAttrRst rst = new UnAttrRst();
+                    rst.pid = _pid;
+                    rst.code = 1;
+                    rst.msg = "通讯成功";
+                    rst.back = en.GetString(back);
+                    rst.data = rst.back;
+                    bool _bool = this.trySuccess(rst);
+                }
             }
             catch(Exception e)
             {
@@ -238,9 +256,12 @@ namespace UnCommon.HTTP
                 rst.msg = e.ToString();
                 this.tryError(rst);
             }
+           
         }
 
-        // 下载
+        /// <summary>
+        /// 下载
+        /// </summary>
         private void down()
         {
             UnAttrPgs pgs = new UnAttrPgs();
@@ -274,28 +295,30 @@ namespace UnCommon.HTTP
                 }
 
                 // 下载数据
-                HttpWebResponse response = UnHttpHelp.creageGet(_url, _timeOut).GetResponse() as HttpWebResponse;
-                using (Stream rsps = response.GetResponseStream())
+                using (HttpWebResponse response = UnHttpHelp.creageGet(_url, _timeOut).GetResponse() as HttpWebResponse)
                 {
-                    UnFile.createDirectory(UnFileEvent.caches);
-                    UnFile.createDirectory(UnFileEvent.tmp);
-                    //创建本地文件写入流
-                    using (Stream stream = new FileStream(f.fullNameTmp, FileMode.Create))
+                    using (Stream rsps = response.GetResponseStream())
                     {
-                        long fSize = response.ContentLength;
-                        long dSize = 0;
-                        byte[] buff = new byte[1024];
-                        int size = rsps.Read(buff, 0, buff.Length);
-                        while (size > 0)
+                        UnFile.createDirectory(UnFileEvent.caches);
+                        UnFile.createDirectory(UnFileEvent.tmp);
+                        //创建本地文件写入流
+                        using (Stream stream = new FileStream(f.fullNameTmp, FileMode.Create))
                         {
-                            dSize += size;
-                            stream.Write(buff, 0, size);
-                            size = rsps.Read(buff, 0, buff.Length);
+                            long fSize = response.ContentLength;
+                            long dSize = 0;
+                            byte[] buff = new byte[1024];
+                            int size = rsps.Read(buff, 0, buff.Length);
+                            while (size > 0)
+                            {
+                                dSize += size;
+                                stream.Write(buff, 0, size);
+                                size = rsps.Read(buff, 0, buff.Length);
 
-                            pgs.pid = _pid;
-                            pgs.totalLength = fSize;
-                            pgs.length = dSize;
-                            this.tryProgress(pgs);
+                                pgs.pid = _pid;
+                                pgs.totalLength = fSize;
+                                pgs.length = dSize;
+                                this.tryProgress(pgs);
+                            }
                         }
                     }
                 }
@@ -327,10 +350,14 @@ namespace UnCommon.HTTP
             }
         }
 
+        #endregion
+
+        #region 公开方法
+
         /// <summary>
         /// 设置过期时间
         /// </summary>
-        /// <param name="timeOut"></param>
+        /// <param name="timeOut">过期时间(秒)</param>
         public void setTimeOut(int timeOut)
         {
             if (timeOut < 1000)
@@ -354,7 +381,7 @@ namespace UnCommon.HTTP
         /// <summary>
         /// 发送消息
         /// </summary>
-        /// <param name="msg"></param>
+        /// <param name="msg">消息内容</param>
         public void sendMsg(string msg)
         {
             this._msg = msg + "";
@@ -364,8 +391,8 @@ namespace UnCommon.HTTP
         /// <summary>
         /// 上传文件
         /// </summary>
-        /// <param name="fileName"></param>
-        /// <param name="eve"></param>
+        /// <param name="fileName">文件名</param>
+        /// <param name="eve">事件</param>
         public void upFile(string fileName, UnHttpUpEvent eve)
         {
             this._fileName = fileName;
@@ -394,7 +421,9 @@ namespace UnCommon.HTTP
             new Thread(down).Start();
         }
 
-        #region Listener
+        #endregion
+
+        #region 监听方法
 
         // 传输接口
         private UnIntTransfer transfer = null;
@@ -408,7 +437,10 @@ namespace UnCommon.HTTP
             this.transfer = t;
         }
 
-        // 尝试回调进度监听
+        /// <summary>
+        /// 尝试回调进度监听
+        /// </summary>
+        /// <param name="pgs"></param>
         private void tryProgress(UnAttrPgs pgs)
         {
             if (transfer != null)
@@ -417,7 +449,11 @@ namespace UnCommon.HTTP
             }
         }
 
-        // 尝试回调完成监听
+        /// <summary>
+        /// 尝试回调完成监听
+        /// </summary>
+        /// <param name="rst"></param>
+        /// <returns></returns>
         private bool trySuccess(UnAttrRst rst)
         {
             if (transfer != null)
@@ -427,7 +463,10 @@ namespace UnCommon.HTTP
             return false;
         }
 
-        // 尝试错误回调
+        /// <summary>
+        /// 尝试错误回调
+        /// </summary>
+        /// <param name="rst"></param>
         private void tryError(UnAttrRst rst)
         {
             if (transfer != null)

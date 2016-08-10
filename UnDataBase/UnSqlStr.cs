@@ -1083,7 +1083,7 @@ end;";
         public static string getQueryPageWhere<T>(string where, string[] whereArgs)
         {
             StringBuilder sb = new StringBuilder();
-            if (where != null && where.Length > 0)
+            if (String.IsNullOrWhiteSpace(where))
             {
                 if (whereArgs != null)
                 {
@@ -1093,8 +1093,8 @@ end;";
                 {
                     sb.Append(where);
                 }
+                sb.Append(" ");
             }
-            sb.Append(" ");
             return sb.ToString();
         }
 

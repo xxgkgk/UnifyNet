@@ -23,6 +23,8 @@ namespace UnTestWin
 
         }
 
+        
+
         private void button1_Click(object sender, EventArgs e)
         {
             redisClient.Set("name", "李大龙");

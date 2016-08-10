@@ -384,7 +384,7 @@ namespace UnDataBase
         /// <returns>返回翻页结果</returns>
         public UnSqlPage getPage(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize)
         {
-            if (where == null || where.Length == 0)
+            if (String.IsNullOrWhiteSpace(where))
             {
                 where = "1 = 1";
             }

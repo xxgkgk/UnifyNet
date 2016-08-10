@@ -1,9 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Net;
 using System.IO;
+using System.Net;
 using System.Net.Security;
 using System.Security.Cryptography.X509Certificates;
 using UnCommon.Config;
@@ -16,10 +13,19 @@ namespace UnCommon.HTTP
     /// </summary>
     public class UnHttpHelp
     {
-        // 默认浏览器
+        /// <summary>
+        /// 默认浏览器
+        /// </summary>
         private static readonly string defaultUserAgent = "Mozilla/4.0 (compatible; MSIE 6.0; Windows NT 5.2; SV1; .NET CLR 1.1.4322; .NET CLR 2.0.50727)";
 
-        // 创建GET方式的HTTP请求  
+        /// <summary>
+        /// 创建GET方式的HTTP请求 
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="timeout"></param>
+        /// <param name="userAgent"></param>
+        /// <param name="cookies"></param>
+        /// <returns></returns>
         private static HttpWebRequest creageGet(string url, int? timeout, string userAgent, CookieCollection cookies)
         {
             if (string.IsNullOrEmpty(url))
@@ -56,8 +62,19 @@ namespace UnCommon.HTTP
             return creageGet(url, timeout, null, null);
         }
 
-        // 创建POST方式的HTTP请求  
-        private static HttpWebRequest createPost(string url, int? timeout, string contentType, string eve, string userAgent, CookieCollection cookies,string _cerPath,string _cerPass)
+        /// <summary>
+        /// 创建POST方式的HTTP请求
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="timeout"></param>
+        /// <param name="contentType"></param>
+        /// <param name="eve"></param>
+        /// <param name="userAgent"></param>
+        /// <param name="cookies"></param>
+        /// <param name="_cerPath"></param>
+        /// <param name="_cerPass"></param>
+        /// <returns></returns>
+        private static HttpWebRequest createPost(string url, int? timeout, string contentType, string eve, string userAgent, CookieCollection cookies, string _cerPath, string _cerPass)
         {
             if (string.IsNullOrEmpty(url))
             {
@@ -93,7 +110,7 @@ namespace UnCommon.HTTP
                             store.Add(cer);
                             store.Close();
                         }
-                        catch(Exception e)
+                        catch (Exception e)
                         {
                             UnFile.writeLog("X509Store", e.ToString());
                         }
@@ -103,7 +120,7 @@ namespace UnCommon.HTTP
                         // cert格式
                         cer = new X509Certificate2(_cerPath);
                     }
-                    request.ClientCertificates.Add(cer); 
+                    request.ClientCertificates.Add(cer);
                 }
                 request.ProtocolVersion = HttpVersion.Version10;
             }
@@ -154,7 +171,7 @@ namespace UnCommon.HTTP
         /// <returns></returns>
         public static HttpWebRequest createPost(string url, int? timeout, string contentType, string eve)
         {
-            return createPost(url, timeout, contentType, eve, null, null, null,null);
+            return createPost(url, timeout, contentType, eve, null, null, null, null);
         }
 
         /// <summary>
@@ -167,12 +184,19 @@ namespace UnCommon.HTTP
         /// <param name="cerPath"></param>
         /// <param name="cerPass"></param>
         /// <returns></returns>
-        public static HttpWebRequest createPost(string url, int? timeout, string contentType, string eve, string cerPath,string cerPass)
+        public static HttpWebRequest createPost(string url, int? timeout, string contentType, string eve, string cerPath, string cerPass)
         {
             return createPost(url, timeout, contentType, eve, null, null, cerPath, cerPass);
         }
 
-        // SSL证书校验
+        /// <summary>
+        /// SSL证书校验
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="certificate"></param>
+        /// <param name="chain"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
         private static bool CheckValidationResult(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
         {
             if (errors == SslPolicyErrors.None)
@@ -180,7 +204,14 @@ namespace UnCommon.HTTP
             return false;
         }
 
-        // SSL不验证证书(只需通道加密)
+        /// <summary>
+        /// SSL不验证证书(只需通道加密)
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="certificate"></param>
+        /// <param name="chain"></param>
+        /// <param name="errors"></param>
+        /// <returns></returns>
         private static bool CheckValidationResult1(object sender, X509Certificate certificate, X509Chain chain, SslPolicyErrors errors)
         {
             return true;
@@ -208,6 +239,10 @@ namespace UnCommon.HTTP
             catch
             {
                 return null;
+            }
+            finally
+            {
+                response.Close();
             }
         }
 

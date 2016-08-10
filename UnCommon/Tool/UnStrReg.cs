@@ -30,7 +30,7 @@ namespace UnCommon.Tool
         /// <summary>
         /// 手机号码
         /// </summary>
-        public static Regex regCellPhoneNum = new Regex(@"^1[3,4,5,8]{1}\d{9}$");
+        public static Regex regCellPhoneNum = new Regex(@"^1[3,4,5,6,7,8,9]{1}\d{9}$");
         /// <summary>
         /// 时间格式
         /// </summary>

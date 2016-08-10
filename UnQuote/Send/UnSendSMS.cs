@@ -11,6 +11,9 @@ using UnCommon.HTTP;
 namespace UnQuote.Send
 {
  
+    /// <summary>
+    /// 发短信工具
+    /// </summary>
     public class UnSendSMS
     {
         // 平台类型
@@ -19,8 +22,13 @@ namespace UnQuote.Send
         private string _User = "LKSDK0001641";
         // 密码
         private string _Pass = "HPKJSMS123";
-     
-        // 实例化
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="type">厂商</param>
+        /// <param name="user">账号</param>
+        /// <param name="pass">密码</param>
         public UnSendSMS(UnSendSMSType type, string user, string pass)
         {
             _type = type;
@@ -28,7 +36,13 @@ namespace UnQuote.Send
             _Pass = pass;
         }
 
-        // 发消息 
+        /// <summary>
+        /// 发消息 
+        /// </summary>
+        /// <param name="pNum">手机号</param>
+        /// <param name="sCont">类型</param>
+        /// <param name="sTime">发送时间</param>
+        /// <returns></returns>
         public UnAttrRst send(string pNum, string sCont, string sTime)
         {
             switch (_type)
@@ -40,7 +54,10 @@ namespace UnQuote.Send
             }
         }
 
-        // 查询余额;
+        /// <summary>
+        /// 查询余额
+        /// </summary>
+        /// <returns></returns>
         public UnAttrRst queryBalance()
         {
             switch (_type)

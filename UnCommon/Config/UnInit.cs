@@ -29,6 +29,11 @@ namespace UnCommon.Config
         private static string _DESKey = "5addc_$%";
 
         /// <summary>
+        /// md5密钥
+        /// </summary>
+        private static string _MD5Key = "aYmW2uTaoeKQj6upJyTTxkgGTrsaz8YQecFhMhp1J7eDEVBBxFbhpuDYSPcKbSJpo3MhAnLCi0kzgMb6Z0L36RBTIQx6eO0ZxXoKjtak2I8xjdSgNeTjhPsGB1ITYOxC";
+
+        /// <summary>
         /// 编码格式
         /// </summary>
         private static Encoding _Encoding = Encoding.UTF8;
@@ -128,6 +133,15 @@ namespace UnCommon.Config
         public static int getVersion()
         {
             return _version;
+        }
+
+        /// <summary>
+        /// 获取md5key
+        /// </summary>
+        /// <returns></returns>
+        public static string getMD5Key()
+        {
+            return _MD5Key;
         }
 
     }

@@ -1,4 +1,5 @@
-﻿using System;
+﻿using ServiceStack.Redis;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -12,6 +13,7 @@ using UnCommon;
 using UnCommon.Config;
 using UnCommon.Encrypt;
 using UnCommon.Tool;
+using UnCommon.XMMP;
 using UnDataBase;
 using UnEntity;
 
@@ -119,16 +121,36 @@ namespace UnTestWin
             return new UnSqlHelpU("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", b);
         }
 
+
+        private static RedisClient redis = new RedisClient("192.168.100.141", 6379);
+
+        private void set<T>(List<T> list)
+        {
+            redis.Set("sss", list);
+            redis.Expire("sss", 5);
+            var list0 = redis.Get<List<T>>("sss");
+            Console.WriteLine(list0.Count + "//");
+            
+        }
+
         private void button4_Click(object sender, EventArgs e)
         {
-            UnSqlHelpU sql = new UnSqlHelpU("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false);
-            //UnSqlHelpU sql1 = new UnSqlHelpU("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false);
-            //int? i = getSql(false).exSql("Select * From Test1");
-            //getSql(false).getDataTable("Select * From Test1");
-            //getSql(false).exSql("INSERT INTO Test1 (a, b) VALUES ('aa', 'bb')");
-            sql.exSql("INSERT INTO Test1 (a, b,c,d) VALUES ('aa', 'bb','cc',2)");
-            sql.exSql("INSERT INTO Test1 (a, b,c,d) VALUES ('aa', 'bb','fdeee',1)");
-            //sql.commit();
+            UnSql sql = new UnSql("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false, redis);
+            //var list = sql.query<TestUser>(null, null, null, null, false,5);
+            //Console.WriteLine(list.Count);
+            //foreach (var item in list)
+            //{
+            //Console.WriteLine(item.Name + "/");
+            //}
+            var page = sql.queryPage<TestUser>(null, null, (string)null, null, 1, 2, 5);
+            Console.WriteLine(page.PageSize + "/" + page.DataSource.Rows.Count);
+            var keys = redis.GetAllKeys();
+            Console.WriteLine("key数量:" + keys.Count);
+            foreach (var item in keys)
+            {
+                Console.WriteLine(item);
+            }
+
         }
 
         private void button5_Click(object sender, EventArgs e)
@@ -143,7 +165,7 @@ namespace UnTestWin
 
         private void button6_Click(object sender, EventArgs e)
         {
-            for (int i = 0; i < 100000; i++)
+            for (int i = 0; i < 5; i++)
             {
                 new Thread(insertUser).Start();
                 int j = i % 1000;
@@ -168,6 +190,55 @@ namespace UnTestWin
             cn.insert(user);
             cn.update<TestUser>(user, null, "TestUserGUID = '{0}'", user.TestUserGUID.ToString());
             cn.commit();
+        }
+
+        private void button7_Click(object sender, EventArgs e)
+        {
+            //UnSql sql = new UnSql("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false, redis);
+            UnSqlPage page = new UnSqlPage();
+
+            DataTable memTable = new DataTable("tableName");
+            memTable.Columns.Add(new DataColumn("ID", typeof(int)));
+            memTable.Columns.Add(new DataColumn("Username", typeof(string)));
+            memTable.Columns.Add(new DataColumn("Password", typeof(Guid)));
+
+            DataRow row = memTable.NewRow();
+            row["ID"] = 1;
+            row["Username"] = "badbug";
+            row["Password"] = Guid.NewGuid();
+
+            memTable.Rows.Add(row);
+            page.DataSource = memTable;
+           
+            var tu = new TestUser();
+            tu.Name = "aac";
+            page.PageSize = 12;
+
+            string s = UnXMMPXml.tToXml(typeof(UnSqlPage), page);
+            Console.WriteLine(s);
+
+            redis.Set("aa", s);
+            var b = redis.Get<string>("aa");
+
+
+            UnSqlPage dt = (UnSqlPage)UnXMMPXml.xmlToT(typeof(UnSqlPage), b);
+            Console.WriteLine(dt.DataSource.Rows[0]["Username"]+"//"+ dt.PageSize);
+   
+
+
+
+
+            var a = redis.GetAllKeys();
+            Console.WriteLine(a.Count);
+            foreach (var item in a)
+            {
+                //Console.WriteLine(item);
+            }
+     
+           redis.RemoveByRegex("UnSql_.*");
+          
+            //redis.RemoveByPattern("UnSql_*");
+            //sql.removeAllRedis();
         }
     }
 }

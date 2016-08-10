@@ -13,18 +13,35 @@ namespace UnWeiXin
     public class UnWeMch
     {
         // 文档地址：https://pay.weixin.qq.com/wiki/doc/api/index.html
-        // 公众账号ID
+
+        /// <summary>
+        /// 公众账号ID
+        /// </summary>
         private string _appid;
-        // 商户号
+
+        /// <summary>
+        /// 商户号
+        /// </summary>
         private string _mch_id;
-        // 私钥
+
+        /// <summary>
+        /// 私钥
+        /// </summary>
         private string _key;
 
+        /// <summary>
+        /// 实例化
+        /// </summary>
         public UnWeMch()
         { 
         }
-  
-        // 实例化
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="appid">appid</param>
+        /// <param name="mchid">mchid</param>
+        /// <param name="key">key</param>
         public UnWeMch(string appid,string mchid,string key)
         {
             _appid = appid;
@@ -32,7 +49,11 @@ namespace UnWeiXin
             _key = key;
         }
 
-        // 添加基础属性(appid,mch_id,nonce_str)
+        /// <summary>
+        /// 添加基础属性(appid,mch_id,nonce_str)
+        /// </summary>
+        /// <param name="od"></param>
+        /// <returns></returns>
         private UnAttrOrder addBase(UnAttrOrder od)
         {
             od.appid = _appid;
@@ -44,6 +65,12 @@ namespace UnWeiXin
             return od;
         }
 
+        /// <summary>
+        /// 签名
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="t">泛型对象</param>
+        /// <returns></returns>
         public string sign<T>(T t) where T : new()
         {
             Dictionary<string, string> sdic = UnSign.filterPara(t, "sign");
@@ -51,13 +78,23 @@ namespace UnWeiXin
             return str.md5Hash().ToUpper();
         }
 
-        // 下单签名
+        /// <summary>
+        /// 下单签名
+        /// </summary>
+        /// <param name="od">订单参数</param>
+        /// <returns></returns>
         private string signOrder(UnAttrOrder od)
         {
             return sign(addBase(od));
         }
 
-        // 通用接口
+        /// <summary>
+        /// 通用接口
+        /// </summary>
+        /// <param name="od">订单参数</param>
+        /// <param name="evt">事件</param>
+        /// <param name="cerPath">证书</param>
+        /// <returns></returns>
         public UnAttrReturn order(UnAttrOrder od, UnWeMchEvent evt, string cerPath)
         {
             od.sign = signOrder(od);
@@ -84,6 +121,14 @@ namespace UnWeiXin
             return ret;
         }
 
+        /// <summary>
+        /// 通用接口
+        /// </summary>
+        /// <param name="od">订单参数</param>
+        /// <param name="evt">事件</param>
+        /// <param name="packPath">pack地址</param>
+        /// <param name="packPass">pack密码</param>
+        /// <returns></returns>
         public UnAttrReturn order(UnAttrOrder od, UnWeMchEvent evt, string packPath, string packPass)
         {
             od.sign = signOrder(od);
@@ -110,19 +155,32 @@ namespace UnWeiXin
             return ret;
         }
 
-        // 通用接口
+        /// <summary>
+        /// 通用接口
+        /// </summary>
+        /// <param name="od">订单参数</param>
+        /// <param name="evt">事件</param>
+        /// <returns></returns>
         public UnAttrReturn order(UnAttrOrder od, UnWeMchEvent evt)
         {
             return order(od, evt, null);
         }
 
-        // 生成并返回二维码图片路径
+        /// <summary>
+        /// 生成并返回二维码图片路径
+        /// </summary>
+        /// <param name="code_url">url地址</param>
+        /// <returns></returns>
         public string getQRCPath(string code_url)
         {
             return UnImage.createQrcPath(code_url, 0, UnImageQRCEtr.Q).fullName;
         }
 
-        // 校验签名
+        /// <summary>
+        /// 校验签名
+        /// </summary>
+        /// <param name="ret"></param>
+        /// <returns></returns>
         public bool checkSign(UnAttrReturn ret)
         {
             Dictionary<string, string> dic = UnSign.filterPara(ret, "sign");
@@ -133,7 +191,11 @@ namespace UnWeiXin
             return false;
         }
 
-        // 错误事件
+        /// <summary>
+        /// 错误事件
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public UnAttrErrorEvent errorEventFromCode(string code)
         {
             switch (code)

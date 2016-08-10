@@ -89,13 +89,13 @@ namespace UnCommon.Encrypt
         }
 
         /// <summary>
-        /// 二次加密
+        /// 变异加密
         /// </summary>
         /// <param name="s"></param>
         /// <returns></returns>
         public static string getMd5Hashs(string s)
         {
-            string s1 = getMd5Hash(s);
+            string s1 = getMd5Hash(s) + UnInit.getMD5Key();
             s1 = getMd5Hash(s1.ToLower());
             return s1;
         }

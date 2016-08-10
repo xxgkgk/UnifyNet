@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
-using System.Xml;
 using UnCommon.Tool;
-using UnCommon.Files;
 using UnCommon.Config;
+using ServiceStack.Redis;
+using UnCommon.Extend;
+using UnCommon.XMMP;
 
 namespace UnDataBase
 {
@@ -17,8 +18,20 @@ namespace UnDataBase
     {
         #region 私有变量/方法
 
-        // 数据库操作对象
+        /// <summary>
+        /// 数据库操作对象
+        /// </summary>
         private UnSqlHelpU help = null;
+
+        /// <summary>
+        /// Redis缓存对象
+        /// </summary>
+        private RedisClient redis = null;
+
+        /// <summary>
+        /// Redis键名前缀
+        /// </summary>
+        private string redisKeyPre = "UnSql_";
 
         /// <summary>
         /// 转参数化条件
@@ -66,8 +79,10 @@ namespace UnDataBase
         /// <param name="dbName">数据库名</param>
         /// <param name="model">连接模式</param>
         /// <param name="trans">是否事务</param>
-        private void init(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans)
+        /// <param name="redisClient">Redis</param>
+        private void init(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans, RedisClient redisClient)
         {
+            this.redis = redisClient;
             string constr1 = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
             string constr2 = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
             switch (model)
@@ -93,7 +108,22 @@ namespace UnDataBase
         /// <param name="model">连接类型</param>
         public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model)
         {
-            init(ip, port, user, pass, dbName, model, false);
+            init(ip, port, user, pass, dbName, model, false, null);
+        }
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="ip">ip地址</param>
+        /// <param name="port">端口</param>
+        /// <param name="user">账号</param>
+        /// <param name="pass">密码</param>
+        /// <param name="dbName">连接的数据库</param>
+        /// <param name="model">连接类型</param>
+        /// <param name="redisClient">Redis</param>
+        public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, RedisClient redisClient)
+        {
+            init(ip, port, user, pass, dbName, model, false, redisClient);
         }
 
         /// <summary>
@@ -108,7 +138,35 @@ namespace UnDataBase
         /// <param name="trans">是否开启事务</param>
         public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans)
         {
-            init(ip, port, user, pass, dbName, model, trans);
+            init(ip, port, user, pass, dbName, model, trans, null);
+        }
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="ip">ip地址</param>
+        /// <param name="port">端口</param>
+        /// <param name="user">账号</param>
+        /// <param name="pass">密码</param>
+        /// <param name="dbName">连接的数据库</param>
+        /// <param name="model">连接类型</param>
+        /// <param name="trans">是否开启事务</param>
+        /// <param name="redisClient">Redis</param>
+        public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans, RedisClient redisClient)
+        {
+            init(ip, port, user, pass, dbName, model, trans, redisClient);
+        }
+
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="constr">连接字符串</param>
+        /// <param name="trans">是否开启事务</param>
+        /// <param name="redisClient">Redis</param>
+        public UnSql(string constr, bool trans, RedisClient redisClient)
+        {
+            this.redis = redisClient;
+            help = new UnSqlHelpU(constr, trans);
         }
 
         /// <summary>
@@ -331,19 +389,15 @@ namespace UnDataBase
         /// <returns>是否成功</returns>
         public bool updateTable(Type t)
         {
-            int? rst = null;
-            rst = dropColumn(t);
-            if (rst == null)
+            if (dropColumn(t) == null)
             {
                 return false;
             }
-            rst = addColumn(t);
-            if (rst == null)
+            if (addColumn(t) == null)
             {
                 return false;
             }
-            rst = alterColumn(t);
-            if (rst == null)
+            if (alterColumn(t) == null)
             {
                 return false;
             }
@@ -604,17 +658,47 @@ namespace UnDataBase
         /// <summary>
         /// 查询实体(核心方法)
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="strSql"></param>
-        /// <param name="parms"></param>
-        /// <returns></returns>
-        private List<T> query<T>(string strSql, SqlParameter[] parms) where T : new()
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="strSql">SQL语句</param>
+        /// <param name="parms">参数</param>
+        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <returns>返回查询泛型数组,没有数据返回0条</returns>
+        private List<T> query<T>(string strSql, SqlParameter[] parms, int? cacheExpire) where T : new()
         {
+            // 缓存key
+            string cacheKey = null;
+            // 有缓存则返回缓存
+            if (redis != null && cacheExpire != null && cacheExpire.Value > 0)
+            {
+                cacheKey = redisKeyPre + strSql.md5Hash16();
+                // 如果键存在
+                if (redis.Exists(cacheKey) == 1)
+                {
+                    // 尝试读取缓存
+                    try
+                    {
+                        return redis.Get<List<T>>(cacheKey);
+                    }
+                    catch
+                    {
+                        
+                    }
+                }
+            }
+
+            // 查询数据
             List<T> list = new List<T>();
             DataTable dt = help.getDataTable(strSql, parms);
             if (dt != null)
             {
                 list = UnToGen.dtToT<T>(dt);
+            }
+
+            // 设置缓存
+            if (cacheKey != null)
+            {
+                redis.Set(cacheKey, list);
+                redis.Expire(cacheKey, cacheExpire.Value);
             }
             return list;
         }
@@ -622,7 +706,7 @@ namespace UnDataBase
         /// <summary>
         /// 参数化获取实体(核心)
         /// </summary>
-        /// <typeparam name="T">实体</typeparam>
+        /// <typeparam name="T">泛型</typeparam>
         /// <param name="columns">字段</param>
         /// <param name="selection">条件-Where ID={0}</param>
         /// <param name="selectionArgs">条件参数</param>
@@ -630,15 +714,60 @@ namespace UnDataBase
         /// <param name="having"></param>
         /// <param name="orderBy">排序</param>
         /// <param name="isLinkedServer">是否链接服务器</param>
-        /// <returns></returns>
-        private List<T> query<T>(string[] columns,
-            string selection, string[] selectionArgs, string groupBy,
-            string having, string orderBy,bool isLinkedServer) where T : new()
+        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <returns>返回查询泛型数组,没有数据返回0条</returns>
+        private List<T> query<T>(string[] columns, string selection, string[] selectionArgs, string groupBy, string having, string orderBy, bool isLinkedServer, int? cacheExpire) where T : new()
         {
             // 构造参数化查询
             object[] objs = toParsSelection(selection, selectionArgs);
             string strSql = UnSqlStr.getQuerySql<T>(columns, (string)objs[0], null, groupBy, having, orderBy, isLinkedServer);
-            return query<T>(strSql, (SqlParameter[])objs[1]);
+            return query<T>(strSql, (SqlParameter[])objs[1], cacheExpire);
+        }
+
+        /// <summary>
+        /// 参数化获取实体
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件-Where ID={0}</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="groupBy">分组</param>
+        /// <param name="having"></param>
+        /// <param name="orderBy">排序</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <returns>返回查询泛型数组,没有数据返回0条</returns>
+        private List<T> query<T>(string columns, string selection, string[] selectionArgs, string groupBy, string having, string orderBy, bool isLinkedServer, int? cacheExpire) where T : new()
+        {
+            string[] cs = null;
+            if (columns != null)
+            {
+                cs = columns.Split(',');
+            }
+            return query<T>(cs, selection, selectionArgs, groupBy, having, orderBy, isLinkedServer, cacheExpire);
+        }
+
+        /// <summary>
+        /// 参数化获取实体
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件-Where ID={0}</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="groupBy">分组</param>
+        /// <param name="having"></param>
+        /// <param name="orderBy">排序</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <returns>返回查询泛型数组,没有数据返回0条</returns>
+        private List<T> query<T>(string columns, string selection, string selectionArgs, string groupBy, string having, string orderBy, bool isLinkedServer, int? cacheExpire) where T : new()
+        {
+            string[] ss = null;
+            if (selectionArgs != null)
+            {
+                ss = selectionArgs.Split(',');
+            }
+            return query<T>(columns, selection, ss, groupBy, having, orderBy, isLinkedServer, cacheExpire);
         }
 
         /// <summary>
@@ -652,13 +781,9 @@ namespace UnDataBase
         /// <param name="having"></param>
         /// <param name="orderBy">排序</param>
         /// <returns></returns>
-        private List<T> query<T>(string[] columns,
-           string selection, string[] selectionArgs, string groupBy,
-           string having, string orderBy) where T : new()
+        private List<T> query<T>(string[] columns, string selection, string[] selectionArgs, string groupBy, string having, string orderBy) where T : new()
         {
-            return query<T>(columns,
-           selection, selectionArgs, groupBy,
-            having, orderBy, false);
+            return query<T>(columns, selection, selectionArgs, groupBy, having, orderBy, false, null);
         }
 
         /// <summary>
@@ -673,18 +798,7 @@ namespace UnDataBase
         /// <returns></returns>
         public List<T> query<T>(string columns, string selection, string selectionArgs, string orderBy, bool isLinkedServer) where T : new()
         {
-            string[] cs = null;
-            string[] ss = null;
-
-            if (columns != null)
-            {
-                cs = columns.Split(',');
-            }
-            if (selectionArgs != null)
-            {
-                ss = selectionArgs.Split(',');
-            }
-            return query<T>(cs, selection, ss, null, null, orderBy, isLinkedServer);
+            return query<T>(columns, selection, selectionArgs, null, null, orderBy, isLinkedServer, null);
         }
 
         /// <summary>
@@ -713,12 +827,23 @@ namespace UnDataBase
         /// <returns></returns>
         public List<T> query<T>(string columns, string selection, string[] selectionArgs, string orderBy, bool isArray) where T : new()
         {
-            string[] cs = null;
-            if (columns != null)
-            {
-                cs = columns.Split(',');
-            }
-            return query<T>(cs, selection, selectionArgs, null, null, orderBy);
+            return query<T>(columns, selection, selectionArgs, null, null, orderBy, false, null);
+        }
+
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="columns"></param>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
+        /// <param name="orderBy"></param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <returns>返回泛型对象,无数据则为NULL</returns>
+        public List<T> query<T>(string columns, string selection, string selectionArgs, string orderBy, bool isLinkedServer, int? cacheExpire) where T : new()
+        {
+            return query<T>(columns, selection, selectionArgs, null, null, orderBy, isLinkedServer, cacheExpire);
         }
 
         /// <summary>
@@ -732,21 +857,9 @@ namespace UnDataBase
         /// <param name="having"></param>
         /// <param name="orderBy">排序</param>
         /// <returns></returns>
-        public List<T> query<T>(string columns,
-        string selection, string selectionArgs, string groupBy,
-        string having, string orderBy) where T : new()
+        public List<T> query<T>(string columns, string selection, string selectionArgs, string groupBy, string having, string orderBy) where T : new()
         {
-            string[] cs = null;
-            string[] ss = null;
-            if (columns != null)
-            {
-                cs = columns.Split(',');
-            }
-            if (selectionArgs != null)
-            {
-                ss = selectionArgs.Split(',');
-            }
-            return query<T>(cs, selection, ss, groupBy, having, orderBy);
+            return query<T>(columns, selection, selectionArgs, groupBy, having, orderBy, false, null);
         }
 
         /// <summary>
@@ -761,7 +874,7 @@ namespace UnDataBase
         /// <returns></returns>
         public T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy, bool isLinkedServer) where T : new()
         {
-            List<T> list = query<T>(columns, selection, selectionArgs, orderBy);
+            List<T> list = query<T>(columns, selection, selectionArgs, orderBy, isLinkedServer);
             if (list.Count > 0)
             {
                 return list[0];
@@ -780,15 +893,8 @@ namespace UnDataBase
         /// <returns></returns>
         public T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy) where T : new()
         {
-            List<T> list = query<T>(columns, selection, selectionArgs, orderBy);
-            if (list.Count > 0)
-            {
-                return list[0];
-            }
-            return default(T);
+            return querySingle<T>(columns, selection, selectionArgs, orderBy, false);
         }
-
-
 
         /// <summary>
         /// 查询数据表
@@ -801,9 +907,7 @@ namespace UnDataBase
         /// <param name="having">having</param>
         /// <param name="orderBy">排序</param>
         /// <returns></returns>
-        private DataTable queryDT<T>(string[] columns,
-      string selection, string[] selectionArgs, string groupBy,
-      string having, string orderBy) where T : new()
+        private DataTable queryDT<T>(string[] columns, string selection, string[] selectionArgs, string groupBy, string having, string orderBy) where T : new()
         {
             string strSql = UnSqlStr.getQuerySql<T>(columns, selection, selectionArgs, groupBy, having, orderBy, false);
             return help.getDataTable(strSql);
@@ -820,9 +924,7 @@ namespace UnDataBase
         /// <param name="having">having</param>
         /// <param name="orderBy">排序</param>
         /// <returns></returns>
-        public DataTable queryDT<T>(string columns,
-        string selection, string selectionArgs, string groupBy,
-        string having, string orderBy) where T : new()
+        public DataTable queryDT<T>(string columns, string selection, string selectionArgs, string groupBy, string having, string orderBy) where T : new()
         {
             string[] cs = null;
             string[] ss = null;
@@ -879,95 +981,6 @@ namespace UnDataBase
                 return list.Rows[0];
             }
             return null;
-        }
-
-        /// <summary>
-        /// 获取翻页数据
-        /// </summary>
-        /// <param name="columns">字段</param>
-        /// <param name="keyName">主键名</param>
-        /// <param name="table">表名</param>
-        /// <param name="where">条件</param>
-        /// <param name="order">排序</param>
-        /// <param name="currentPage">当前页</param>
-        /// <param name="pageSize">每页条数</param>
-        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
-        public UnSqlPage queryPage(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize)
-        {
-            UnSqlPage page = help.getPage(columns, keyName, table, where, order, currentPage, pageSize);
-            return page;
-        }
-
-        /// <summary>
-        /// 获取翻页数据
-        /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
-        /// <param name="columns">字段</param>
-        /// <param name="where">条件</param>
-        /// <param name="whereArgs">条件参数</param>
-        /// <param name="order">排序</param>
-        /// <param name="currentPage">当前页</param>
-        /// <param name="pageSize">每页条数</param>
-        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
-        public UnSqlPage queryPage<T>(string columns, string where, string[] whereArgs, string order, int currentPage, int pageSize) where T : new()
-        {
-            string keyName = UnToGen.getAutoNum(typeof(T), true);
-            string table = UnToGen.getTableName(typeof(T));
-            where = UnSqlStr.getQueryPageWhere<T>(where, whereArgs);
-            UnSqlPage page = help.getPage(columns, keyName, table, where, order, currentPage, pageSize);
-            page.TSource = UnToGen.dtToT<T>(page.DataSource);
-            return page;
-        }
-
-        /// <summary>
-        /// 获取翻页数据
-        /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
-        /// <param name="columns">字段</param>
-        /// <param name="where">条件</param>
-        /// <param name="whereArgs">条件参数</param>
-        /// <param name="order">排序</param>
-        /// <param name="currentPage">当前页</param>
-        /// <param name="pageSize">每页条数</param>
-        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
-        public UnSqlPage queryPage<T>(string columns, string where, string whereArgs, string order, int currentPage, int pageSize) where T : new()
-        {
-            string keyName = UnToGen.getAutoNum(typeof(T), true);
-            string table = UnToGen.getTableName(typeof(T));
-            string[] args = null;
-            if (whereArgs != null && whereArgs.Length > 0)
-            {
-                args = whereArgs.Split(',');
-            }
-            where = UnSqlStr.getQueryPageWhere<T>(where, args);
-            UnSqlPage page = help.getPage(columns, keyName, table, where, order, currentPage, pageSize);
-            if (page.DataSource != null && page.DataSource.Rows.Count > 0)
-            {
-                page.TSource = UnToGen.dtToT<T>(page.DataSource);
-            }
-            else
-            {
-                page.TSource = new List<T>();
-            }
-            return page;
-        }
-
-        /// <summary>
-        /// 获取翻页数据
-        /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
-        /// <param name="columns">字段</param>
-        /// <param name="order">排序</param>
-        /// <param name="currentPage">当前页</param>
-        /// <param name="pageSize">每页条数</param>
-        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
-        public UnSqlPage queryPage<T>(string columns, string order, int currentPage, int pageSize) where T : new()
-        {
-            string keyName = UnToGen.getAutoNum(typeof(T), true);
-            string table = UnToGen.getTableName(typeof(T));
-            UnSqlPage page = help.getPage(columns, keyName, table, null, order, currentPage, pageSize);
-            page.TSource = UnToGen.dtToT<T>(page.DataSource);
-            return page;
         }
 
         /// <summary>
@@ -1057,6 +1070,175 @@ namespace UnDataBase
             {
                 return null;
             }
+        }
+
+        #endregion
+
+        #region 查询翻页
+
+        /// <summary>
+        /// 获取翻页数据(核心)
+        /// </summary>
+        /// <param name="columns">字段</param>
+        /// <param name="keyName">主键名</param>
+        /// <param name="table">表名或联合表名</param>
+        /// <param name="where">条件</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
+        public UnSqlPage queryPage(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize, int? cacheExpire)
+        {
+            // 缓存key
+            string cacheKey = null;
+            // 有缓存则返回缓存
+            if (redis != null && cacheExpire != null && cacheExpire.Value > 0)
+            {
+                cacheKey = redisKeyPre + (columns + keyName + table + where + order + currentPage).md5Hash16();
+                // 如果键存在
+                if (redis.Exists(cacheKey) == 1)
+                {
+                    // 尝试读取缓存
+                    try
+                    {
+                        // 取出XML并转为对象
+                        string xml = redis.Get<string>(cacheKey);
+                        return (UnSqlPage)UnXMMPXml.xmlToT(typeof(UnSqlPage), xml);
+                    }
+                    catch
+                    {
+
+                    }
+                }
+            }
+
+            // 查询数据
+            UnSqlPage page = help.getPage(columns, keyName, table, where, order, currentPage, pageSize);
+
+            // 设置缓存
+            if (cacheKey != null)
+            {
+                // 须转为XML存储
+                string xml = UnXMMPXml.tToXml(typeof(UnSqlPage), page);
+                redis.Set(cacheKey, xml);
+                redis.Expire(cacheKey, cacheExpire.Value);
+            }
+            Console.WriteLine("11");
+            return page;
+        }
+
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <param name="columns">字段</param>
+        /// <param name="keyName">主键名</param>
+        /// <param name="table">表名或联合表名</param>
+        /// <param name="where">条件</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <returns></returns>
+        public UnSqlPage queryPage(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize)
+        {
+            return queryPage(columns, keyName, table, where, order, currentPage, pageSize, null);
+        }
+
+        /// <summary>
+        /// 获取翻页数据(核心)
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="where">条件</param>
+        /// <param name="whereArgs">条件参数</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
+        public UnSqlPage queryPage<T>(string columns, string where, string[] whereArgs, string order, int currentPage, int pageSize, int? cacheExpire) where T : new()
+        {
+            string keyName = UnToGen.getAutoNum(typeof(T), true);
+            string table = UnToGen.getTableName(typeof(T));
+            where = UnSqlStr.getQueryPageWhere<T>(where, whereArgs);
+            UnSqlPage page = queryPage(columns, keyName, table, where, order, currentPage, pageSize, cacheExpire);
+            if (page.DataSource != null && page.DataSource.Rows.Count > 0)
+            {
+                page.TSource = UnToGen.dtToT<T>(page.DataSource);
+            }
+            else
+            {
+                page.TSource = new List<T>();
+            }
+            return page;
+        }
+
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="where">条件</param>
+        /// <param name="whereArgs">条件参数</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
+        public UnSqlPage queryPage<T>(string columns, string where, string[] whereArgs, string order, int currentPage, int pageSize) where T : new()
+        {
+            return queryPage<T>(columns, where, whereArgs, order, currentPage, pageSize, null);
+        }
+
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="where">条件</param>
+        /// <param name="whereArgs">条件参数</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
+        public UnSqlPage queryPage<T>(string columns, string where, string whereArgs, string order, int currentPage, int pageSize, int? cacheExpire) where T : new()
+        {
+            string[] args = null;
+            if (whereArgs != null && whereArgs.Length > 0)
+            {
+                args = whereArgs.Split(',');
+            }
+            return queryPage<T>(columns, where, args, order, currentPage, pageSize, cacheExpire);
+        }
+
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="where">条件</param>
+        /// <param name="whereArgs">条件参数</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
+        public UnSqlPage queryPage<T>(string columns, string where, string whereArgs, string order, int currentPage, int pageSize) where T : new()
+        {
+            return queryPage<T>(columns, where, whereArgs, order, currentPage, pageSize, null);
+        }
+
+        /// <summary>
+        /// 获取翻页数据
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="order">排序</param>
+        /// <param name="currentPage">当前页</param>
+        /// <param name="pageSize">每页条数</param>
+        /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
+        public UnSqlPage queryPage<T>(string columns, string order, int currentPage, int pageSize) where T : new()
+        {
+            return queryPage<T>(columns, null, (string)null, order, currentPage, pageSize);
         }
 
         #endregion
@@ -1163,6 +1345,19 @@ namespace UnDataBase
         public void commit()
         {
             help.commit();
+        }
+
+        #endregion
+
+        #region Redis缓存
+
+        /// <summary>
+        /// 清除所有缓存
+        /// </summary>
+        public void removeAllRedis()
+        {
+            redis.RemoveByRegex(redisKeyPre + ".*");
+            //redis.RemoveByPattern(redisKeyPre+"*");
         }
 
         #endregion
