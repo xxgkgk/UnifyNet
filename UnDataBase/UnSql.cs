@@ -34,6 +34,11 @@ namespace UnDataBase
         private string redisKeyPre = "UnSql_";
 
         /// <summary>
+        /// 默认
+        /// </summary>
+        private bool _isRemoveRedis = false;
+
+        /// <summary>
         /// 转参数化条件
         /// </summary>
         /// <param name="selection">条件语句,如:ID = {0} Or Name = '{1}'</param>
@@ -85,6 +90,7 @@ namespace UnDataBase
             this.redis = redisClient;
             string constr1 = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
             string constr2 = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
+            this.redisKeyPre = redisKeyPre + constr2.md5Hash16() + "_";
             switch (model)
             {
                 case UnSqlConnectModel.Create:
@@ -166,6 +172,7 @@ namespace UnDataBase
         public UnSql(string constr, bool trans, RedisClient redisClient)
         {
             this.redis = redisClient;
+            this.redisKeyPre = redisKeyPre + constr.md5Hash16() + "_";
             help = new UnSqlHelpU(constr, trans);
         }
 
@@ -195,7 +202,7 @@ namespace UnDataBase
         /// <summary>
         /// 创建表
         /// </summary>
-        /// <param name="t">类型</param>
+        /// <param name="t">表数据对象</param>
         /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
         public int? createTable(Type t)
         {
@@ -541,13 +548,14 @@ namespace UnDataBase
         #region 添加数据
 
         /// <summary>
-        /// 添加一条记录
+        /// 添加一条记录(核心)
         /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
-        /// <param name="t">泛型对象</param>
+        /// <typeparam name="T">表对应泛型</typeparam>
+        /// <param name="t">表数据对象</param>
         /// <param name="isXactAbort">是否嵌套事务</param>
+        /// <param name="isRemoveRedis">是否清除表缓存</param>
         /// <returns></returns>
-        public long insert<T>(T t, bool isXactAbort) where T : new()
+        public long insert<T>(T t, bool isXactAbort, bool? isRemoveRedis) where T : new()
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t);
             StringBuilder strSql = new StringBuilder();
@@ -566,6 +574,8 @@ namespace UnDataBase
                 {
                     return -1;
                 }
+                // 清除表缓存
+                removeTableRedis(typeof(T), isRemoveRedis);
                 return Convert.ToInt64(obj);
             }
             obj = help.getExSc(strSql.ToString(), SqlPmtA);
@@ -573,7 +583,21 @@ namespace UnDataBase
             {
                 return -1;
             }
+            // 清除表缓存
+            removeTableRedis(typeof(T), isRemoveRedis);
             return 0;
+        }
+
+        /// <summary>
+        /// 添加一条记录
+        /// </summary>
+        /// <typeparam name="T">表对应泛型</typeparam>
+        /// <param name="t">表数据对象</param>
+        /// <param name="isXactAbort">是否嵌套事务</param>
+        /// <returns></returns>
+        public long insert<T>(T t, bool isXactAbort) where T : new()
+        {
+            return insert<T>(t, isXactAbort, null);
         }
 
         /// <summary>
@@ -589,17 +613,145 @@ namespace UnDataBase
 
         #endregion
 
+        #region 修改数据
+
+        /// <summary>
+        /// 条件修改(核心)
+        /// </summary>
+        /// <typeparam name="T">表对应泛型</typeparam>
+        /// <param name="t">表数据对象</param>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否链接服务顺</param>
+        /// <param name="isRemoveRedis">是否清除缓存</param>
+        /// <returns></returns>
+        private int? update<T>(T t, string columns, string selection, string[] selectionArgs, bool isXactAbort, bool? isRemoveRedis) where T : new()
+        {
+            // 实体属性参数化
+            SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
+            StringBuilder strSql = new StringBuilder();
+            if (isXactAbort)
+            {
+                strSql.Append("Set xact_abort ON;");
+            }
+            strSql.Append("Update " + UnToGen.getTableName(typeof(T), isXactAbort) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " ");
+
+            // 构造参数化查询
+            object[] objs = toParsSelection(selection, selectionArgs);
+            string where = (string)objs[0];
+            if (where.Length > 0)
+            {
+                strSql.Append("Where " + where);
+            }
+
+            // 属性参数和条件参数合并
+            List<SqlParameter> list = new List<SqlParameter>();
+            list.AddRange(SqlPmtA);
+            list.AddRange((SqlParameter[])objs[1]);
+            // 清除表缓存
+            removeTableRedis(typeof(T), isRemoveRedis);
+            return help.exSql(strSql.ToString(), list.ToArray());
+        }
+
+        /// <summary>
+        /// 条件修改
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="columns"></param>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
+        /// <param name="isXactAbort"></param>
+        /// <returns></returns>
+        public int? update<T>(T t, string columns, string selection, string[] selectionArgs, bool isXactAbort) where T : new()
+        {
+            return update<T>(t, columns, selection, selectionArgs, isXactAbort, null);
+        }
+
+        /// <summary>
+        /// 条件修改
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="columns"></param>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
+        /// <returns></returns>
+        public int? update<T>(T t, string columns, string selection, string[] selectionArgs) where T : new()
+        {
+            return update(t, columns, selection, selectionArgs, false);
+        }
+
+        /// <summary>
+        /// 修改数据
+        /// </summary>
+        /// <typeparam name="T">表对应泛型</typeparam>
+        /// <param name="t">表数据对象</param>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否链接服务器</param>
+        /// <param name="isRemoveRedis">是否清除表缓存</param>
+        /// <returns></returns>
+        public int? update<T>(T t, string columns, string selection, string selectionArgs, bool isXactAbort, bool? isRemoveRedis) where T : new()
+        {
+            string[] args = null;
+            if (selectionArgs != null)
+            {
+                args = selectionArgs.Split(',');
+            }
+            return update<T>(t, columns, selection, args, isXactAbort, isRemoveRedis);
+        }
+
+        /// <summary>
+        /// 修改数据
+        /// </summary>
+        /// <typeparam name="T">表对应泛型</typeparam>
+        /// <param name="t">表数据对象</param>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否链接服务器</param>
+        /// <returns></returns>
+        public int? update<T>(T t, string columns, string selection, string selectionArgs, bool isXactAbort) where T : new()
+        {
+            return update<T>(t, columns, selection, selectionArgs, isXactAbort, null);
+        }
+
+        /// <summary>
+        /// 条件修改
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="columns"></param>
+        /// <param name="selection"></param>
+        /// <param name="selectionArgs"></param>
+        /// <returns></returns>
+        public int? update<T>(T t, string columns, string selection, string selectionArgs) where T : new()
+        {
+            string[] args = null;
+            if (selectionArgs != null)
+            {
+                args = selectionArgs.Split(',');
+            }
+            return update<T>(t, columns, selection, args, false);
+        }
+
+        #endregion
+
         #region 删除数据
 
         /// <summary>
         /// 删除数据(核心)
         /// </summary>
-        /// <typeparam name="T">实体</typeparam>
+        /// <typeparam name="T">表对应泛型</typeparam>
         /// <param name="selection">条件</param>
         /// <param name="selectionArgs">条件参数</param>
         /// <param name="isXactAbort">是否嵌套事务</param>
+        /// <param name="isRemoveRedis">是否清除缓存</param>
         /// <returns></returns>
-        public int? delete<T>(string selection, string[] selectionArgs, bool isXactAbort) where T : new()
+        private int? delete<T>(string selection, string[] selectionArgs, bool isXactAbort, bool? isRemoveRedis) where T : new()
         {
             // 构造参数化查询
             object[] objs = toParsSelection(selection, selectionArgs);
@@ -615,24 +767,54 @@ namespace UnDataBase
             {
                 strSql.Append("Where " + where);
             }
+            // 清除表缓存
+            removeTableRedis(typeof(T), isRemoveRedis);
             return help.exSql(strSql.ToString(), (SqlParameter[])objs[1]);
         }
 
         /// <summary>
         /// 删除数据
         /// </summary>
-        /// <typeparam name="T">实体</typeparam>
+        /// <typeparam name="T">表对应泛型</typeparam>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否嵌套事务</param>
+        /// <returns></returns>
+        public int? delete<T>(string selection, string[] selectionArgs, bool isXactAbort) where T : new()
+        {
+            return delete<T>(selection, selectionArgs, isXactAbort, null);
+        }
+
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <typeparam name="T">表对应泛型</typeparam>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否嵌套事务</param>
+        /// <param name="isRemoveRedis">是否清除缓存</param>
+        /// <returns></returns>
+        public int? delete<T>(string selection, string selectionArgs, bool isXactAbort, bool? isRemoveRedis) where T : new()
+        {
+            string[] args = null;
+            if (selectionArgs != null)
+            {
+                args = selectionArgs.Split(',');
+            }
+            return delete<T>(selection, args, isXactAbort, isRemoveRedis);
+        }
+
+        /// <summary>
+        /// 删除数据
+        /// </summary>
+        /// <typeparam name="T">表对应泛型</typeparam>
         /// <param name="selection">条件</param>
         /// <param name="selectionArgs">条件参数</param>
         /// <param name="isXactAbort">是否嵌套事务</param>
         /// <returns></returns>
         public int? delete<T>(string selection, string selectionArgs, bool isXactAbort) where T : new()
         {
-            if (selectionArgs != null)
-            {
-                return delete<T>(selection, selectionArgs.Split(','), isXactAbort);
-            }
-            return delete<T>(selection, (string[])null, isXactAbort);
+            return delete<T>(selection, selectionArgs, isXactAbort, null);
         }
 
         /// <summary>
@@ -653,7 +835,7 @@ namespace UnDataBase
 
         #endregion
 
-        #region 查询数据
+        #region 查询返回泛型
 
         /// <summary>
         /// 查询实体(核心方法)
@@ -661,18 +843,30 @@ namespace UnDataBase
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="strSql">SQL语句</param>
         /// <param name="parms">参数</param>
-        /// <param name="cacheExpire">缓存时间(秒)</param>
-        /// <returns>返回查询泛型数组,没有数据返回0条</returns>
+        /// <param name="cacheExpire">
+        /// >0 = 缓存时间(秒)
+        /// -1 = 清除缓存
+        /// </param>
+        /// <returns>返回查询泛型数组,没有数据返回0条,cacheExpire = -1时返回NULL</returns>
         private List<T> query<T>(string strSql, SqlParameter[] parms, int? cacheExpire) where T : new()
         {
             // 缓存key
             string cacheKey = null;
+
             // 有缓存则返回缓存
-            if (redis != null && cacheExpire != null && cacheExpire.Value > 0)
+            if (redis != null && cacheExpire != null)
             {
-                cacheKey = redisKeyPre + strSql.md5Hash16();
+                cacheKey = getQueryKeyPre(typeof(T)) + strSql.md5Hash16();
+
+                // 删除缓存
+                if (cacheExpire.Value == -1)
+                {
+                    redis.Remove(cacheKey);
+                    return null;
+                }
+
                 // 如果键存在
-                if (redis.Exists(cacheKey) == 1)
+                if (redis.Exists(cacheKey) == 1 && cacheExpire.Value > 0)
                 {
                     // 尝试读取缓存
                     try
@@ -681,7 +875,7 @@ namespace UnDataBase
                     }
                     catch
                     {
-                        
+
                     }
                 }
             }
@@ -695,7 +889,7 @@ namespace UnDataBase
             }
 
             // 设置缓存
-            if (cacheKey != null)
+            if (cacheKey != null && cacheExpire.Value > 0)
             {
                 redis.Set(cacheKey, list);
                 redis.Expire(cacheKey, cacheExpire.Value);
@@ -704,7 +898,7 @@ namespace UnDataBase
         }
 
         /// <summary>
-        /// 参数化获取实体(核心)
+        /// 参数化获取实体
         /// </summary>
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="columns">字段</param>
@@ -896,6 +1090,77 @@ namespace UnDataBase
             return querySingle<T>(columns, selection, selectionArgs, orderBy, false);
         }
 
+        #endregion
+
+        #region 查询返回DataTable
+
+        /// <summary>
+        /// 查询数据(核心)
+        /// </summary>
+        /// <param name="strSql">sql</param>
+        /// <param name="parms">参数</param>
+        /// <returns></returns>
+        public DataTable queryDT(string strSql, SqlParameter[] parms)
+        {
+            return help.getDataTable(strSql, parms);
+        }
+
+        /// <summary>
+        /// 查询数据(核心)
+        /// </summary>
+        /// <param name="strSql">sql</param>
+        /// <param name="parms">参数</param>
+        /// <param name="cacheExpire">
+        /// >0 = 缓存时间
+        /// </param>
+        /// <returns>返回DataTable</returns>
+        public DataTable queryDT<T>(string strSql, SqlParameter[] parms, int? cacheExpire)
+        {
+            // 缓存key
+            string cacheKey = null;
+
+            // 有缓存则返回缓存
+            if (redis != null && cacheExpire != null)
+            {
+                cacheKey = getQueryDTKeyPre(typeof(T)) + strSql.md5Hash16();
+
+                // 删除缓存
+                if (cacheExpire.Value == -1)
+                {
+                    redis.Remove(cacheKey);
+                    return null;
+                }
+
+                // 如果键存在
+                if (redis.Exists(cacheKey) == 1 && cacheExpire.Value > 0)
+                {
+                    // 尝试读取缓存
+                    try
+                    {
+                        // 取出XML并转为对象
+                        string xml = redis.Get<string>(cacheKey);
+                        return (DataTable)UnXMMPXml.xmlToT(typeof(DataTable), xml);
+                    }
+                    catch
+                    {
+                    }
+                }
+            }
+
+            // 查询数据
+            DataTable dt = help.getDataTable(strSql, parms);
+
+            // 设置缓存
+            if (cacheKey != null && cacheExpire.Value > 0)
+            {
+                // 须转为XML存储
+                string xml = UnXMMPXml.tToXml(typeof(DataTable), dt);
+                redis.Set(cacheKey, xml);
+                redis.Expire(cacheKey, cacheExpire.Value);
+            }
+            return dt;
+        }
+
         /// <summary>
         /// 查询数据表
         /// </summary>
@@ -910,7 +1175,7 @@ namespace UnDataBase
         private DataTable queryDT<T>(string[] columns, string selection, string[] selectionArgs, string groupBy, string having, string orderBy) where T : new()
         {
             string strSql = UnSqlStr.getQuerySql<T>(columns, selection, selectionArgs, groupBy, having, orderBy, false);
-            return help.getDataTable(strSql);
+            return queryDT(strSql, null);
         }
 
         /// <summary>
@@ -983,98 +1248,9 @@ namespace UnDataBase
             return null;
         }
 
-        /// <summary>
-        /// 递归查询
-        /// </summary>
-        /// <typeparam name="T">泛型</typeparam>
-        /// <param name="ID">开始ID</param>
-        /// <returns>返回所有递归ID</returns>
-        public string recursiveID<T>(int ID) where T : new()
-        {
-            string tableName = UnToGen.getTableName(typeof(T));
-            string CodeName = ""; ;
-            foreach (string str1 in UnToGen.getListField<T>())
-            {
-                if (str1.Replace("Code", "") != str1)
-                {
-                    CodeName = str1.Replace("_", "");
-                }
-            }
-            string IDList = "";
-            DataTable _DataTable = help.getDataTable("declare @Id Int;set @Id=" + ID + ";With GetInd as(Select * from " + UnToGen.getTableName(typeof(T)) + " where ID=@Id union all select w1.* from " + UnToGen.getTableName(typeof(T)) + " w1 inner join GetInd on w1." + CodeName + " = convert(nvarchar(20),GetInd." + CodeName + ") + convert(nvarchar(20),GetInd.ID)) select * from GetInd");
-            foreach (DataRow _DataRow in _DataTable.Rows)
-            {
-                IDList += _DataRow["ID"] + ",";
-            }
-            return IDList.TrimEnd(',');
-        }
-
-        /// <summary>
-        /// 查询数据
-        /// </summary>
-        /// <param name="sql">sql</param>
-        /// <param name="parms">参数</param>
-        /// <returns>返回DataTable</returns>
-        public DataTable queryDT(string sql, SqlParameter[] parms)
-        {
-            return help.getDataTable(sql, parms);
-        }
-
-        /// <summary>
-        /// 查询第一行第一个值
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parms"></param>
-        /// <returns></returns>
-        public object queryScalar(String sql, SqlParameter[] parms)
-        {
-            DataTable dt = queryDT(sql, parms);
-            if (dt.Rows.Count > 0)
-            {
-                return dt.Rows[0][0];
-            }
-            return null;
-        }
-
-        /// <summary>
-        /// 查询第一行第一个值并转为Int
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parms"></param>
-        /// <returns></returns>
-        public int? queryScalarToInt(String sql, SqlParameter[] parms)
-        {
-            try
-            {
-                return Convert.ToInt32(queryScalar(sql, parms));
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// 查询第一行第一个值并转为Stringt
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <param name="parms"></param>
-        /// <returns></returns>
-        public String queryScalarToString(String sql, SqlParameter[] parms)
-        {
-            try
-            {
-                return queryScalar(sql, parms).ToString();
-            }
-            catch
-            {
-                return null;
-            }
-        }
-
         #endregion
 
-        #region 查询翻页
+        #region 查询返回UnSqlPage
 
         /// <summary>
         /// 获取翻页数据(核心)
@@ -1086,18 +1262,46 @@ namespace UnDataBase
         /// <param name="order">排序</param>
         /// <param name="currentPage">当前页</param>
         /// <param name="pageSize">每页条数</param>
-        /// <param name="cacheExpire">缓存时间(秒)</param>
+        /// <param name="cacheExpire">
+        /// >0 = 缓存时间(秒)
+        /// -1 = 清除表所有缓存
+        /// -2 = 清除对应页数缓存
+        /// -3 = 清除所有页缓存
+        /// </param>
         /// <returns>返回DataSource:数据集,CurrentPage:当前页码,PageSize:每页大小,TotalNumber:总记录数,TotalPages:总页数</returns>
-        public UnSqlPage queryPage(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize, int? cacheExpire)
+        public UnSqlPage queryPage<T>(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize, int? cacheExpire) where T : new()
         {
             // 缓存key
             string cacheKey = null;
             // 有缓存则返回缓存
-            if (redis != null && cacheExpire != null && cacheExpire.Value > 0)
+            if (redis != null && cacheExpire != null)
             {
-                cacheKey = redisKeyPre + (columns + keyName + table + where + order + currentPage).md5Hash16();
+                // 只包含条件
+                string cacheKeyPre = getQueryPageKeyPre(typeof(T)) + (columns + keyName + table + where + order).md5Hash16() + "_";
+                // 包含页码及页数
+                cacheKey = cacheKeyPre + pageSize + "_" + currentPage;
+
+                // 清除表所有缓存
+                if (cacheExpire.Value == -1)
+                {
+                    getRedisKeyPre(typeof(T));
+                    return new UnSqlPage();
+                }
+                // 清除条件所有页缓存
+                if (cacheExpire.Value == -2)
+                {
+                    redis.RemoveByRegex(cacheKeyPre + ".*");
+                    return new UnSqlPage();
+                }
+                // 清除条件对应页缓存
+                if (cacheExpire.Value == -3)
+                {
+                    redis.Remove(cacheKey);
+                    return new UnSqlPage();
+                }
+
                 // 如果键存在
-                if (redis.Exists(cacheKey) == 1)
+                if (cacheExpire.Value > 0 && redis.Exists(cacheKey) == 1)
                 {
                     // 尝试读取缓存
                     try
@@ -1108,7 +1312,6 @@ namespace UnDataBase
                     }
                     catch
                     {
-
                     }
                 }
             }
@@ -1117,14 +1320,25 @@ namespace UnDataBase
             UnSqlPage page = help.getPage(columns, keyName, table, where, order, currentPage, pageSize);
 
             // 设置缓存
-            if (cacheKey != null)
+            if (cacheKey != null && cacheExpire > 0)
             {
                 // 须转为XML存储
                 string xml = UnXMMPXml.tToXml(typeof(UnSqlPage), page);
                 redis.Set(cacheKey, xml);
                 redis.Expire(cacheKey, cacheExpire.Value);
             }
-            Console.WriteLine("11");
+
+            // 转实体
+            if (page.DataSource != null && page.DataSource.Rows.Count > 0)
+            {
+                try
+                {
+                    page.TSource = UnToGen.dtToT<T>(page.DataSource);
+                }
+                catch
+                {
+                }
+            }
             return page;
         }
 
@@ -1141,11 +1355,11 @@ namespace UnDataBase
         /// <returns></returns>
         public UnSqlPage queryPage(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize)
         {
-            return queryPage(columns, keyName, table, where, order, currentPage, pageSize, null);
+            return queryPage<UnSqlPage>(columns, keyName, table, where, order, currentPage, pageSize, null);
         }
 
         /// <summary>
-        /// 获取翻页数据(核心)
+        /// 获取翻页数据
         /// </summary>
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="columns">字段</param>
@@ -1161,16 +1375,7 @@ namespace UnDataBase
             string keyName = UnToGen.getAutoNum(typeof(T), true);
             string table = UnToGen.getTableName(typeof(T));
             where = UnSqlStr.getQueryPageWhere<T>(where, whereArgs);
-            UnSqlPage page = queryPage(columns, keyName, table, where, order, currentPage, pageSize, cacheExpire);
-            if (page.DataSource != null && page.DataSource.Rows.Count > 0)
-            {
-                page.TSource = UnToGen.dtToT<T>(page.DataSource);
-            }
-            else
-            {
-                page.TSource = new List<T>();
-            }
-            return page;
+            return queryPage<T>(columns, keyName, table, where, order, currentPage, pageSize, cacheExpire);
         }
 
         /// <summary>
@@ -1243,96 +1448,58 @@ namespace UnDataBase
 
         #endregion
 
-        #region 修改数据
+        #region 查询返回第1行第1列值
 
         /// <summary>
-        /// 条件修改(核心)
+        /// 查询第一行第一个值
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="isXactAbort"></param>
+        /// <param name="sql"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
-        public int? update<T>(T t, string columns, string selection, string[] selectionArgs, bool isXactAbort) where T : new()
+        public object queryScalar(String sql, SqlParameter[] parms)
         {
-            // 实体属性参数化
-            SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
-            StringBuilder strSql = new StringBuilder();
-            if (isXactAbort)
+            DataTable dt = queryDT(sql, parms);
+            if (dt.Rows.Count > 0)
             {
-                strSql.Append("Set xact_abort ON;");
+                return dt.Rows[0][0];
             }
-            strSql.Append("Update " + UnToGen.getTableName(typeof(T), isXactAbort) + " Set " + UnSqlStr.getUpdStr(SqlPmtA) + " ");
-
-            // 构造参数化查询
-            object[] objs = toParsSelection(selection, selectionArgs);
-            string where = (string)objs[0];
-            if (where.Length > 0)
-            {
-                strSql.Append("Where " + where);
-            }
-
-            // 属性参数和条件参数合并
-            List<SqlParameter> list = new List<SqlParameter>();
-            list.AddRange(SqlPmtA);
-            list.AddRange((SqlParameter[])objs[1]);
-
-            return help.exSql(strSql.ToString(), list.ToArray());
+            return null;
         }
 
         /// <summary>
-        /// 条件修改
+        /// 查询第一行第一个值并转为Int
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
+        /// <param name="sql"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
-        public int? update<T>(T t, string columns, string selection, string[] selectionArgs) where T : new()
+        public int? queryScalarToInt(String sql, SqlParameter[] parms)
         {
-            return update(t, columns, selection, selectionArgs, false);
+            try
+            {
+                return Convert.ToInt32(queryScalar(sql, parms));
+            }
+            catch
+            {
+                return null;
+            }
         }
 
         /// <summary>
-        /// 条件修改
+        /// 查询第一行第一个值并转为Stringt
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="isXactAbort"></param>
+        /// <param name="sql"></param>
+        /// <param name="parms"></param>
         /// <returns></returns>
-        public int? update<T>(T t, string columns, string selection, string selectionArgs, bool isXactAbort) where T : new()
+        public String queryScalarToString(String sql, SqlParameter[] parms)
         {
-            string[] args = null;
-            if (selectionArgs != null)
+            try
             {
-                args = selectionArgs.Split(',');
+                return queryScalar(sql, parms).ToString();
             }
-            return update<T>(t, columns, selection, args, isXactAbort);
-        }
-
-        /// <summary>
-        /// 条件修改
-        /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <returns></returns>
-        public int? update<T>(T t, string columns, string selection, string selectionArgs) where T : new()
-        {
-            string[] args = null;
-            if (selectionArgs != null)
+            catch
             {
-                args = selectionArgs.Split(',');
+                return null;
             }
-            return update<T>(t, columns, selection, args, false);
         }
 
         #endregion
@@ -1352,15 +1519,112 @@ namespace UnDataBase
         #region Redis缓存
 
         /// <summary>
+        /// 获取Key前缀
+        /// </summary>
+        /// <param name="t">表对应泛型</param>
+        /// <returns></returns>
+        private string getRedisKeyPre(Type t)
+        {
+            return redisKeyPre + UnToGen.getTableName(t) + "_";
+        }
+
+        /// <summary>
+        /// 获取Query方法Key前缀
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private string getQueryKeyPre(Type t)
+        {
+            return getRedisKeyPre(t) + "Query_";
+        }
+
+        /// <summary>
+        /// 获取QueryPage方法Key前缀
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private string getQueryPageKeyPre(Type t)
+        {
+            return getRedisKeyPre(t) + "QueryPage_";
+        }
+
+        /// <summary>
+        /// 获取QueryDT方法Key前缀
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
+        private string getQueryDTKeyPre(Type t)
+        {
+            return getRedisKeyPre(t) + "QueryDT_";
+        }
+
+        /// <summary>
         /// 清除所有缓存
         /// </summary>
         public void removeAllRedis()
         {
-            redis.RemoveByRegex(redisKeyPre + ".*");
-            //redis.RemoveByPattern(redisKeyPre+"*");
+            if (redis != null)
+            {
+                redis.RemoveByRegex(redisKeyPre + ".*");
+                //redis.RemoveByPattern(redisKeyPre+"*");
+            }
+        }
+
+        /// <summary>
+        /// 清除Query方法缓存
+        /// </summary>
+        /// <param name="t">表对应实体类型</param>
+        public void removeQueryRedis(Type t)
+        {
+            if (redis != null)
+            {
+                redis.RemoveByRegex(getQueryKeyPre(t) + ".*");
+            }
+        }
+
+        /// <summary>
+        /// 清除QueryPage方法缓存 
+        /// </summary>
+        /// <param name="t"></param>
+        public void removeQueryPageRedis(Type t)
+        {
+            if (redis != null)
+            {
+                redis.RemoveByRegex(getQueryPageKeyPre(t) + ".*");
+            }
+        }
+
+        /// <summary>
+        /// 清除QueryDT方法缓存
+        /// </summary>
+        /// <param name="t"></param>
+        public void removeQueryDTRedis(Type t)
+        {
+            if (redis != null)
+            {
+                redis.RemoveByRegex(getQueryDTKeyPre(t) + ".*");
+            }
+        }
+
+        /// <summary>
+        /// 清除表所有缓存
+        /// </summary>
+        /// <param name="t">表实体类型</param>
+        /// <param name="isRemoveRedis">是否清除缓存</param>
+        public void removeTableRedis(Type t, bool? isRemoveRedis)
+        {
+            if (isRemoveRedis == null)
+            {
+                isRemoveRedis = _isRemoveRedis;
+            }
+            if (isRemoveRedis == true)
+            {
+                removeQueryRedis(t);
+                removeQueryPageRedis(t);
+                removeQueryDTRedis(t);
+            }
         }
 
         #endregion
-
     }
 }

@@ -136,20 +136,42 @@ namespace UnTestWin
         private void button4_Click(object sender, EventArgs e)
         {
             UnSql sql = new UnSql("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false, redis);
-            //var list = sql.query<TestUser>(null, null, null, null, false,5);
-            //Console.WriteLine(list.Count);
+            var list = sql.query<TestUser>(null, null, null, null, false, 5);
+            Console.WriteLine("list数量：" + list.Count);
             //foreach (var item in list)
             //{
-            //Console.WriteLine(item.Name + "/");
+            //    Console.WriteLine(item.Name + "/");
             //}
-            var page = sql.queryPage<TestUser>(null, null, (string)null, null, 1, 2, 5);
+
+
+            var page = sql.queryPage<TestUser>(null, "TestUserID = 212734", (string)null, null, 1, 3, 5);
+            page = sql.queryPage<TestUser>(null, null, (string)null, null, 2, 2, 5);
+            page = sql.queryPage<TestCard>(null, null, (string)null, null, 2, 2, 5);
             Console.WriteLine(page.PageSize + "/" + page.DataSource.Rows.Count);
+
+            var dt = sql.queryDT<TestUser>("Select * From TestUser", null, 5);
+            //page = sql.queryPage<TestUser>(null, null, (string)null, null, 2, 2, 5);
+            Console.WriteLine(dt.Rows.Count);
+
             var keys = redis.GetAllKeys();
-            Console.WriteLine("key数量:" + keys.Count);
+            Console.WriteLine("key数量1:" + keys.Count);
+
+            TestUser tu = new TestUser();
+            tu.Name = UnStrRan.getStr(1, 32);
+            sql.update<TestUser>(tu, null, "TestUserID = 212734", (string)null, false, true);
+
+            //sql.removeQueryPageRedis(typeof(TestUser));
+            sql.removeQueryDTRedis(typeof(TestUser));
+            sql.removeQueryRedis(typeof(TestUser));
+
+            keys = redis.GetAllKeys();
+            Console.WriteLine("key数量2:" + keys.Count);
             foreach (var item in keys)
             {
-                Console.WriteLine(item);
+                Console.WriteLine("key:" + item);
             }
+            //sql.query<TestUser>(null, null, null, null, false, -1);
+            //sql.queryPage<TestUser>(null, null, (string)null, null, 1, 2, -2);
 
         }
 

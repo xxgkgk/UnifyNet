@@ -1083,7 +1083,7 @@ end;";
         public static string getQueryPageWhere<T>(string where, string[] whereArgs)
         {
             StringBuilder sb = new StringBuilder();
-            if (String.IsNullOrWhiteSpace(where))
+            if (!String.IsNullOrWhiteSpace(where))
             {
                 if (whereArgs != null)
                 {
