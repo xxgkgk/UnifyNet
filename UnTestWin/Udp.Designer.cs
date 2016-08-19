@@ -46,6 +46,7 @@
             this.textBox3 = new System.Windows.Forms.TextBox();
             this.textBox4 = new System.Windows.Forms.TextBox();
             this.textBox5 = new System.Windows.Forms.TextBox();
+            this.textBox6 = new System.Windows.Forms.TextBox();
             this.SuspendLayout();
             // 
             // button1
@@ -91,7 +92,9 @@
             this.comboBox1.Items.AddRange(new object[] {
             "127.0.0.1",
             "121.41.18.224",
-            "192.168.100.141"});
+            "192.168.100.141",
+            "10.165.9.33",
+            "115.29.201.170"});
             this.comboBox1.Location = new System.Drawing.Point(22, 12);
             this.comboBox1.Name = "comboBox1";
             this.comboBox1.Size = new System.Drawing.Size(121, 20);
@@ -218,11 +221,21 @@
             this.textBox5.Size = new System.Drawing.Size(78, 21);
             this.textBox5.TabIndex = 17;
             // 
+            // textBox6
+            // 
+            this.textBox6.Location = new System.Drawing.Point(627, 41);
+            this.textBox6.Multiline = true;
+            this.textBox6.Name = "textBox6";
+            this.textBox6.Size = new System.Drawing.Size(347, 232);
+            this.textBox6.TabIndex = 18;
+            this.textBox6.TextChanged += new System.EventHandler(this.textBox6_TextChanged);
+            // 
             // Udp
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 12F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(781, 354);
+            this.ClientSize = new System.Drawing.Size(1013, 354);
+            this.Controls.Add(this.textBox6);
             this.Controls.Add(this.textBox5);
             this.Controls.Add(this.textBox4);
             this.Controls.Add(this.textBox3);
@@ -268,5 +281,6 @@
         private System.Windows.Forms.TextBox textBox3;
         private System.Windows.Forms.TextBox textBox4;
         private System.Windows.Forms.TextBox textBox5;
+        private System.Windows.Forms.TextBox textBox6;
     }
 }

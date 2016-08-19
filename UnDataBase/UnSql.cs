@@ -8,6 +8,9 @@ using UnCommon.Config;
 using ServiceStack.Redis;
 using UnCommon.Extend;
 using UnCommon.XMMP;
+using System.Text.RegularExpressions;
+using System.IO;
+using UnCommon.Files;
 
 namespace UnDataBase
 {
@@ -70,6 +73,31 @@ namespace UnDataBase
             return objs;
         }
 
+        /// <summary>
+        /// 替换掉参数化变量
+        /// </summary>
+        private Regex regParms = new Regex(@"@p\d*_\d*");
+
+        /// <summary>
+        /// 获取SQL的MD5值
+        /// </summary>
+        /// <param name="strSql">SQL语句</param>
+        /// <param name="parms">参数</param>
+        /// <returns></returns>
+        private string getSqlMD5(string strSql, SqlParameter[] parms)
+        {
+            string s = strSql;
+            s = regParms.Replace(s, "");
+            if (parms != null)
+            {
+                foreach (var parm in parms)
+                {
+                    s += parm.Value.ToString();
+                }
+            }
+            return s.md5Hash16();
+        }
+
         #endregion
 
         #region 实例化
@@ -82,24 +110,14 @@ namespace UnDataBase
         /// <param name="user">账户</param>
         /// <param name="pass">密码</param>
         /// <param name="dbName">数据库名</param>
-        /// <param name="model">连接模式</param>
         /// <param name="trans">是否事务</param>
         /// <param name="redisClient">Redis</param>
-        private void init(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans, RedisClient redisClient)
+        private void init(string ip, string port, string user, string pass, string dbName, bool trans, RedisClient redisClient)
         {
             this.redis = redisClient;
             string constr1 = "Data Source=" + ip + "," + port + ";Initial Catalog=master;User ID=" + user + ";Password=" + pass + ";";
             string constr2 = "Data Source=" + ip + "," + port + ";Initial Catalog=" + dbName + ";User ID=" + user + ";Password=" + pass + ";";
             this.redisKeyPre = redisKeyPre + constr2.md5Hash16() + "_";
-            switch (model)
-            {
-                case UnSqlConnectModel.Create:
-                case UnSqlConnectModel.ConnectOrCreate:
-                    string crtstr = UnSqlStr.createDB(dbName, model);
-                    // 创建数据库
-                    new UnSqlHelpU(constr1, false).exSql(crtstr);
-                    break;
-            }
             help = new UnSqlHelpU(constr2, trans);
         }
 
@@ -111,10 +129,9 @@ namespace UnDataBase
         /// <param name="user">账号</param>
         /// <param name="pass">密码</param>
         /// <param name="dbName">连接的数据库</param>
-        /// <param name="model">连接类型</param>
-        public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model)
+        public UnSql(string ip, string port, string user, string pass,string dbName)
         {
-            init(ip, port, user, pass, dbName, model, false, null);
+            init(ip, port, user, pass, dbName, false, null);
         }
 
         /// <summary>
@@ -125,11 +142,10 @@ namespace UnDataBase
         /// <param name="user">账号</param>
         /// <param name="pass">密码</param>
         /// <param name="dbName">连接的数据库</param>
-        /// <param name="model">连接类型</param>
         /// <param name="redisClient">Redis</param>
-        public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, RedisClient redisClient)
+        public UnSql(string ip, string port, string user, string pass,string dbName,RedisClient redisClient)
         {
-            init(ip, port, user, pass, dbName, model, false, redisClient);
+            init(ip, port, user, pass, dbName,false, redisClient);
         }
 
         /// <summary>
@@ -140,11 +156,10 @@ namespace UnDataBase
         /// <param name="user">账号</param>
         /// <param name="pass">密码</param>
         /// <param name="dbName">连接的数据库</param>
-        /// <param name="model">连接类型</param>
         /// <param name="trans">是否开启事务</param>
-        public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans)
+        public UnSql(string ip, string port, string user, string pass,string dbName,bool trans)
         {
-            init(ip, port, user, pass, dbName, model, trans, null);
+            init(ip, port, user, pass, dbName,trans, null);
         }
 
         /// <summary>
@@ -155,12 +170,11 @@ namespace UnDataBase
         /// <param name="user">账号</param>
         /// <param name="pass">密码</param>
         /// <param name="dbName">连接的数据库</param>
-        /// <param name="model">连接类型</param>
         /// <param name="trans">是否开启事务</param>
         /// <param name="redisClient">Redis</param>
-        public UnSql(string ip, string port, string user, string pass, string dbName, UnSqlConnectModel model, bool trans, RedisClient redisClient)
+        public UnSql(string ip, string port, string user, string pass, string dbName, bool trans, RedisClient redisClient)
         {
-            init(ip, port, user, pass, dbName, model, trans, redisClient);
+            init(ip, port, user, pass, dbName, trans, redisClient);
         }
 
         /// <summary>
@@ -197,7 +211,19 @@ namespace UnDataBase
 
         #endregion
 
-        #region 库/表/存储过程操作
+        #region 库/表/字段方法
+
+        /// <summary>
+        /// 创建数据库
+        /// </summary>
+        /// <param name="dbPath"></param>
+        /// <param name="dbName"></param>
+        /// <returns></returns>
+        public int? createDataBase(string dbPath, string dbName)
+        {
+            string s1 = UnSqlStr.createDB(dbPath, dbName);
+            return help.exSql(s1);
+        }
 
         /// <summary>
         /// 创建表
@@ -500,6 +526,20 @@ namespace UnDataBase
             return true;
         }
 
+        #endregion
+
+        #region 基础方法
+
+        /// <summary>
+        /// 执行语句
+        /// </summary>
+        /// <param name="sql"></param>
+        /// <returns></returns>
+        public int? exSql(string sql)
+        {
+            return help.exSql(sql);
+        }
+
         /// <summary>
         /// 更新基础存储过程/函数等
         /// </summary>
@@ -533,16 +573,6 @@ namespace UnDataBase
             return true;
         }
 
-        /// <summary>
-        /// 执行语句
-        /// </summary>
-        /// <param name="sql"></param>
-        /// <returns></returns>
-        public int? exSql(string sql)
-        {
-            return help.exSql(sql);
-        }
-
         #endregion
 
         #region 添加数据
@@ -554,7 +584,7 @@ namespace UnDataBase
         /// <param name="t">表数据对象</param>
         /// <param name="isXactAbort">是否嵌套事务</param>
         /// <param name="isRemoveRedis">是否清除表缓存</param>
-        /// <returns></returns>
+        /// <returns>非嵌套事务返回自增ID,嵌套事务返回受影响行数</returns>
         public long insert<T>(T t, bool isXactAbort, bool? isRemoveRedis) where T : new()
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t);
@@ -565,11 +595,10 @@ namespace UnDataBase
             }
             strSql.Append("Insert Into " + UnToGen.getTableName(typeof(T), isXactAbort) + " ");
             strSql.Append(UnSqlStr.getAddStr<T>(SqlPmtA));
-            object obj = null;
             if (!isXactAbort)
             {
                 strSql.Append(" Select SCOPE_IDENTITY() As KeyID");
-                obj = help.getExSc(strSql.ToString(), SqlPmtA);
+                object obj = help.getExSc(strSql.ToString(), SqlPmtA);
                 if (obj == null)
                 {
                     return -1;
@@ -578,14 +607,14 @@ namespace UnDataBase
                 removeTableRedis(typeof(T), isRemoveRedis);
                 return Convert.ToInt64(obj);
             }
-            obj = help.getExSc(strSql.ToString(), SqlPmtA);
-            if (obj == null)
+            int? i = help.exSql(strSql.ToString(), SqlPmtA);
+            if (i == null)
             {
                 return -1;
             }
             // 清除表缓存
             removeTableRedis(typeof(T), isRemoveRedis);
-            return 0;
+            return i.Value;
         }
 
         /// <summary>
@@ -594,7 +623,7 @@ namespace UnDataBase
         /// <typeparam name="T">表对应泛型</typeparam>
         /// <param name="t">表数据对象</param>
         /// <param name="isXactAbort">是否嵌套事务</param>
-        /// <returns></returns>
+        /// <returns>非嵌套事务返回自增ID,嵌套事务返回受影响行数</returns>
         public long insert<T>(T t, bool isXactAbort) where T : new()
         {
             return insert<T>(t, isXactAbort, null);
@@ -856,7 +885,7 @@ namespace UnDataBase
             // 有缓存则返回缓存
             if (redis != null && cacheExpire != null)
             {
-                cacheKey = getQueryKeyPre(typeof(T)) + strSql.md5Hash16();
+                cacheKey = getQueryKeyPre(typeof(T)) + getSqlMD5(strSql, parms);
 
                 // 删除缓存
                 if (cacheExpire.Value == -1)
@@ -865,18 +894,11 @@ namespace UnDataBase
                     return null;
                 }
 
-                // 如果键存在
-                if (redis.Exists(cacheKey) == 1 && cacheExpire.Value > 0)
+                // 获取缓存
+                var list1 = getRedis<List<T>>(cacheKey, cacheExpire);
+                if (list1 != null)
                 {
-                    // 尝试读取缓存
-                    try
-                    {
-                        return redis.Get<List<T>>(cacheKey);
-                    }
-                    catch
-                    {
-
-                    }
+                    return list1;
                 }
             }
 
@@ -889,11 +911,7 @@ namespace UnDataBase
             }
 
             // 设置缓存
-            if (cacheKey != null && cacheExpire.Value > 0)
-            {
-                redis.Set(cacheKey, list);
-                redis.Expire(cacheKey, cacheExpire.Value);
-            }
+            setRedis(cacheKey, cacheExpire, list);
             return list;
         }
 
@@ -1122,7 +1140,7 @@ namespace UnDataBase
             // 有缓存则返回缓存
             if (redis != null && cacheExpire != null)
             {
-                cacheKey = getQueryDTKeyPre(typeof(T)) + strSql.md5Hash16();
+                cacheKey = getQueryDTKeyPre(typeof(T)) + getSqlMD5(strSql, parms);
 
                 // 删除缓存
                 if (cacheExpire.Value == -1)
@@ -1131,33 +1149,21 @@ namespace UnDataBase
                     return null;
                 }
 
-                // 如果键存在
-                if (redis.Exists(cacheKey) == 1 && cacheExpire.Value > 0)
+                // 获取缓存
+                string xml = getRedis<string>(cacheKey, cacheExpire);
+                if (xml != null)
                 {
-                    // 尝试读取缓存
-                    try
-                    {
-                        // 取出XML并转为对象
-                        string xml = redis.Get<string>(cacheKey);
-                        return (DataTable)UnXMMPXml.xmlToT(typeof(DataTable), xml);
-                    }
-                    catch
-                    {
-                    }
+                    return (DataTable)UnXMMPXml.xmlToT(typeof(DataTable), xml);
                 }
             }
 
             // 查询数据
             DataTable dt = help.getDataTable(strSql, parms);
 
+            // 须转为XML存储
+            string xml1 = UnXMMPXml.tToXml(typeof(DataTable), dt);
             // 设置缓存
-            if (cacheKey != null && cacheExpire.Value > 0)
-            {
-                // 须转为XML存储
-                string xml = UnXMMPXml.tToXml(typeof(DataTable), dt);
-                redis.Set(cacheKey, xml);
-                redis.Expire(cacheKey, cacheExpire.Value);
-            }
+            setRedis(cacheKey, cacheExpire, xml1);
             return dt;
         }
 
@@ -1253,6 +1259,20 @@ namespace UnDataBase
         #region 查询返回UnSqlPage
 
         /// <summary>
+        /// 尝试将DataTable转为T
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="page"></param>
+        private void tryPageToT<T>(UnSqlPage page) where T : new()
+        {
+            // 转实体
+            if (page.DataSource != null && page.DataSource.Rows.Count > 0)
+            {
+                page.TSource = UnToGen.dtToT<T>(page.DataSource);
+            }
+        }
+
+        /// <summary>
         /// 获取翻页数据(核心)
         /// </summary>
         /// <param name="columns">字段</param>
@@ -1290,7 +1310,7 @@ namespace UnDataBase
                 // 清除条件所有页缓存
                 if (cacheExpire.Value == -2)
                 {
-                    redis.RemoveByRegex(cacheKeyPre + ".*");
+                    removeByRegex("^" + cacheKeyPre + ".*");
                     return new UnSqlPage();
                 }
                 // 清除条件对应页缓存
@@ -1300,45 +1320,25 @@ namespace UnDataBase
                     return new UnSqlPage();
                 }
 
-                // 如果键存在
-                if (cacheExpire.Value > 0 && redis.Exists(cacheKey) == 1)
+                // 获取缓存
+                string xml = getRedis< string>(cacheKey, cacheExpire);
+                if (xml != null)
                 {
-                    // 尝试读取缓存
-                    try
-                    {
-                        // 取出XML并转为对象
-                        string xml = redis.Get<string>(cacheKey);
-                        return (UnSqlPage)UnXMMPXml.xmlToT(typeof(UnSqlPage), xml);
-                    }
-                    catch
-                    {
-                    }
+                    UnSqlPage page0 = (UnSqlPage)UnXMMPXml.xmlToT(typeof(UnSqlPage), xml);
+                    tryPageToT<T>(page0);
+                    return page0;
                 }
             }
 
             // 查询数据
             UnSqlPage page = help.getPage(columns, keyName, table, where, order, currentPage, pageSize);
 
+            // 须转为XML存储
+            string xml1 = UnXMMPXml.tToXml(typeof(UnSqlPage), page);
             // 设置缓存
-            if (cacheKey != null && cacheExpire > 0)
-            {
-                // 须转为XML存储
-                string xml = UnXMMPXml.tToXml(typeof(UnSqlPage), page);
-                redis.Set(cacheKey, xml);
-                redis.Expire(cacheKey, cacheExpire.Value);
-            }
-
+            setRedis(cacheKey, cacheExpire, xml1);
             // 转实体
-            if (page.DataSource != null && page.DataSource.Rows.Count > 0)
-            {
-                try
-                {
-                    page.TSource = UnToGen.dtToT<T>(page.DataSource);
-                }
-                catch
-                {
-                }
-            }
+            tryPageToT<T>(page);
             return page;
         }
 
@@ -1519,6 +1519,74 @@ namespace UnDataBase
         #region Redis缓存
 
         /// <summary>
+        /// REDIS错误日志打印状态
+        /// </summary>
+        private static bool redisLogLock = false;
+
+        /// <summary>
+        /// 设置缓存
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="cacheExpire"></param>
+        /// <param name="t"></param>
+        private void setRedis<T>(string cacheKey, int? cacheExpire, T t)
+        {
+            try
+            {
+                // 设置缓存
+                if (redis != null && cacheKey != null && cacheExpire.Value > 0 && t != null)
+                {
+                    redis.Set(cacheKey, t);
+                    redis.Expire(cacheKey, cacheExpire.Value);
+                }
+            }
+            catch (Exception e)
+            {
+                if(redisLogLock == false)
+                {
+                    redisLogLock = true;
+                    UnFile.writeLog("setRedis", e.ToString() + "\r\ncacheKey:" + cacheKey + "\r\ncacheExpire:" + cacheExpire);
+                    redisLogLock = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// 获取缓存
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="cacheKey"></param>
+        /// <param name="cacheExpire"></param>
+        /// <returns></returns>
+        private T getRedis<T>(string cacheKey, int? cacheExpire)
+        {
+            try
+            {
+                // 如果键存在
+                if (redis != null && redis.Exists(cacheKey) == 1 && cacheExpire.Value > 0)
+                {
+                    // 尝试读取缓存
+                    return redis.Get<T>(cacheKey);
+                }
+            }
+            catch (Exception e)
+            {
+                if (redisLogLock == false)
+                {
+                    redisLogLock = true;
+                    if (redis != null && redis.Exists(cacheKey) == 1)
+                    {
+                        redis.Remove(cacheKey);
+                    }
+                    UnFile.writeLog("getRedis", e.ToString() + "\r\ncacheKey:" + cacheKey + "\r\ncacheExpire:" + cacheExpire);
+                    redisLogLock = false;
+                }
+            }
+            return default(T);
+        }
+
+        /// <summary>
         /// 获取Key前缀
         /// </summary>
         /// <param name="t">表对应泛型</param>
@@ -1559,14 +1627,42 @@ namespace UnDataBase
         }
 
         /// <summary>
+        /// 匹配所有键
+        /// </summary>
+        /// <param name="pattern">正则</param>
+        /// <returns></returns>
+        private List<string> getRedisKeysByPattern(string pattern)
+        {
+            List<string> list = new List<string>();
+            Regex regex = new Regex(pattern);
+            var keys = redis.GetAllKeys();
+            foreach (var item in keys)
+            {
+                if (regex.IsMatch(item))
+                {
+                    list.Add(item);
+                }
+            }
+            return list;
+        }
+
+        /// <summary>
+        /// 清除缓存
+        /// </summary>
+        /// <param name="pattern">正则</param>
+        private void removeByRegex(string pattern)
+        {
+            redis.RemoveAll(getRedisKeysByPattern(pattern));
+        }
+
+        /// <summary>
         /// 清除所有缓存
         /// </summary>
         public void removeAllRedis()
         {
             if (redis != null)
             {
-                redis.RemoveByRegex(redisKeyPre + ".*");
-                //redis.RemoveByPattern(redisKeyPre+"*");
+                removeByRegex("^" + redisKeyPre + ".*");
             }
         }
 
@@ -1578,7 +1674,7 @@ namespace UnDataBase
         {
             if (redis != null)
             {
-                redis.RemoveByRegex(getQueryKeyPre(t) + ".*");
+                removeByRegex("^" + getQueryKeyPre(t) + ".*");
             }
         }
 
@@ -1590,7 +1686,7 @@ namespace UnDataBase
         {
             if (redis != null)
             {
-                redis.RemoveByRegex(getQueryPageKeyPre(t) + ".*");
+                removeByRegex("^" + getQueryPageKeyPre(t) + ".*");
             }
         }
 
@@ -1602,16 +1698,16 @@ namespace UnDataBase
         {
             if (redis != null)
             {
-                redis.RemoveByRegex(getQueryDTKeyPre(t) + ".*");
+                removeByRegex("^" + getQueryDTKeyPre(t) + ".*");
             }
         }
 
         /// <summary>
         /// 清除表所有缓存
         /// </summary>
-        /// <param name="t">表实体类型</param>
+        /// <param name="t">表对应泛型</param>
         /// <param name="isRemoveRedis">是否清除缓存</param>
-        public void removeTableRedis(Type t, bool? isRemoveRedis)
+        private void removeTableRedis(Type t, bool? isRemoveRedis)
         {
             if (isRemoveRedis == null)
             {
@@ -1623,6 +1719,17 @@ namespace UnDataBase
                 removeQueryPageRedis(t);
                 removeQueryDTRedis(t);
             }
+        }
+
+        /// <summary>
+        /// 清除表所有缓存
+        /// </summary>
+        /// <param name="t">表对应泛型</param>
+        public void removeTableRedis(Type t)
+        {
+            removeQueryRedis(t);
+            removeQueryPageRedis(t);
+            removeQueryDTRedis(t);
         }
 
         #endregion

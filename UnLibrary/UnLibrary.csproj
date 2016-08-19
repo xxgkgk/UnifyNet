@@ -46,9 +46,12 @@
     <Content Include="HPSocketCS.dll" />
     <Content Include="Newtonsoft.Json.dll" />
     <Content Include="ServiceStack.Common.dll" />
+    <Content Include="ServiceStack.Common.xml" />
     <Content Include="ServiceStack.Interfaces.dll" />
     <Content Include="ServiceStack.Redis.dll" />
+    <Content Include="ServiceStack.Redis.XML" />
     <Content Include="ServiceStack.Text.dll" />
+    <Content Include="ServiceStack.Text.xml" />
     <Content Include="ThoughtWorks.QRCode.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

@@ -8,6 +8,8 @@ using System.Text;
 using UnCommon.Tool;
 using UnCommon.Entity;
 using UnCommon.Config;
+using UnCommon.Files;
+using System.IO;
 
 namespace UnDataBase
 {
@@ -22,25 +24,26 @@ namespace UnDataBase
         /// 创建数据库
         /// </summary>
         /// <param name="dbName">数据库名</param>
-        /// <param name="model">创建模式</param>
+        /// <param name="dbPath">数据库存放路径</param>
         /// <returns></returns>
-        public static string createDB(string dbName, UnSqlConnectModel model)
+        public static string createDB(string dbPath, string dbName)
         {
+            dbPath = dbPath.Replace("/", "\\").TrimEnd('\\');
+            string dbFullName = dbPath + "\\" + dbName + ".mdf";
+            string dbLogFullName = dbPath + "\\" + dbName + "_log.ldf";
             StringBuilder sb = new StringBuilder(); ;
-            switch (model)
-            {
-                case UnSqlConnectModel.Create:
-                    sb.AppendLine("Use master;");
-                    sb.AppendLine("If Exists(Select * From sysdatabases Where name = '" + dbName + "') ");
-                    sb.AppendLine("Drop DataBase " + dbName + ";");
-                    sb.Append("Create DataBase " + dbName);
-                    break;
-                case UnSqlConnectModel.ConnectOrCreate:
-                    sb.AppendLine("Use master;");
-                    sb.AppendLine("If Not Exists(Select * From sysdatabases Where name = '" + dbName + "') ");
-                    sb.Append("Create DataBase " + dbName);
-                    break;
-            }
+            sb.AppendLine("Use master;");
+            sb.AppendLine("If Not Exists(Select * From sysdatabases Where name = '" + dbName + "') ");
+            sb.AppendLine("Create DataBase " + dbName + " On Primary (");
+            sb.AppendLine("Name = " + dbName + ",");
+            sb.AppendLine("FileName = N'" + dbFullName + "',");
+            sb.AppendLine("Size = 10,");
+            sb.AppendLine("FileGrowth = 5)");
+            sb.AppendLine("Log On(");
+            sb.AppendLine("Name = N'" + dbName + "_log',");
+            sb.AppendLine("FileName = N'" + dbLogFullName + "',");
+            sb.AppendLine("Size = 5,");
+            sb.AppendLine("FileGrowth = 10%);");
             return sb.ToString();
         }
 

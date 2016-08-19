@@ -36,8 +36,10 @@ namespace UnTestWin
             listT.Add(typeof(TestCardType));
             listT.Add(typeof(TestCard));
 
-            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", UnSqlConnectModel.ConnectOrCreate, true);
+            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "master");
+            cn.createDataBase("D:/DBFile", "AEnterprise1");
 
+            cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", true);
             cn.updateBase();
             cn.createTableList(listT);
             cn.createTableRelationList(listT);
@@ -46,7 +48,7 @@ namespace UnTestWin
 
         private void button2_Click(object sender, EventArgs e)
         {
-            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", UnSqlConnectModel.Connect, true);
+            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013","AEnterprise1",true);
             TestUser user = new TestUser();
             user.UnionNonclusteredA = "indexA";
             //user.UnionNonclusteredB = "";
@@ -108,7 +110,7 @@ namespace UnTestWin
             listT.Add(typeof(TestCardType));
             listT.Add(typeof(TestCard));
 
-            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", UnSqlConnectModel.Connect);
+            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1");
             cn.updateBase();
             cn.createTableList(listT);
             cn.dropTableRelationList(listT);
@@ -122,7 +124,7 @@ namespace UnTestWin
         }
 
 
-        private static RedisClient redis = new RedisClient("192.168.100.141", 6379);
+        private static RedisClient redis = new RedisClient("127.0.0.1", 6379);
 
         private void set<T>(List<T> list)
         {
@@ -136,7 +138,7 @@ namespace UnTestWin
         private void button4_Click(object sender, EventArgs e)
         {
             UnSql sql = new UnSql("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false, redis);
-            var list = sql.query<TestUser>(null, null, null, null, false, 5);
+            var list = sql.query<TestUser>(null, " 0 = {0} And 1 = {1}", "0,1", null, false, 5);
             Console.WriteLine("list数量：" + list.Count);
             //foreach (var item in list)
             //{
@@ -144,31 +146,32 @@ namespace UnTestWin
             //}
 
 
-            var page = sql.queryPage<TestUser>(null, "TestUserID = 212734", (string)null, null, 1, 3, 5);
-            page = sql.queryPage<TestUser>(null, null, (string)null, null, 2, 2, 5);
-            page = sql.queryPage<TestCard>(null, null, (string)null, null, 2, 2, 5);
-            Console.WriteLine(page.PageSize + "/" + page.DataSource.Rows.Count);
-
-            var dt = sql.queryDT<TestUser>("Select * From TestUser", null, 5);
+            var page = sql.queryPage<TestUser>(null, "TestUserID = {0}", "212734", "TestUserID", 1, 3, 5);
             //page = sql.queryPage<TestUser>(null, null, (string)null, null, 2, 2, 5);
-            Console.WriteLine(dt.Rows.Count);
+            //page = sql.queryPage<TestCard>(null, null, (string)null, null, 2, 2, 5);
+            var dt = sql.queryDT<TestUser>("Select * From TestUser", null, 5);
+            //Console.WriteLine(page.PageSize + "/" + page.DataSource.Rows.Count+"/"+((List<TestUser>)page.TSource)[0].TestUserID);
 
+            Console.WriteLine(dt.Rows.Count);
+            Console.WriteLine(page.DataSource.Rows.Count);
+            return;
             var keys = redis.GetAllKeys();
             Console.WriteLine("key数量1:" + keys.Count);
 
-            TestUser tu = new TestUser();
-            tu.Name = UnStrRan.getStr(1, 32);
-            sql.update<TestUser>(tu, null, "TestUserID = 212734", (string)null, false, true);
+            //TestUser tu = new TestUser();
+            //tu.Name = UnStrRan.getStr(1, 32);
+            //sql.update<TestUser>(tu, null, "TestUserID = 212734", (string)null, false, true);
 
+            //sql.removeQueryRedis(typeof(TestUser));
             //sql.removeQueryPageRedis(typeof(TestUser));
-            sql.removeQueryDTRedis(typeof(TestUser));
-            sql.removeQueryRedis(typeof(TestUser));
+            //sql.removeQueryDTRedis(typeof(TestUser));
+            //sql.removeAllRedis();
 
             keys = redis.GetAllKeys();
             Console.WriteLine("key数量2:" + keys.Count);
             foreach (var item in keys)
             {
-                Console.WriteLine("key:" + item);
+                //Console.WriteLine("key:" + item);
             }
             //sql.query<TestUser>(null, null, null, null, false, -1);
             //sql.queryPage<TestUser>(null, null, (string)null, null, 1, 2, -2);
@@ -177,7 +180,7 @@ namespace UnTestWin
 
         private void button5_Click(object sender, EventArgs e)
         {
-            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", UnSqlConnectModel.Connect);
+            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1");
             List<TestUser> list = cn.query<TestUser>(null, "1 = 1", null, null);
             foreach (var item in list)
             {
@@ -200,7 +203,7 @@ namespace UnTestWin
 
         void insertUser()
         {
-            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", UnSqlConnectModel.Connect, true);
+            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", true);
             TestUser user = new TestUser();
             user.UnionNonclusteredA = "indexA";
             user.Name = "Name_" + UnStrRan.getShortGUID();
@@ -216,51 +219,15 @@ namespace UnTestWin
 
         private void button7_Click(object sender, EventArgs e)
         {
-            //UnSql sql = new UnSql("Data Source=192.168.100.141,1433;Initial Catalog=AEnterprise1;User ID=hpadmin;Password=cdhpadmin2013;", false, redis);
-            UnSqlPage page = new UnSqlPage();
 
-            DataTable memTable = new DataTable("tableName");
-            memTable.Columns.Add(new DataColumn("ID", typeof(int)));
-            memTable.Columns.Add(new DataColumn("Username", typeof(string)));
-            memTable.Columns.Add(new DataColumn("Password", typeof(Guid)));
-
-            DataRow row = memTable.NewRow();
-            row["ID"] = 1;
-            row["Username"] = "badbug";
-            row["Password"] = Guid.NewGuid();
-
-            memTable.Rows.Add(row);
-            page.DataSource = memTable;
-           
-            var tu = new TestUser();
-            tu.Name = "aac";
-            page.PageSize = 12;
-
-            string s = UnXMMPXml.tToXml(typeof(UnSqlPage), page);
-            Console.WriteLine(s);
-
-            redis.Set("aa", s);
-            var b = redis.Get<string>("aa");
-
-
-            UnSqlPage dt = (UnSqlPage)UnXMMPXml.xmlToT(typeof(UnSqlPage), b);
-            Console.WriteLine(dt.DataSource.Rows[0]["Username"]+"//"+ dt.PageSize);
-   
-
-
-
-
-            var a = redis.GetAllKeys();
-            Console.WriteLine(a.Count);
-            foreach (var item in a)
+            var keys = redis.GetAllKeys();
+            Console.WriteLine("key数量:" + keys.Count);
+            foreach (var item in keys)
             {
-                //Console.WriteLine(item);
+                Console.WriteLine("key:" + item);
+                redis.Remove(item);
             }
-     
-           redis.RemoveByRegex("UnSql_.*");
-          
-            //redis.RemoveByPattern("UnSql_*");
-            //sql.removeAllRedis();
+
         }
     }
 }

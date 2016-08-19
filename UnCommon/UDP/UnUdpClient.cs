@@ -353,7 +353,7 @@ namespace UnCommon.UDP
                             foreach (var uup in list)
                             {
                                 udpSendPack(upp.getUpFileSendPackage(uup.PackNo));
-                                Thread.Sleep(1);
+                                //Thread.Sleep(1);
                             }
                             Thread.Sleep(sleepTime);
                         }

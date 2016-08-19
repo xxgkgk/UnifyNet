@@ -130,7 +130,7 @@ namespace UnDataBase
                 this.comd.Transaction = null;
             }
             close();
-            string s = ex.ToString() + "\r\n" + cmdText + "\r\n";
+            string s = ex.ToString() + "\r\n链接串:" + cs + "\r\nCmdText：" + cmdText + "\r\n";
             if (parms != null)
             {
                 foreach (SqlParameter par in parms)

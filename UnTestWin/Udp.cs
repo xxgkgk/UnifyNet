@@ -15,6 +15,7 @@ using System.Threading;
 using UnCommon.Config;
 using UnCommon.Encrypt;
 using UnCommon.Tool;
+using System.Runtime.InteropServices;
 
 namespace UnTestWin
 {
@@ -42,33 +43,119 @@ namespace UnTestWin
 
         private void button1_Click(object sender, EventArgs e)
         {
+            new Thread(timer).Start();
             Console.WriteLine(comboBox1.Text + "/" + comboBox2.Text + "/" + textBox1.Text);
             UnUdpClient udp = new UnUdpClient(comboBox1.Text, Convert.ToInt32(comboBox2.Text));
-            udp.setIntTransfer(this);
+            udp.setIntTransfer(new tran());
             udp.setTimeOut(10000);
             udp.upFile(textBox1.Text);
             d = UnDate.ticksSec();
         }
 
+        public delegate bool ConsoleCtrlDelegate(int ctrlType);
+
+        [DllImport("kernel32.dll")]
+        private static extern bool SetConsoleCtrlHandler(ConsoleCtrlDelegate HandlerRoutine, bool Add);
+        //当用户关闭Console时，系统会发送次消息
+        private const int CTRL_CLOSE_EVENT = 2;
+        //Ctrl+C，系统会发送次消息
+        private const int CTRL_C_EVENT = 0;
+        //Ctrl+break，系统会发送次消息
+        private const int CTRL_BREAK_EVENT = 1;
+        //用户退出（注销），系统会发送次消息
+        private const int CTRL_LOGOFF_EVENT = 5;
+        //系统关闭，系统会发送次消息
+        private const int CTRL_SHUTDOWN_EVENT = 6;
+
+        private static bool HandlerRoutine(int ctrlType)
+        {
+            switch (ctrlType)
+            {
+                case CTRL_C_EVENT:
+                    //MessageBox.Show("C");
+                    break;
+                case CTRL_BREAK_EVENT:
+                    //MessageBox.Show("BREAK");
+                    break;
+                case CTRL_CLOSE_EVENT:
+                    //MessageBox.Show("CLOSE");
+                    timerState = false;
+                    break;
+                case CTRL_LOGOFF_EVENT:
+                    break;
+                case CTRL_SHUTDOWN_EVENT:
+                    break;
+            }
+            //return true;//表示阻止响应系统对该程序的操作
+            return false;//忽略处理，让系统进行默认操作
+        }
+
+        /// <summary>
+        /// 打印内容数组
+        /// </summary>
+        private static List<string> listConsole = new List<string>();
+
+        /// <summary>
+        /// 打印锁
+        /// </summary>
+        private static object lockConsole = new object();
+
+        /// <summary>
+        /// 计时器状态
+        /// </summary>
+        private static bool timerState = false;
+
+        /// <summary>
+        /// 计时器
+        /// </summary>
+        private void timer()
+        {
+            timerState = true;
+            while (timerState)
+            {
+                lock (lockConsole)
+                {
+                    for (int i = 0; i < listConsole.Count; i++)
+                    {
+                        textBox6.Invoke(new EventHandler(delegate
+                        {
+                            textBox6.Text = listConsole[i] + System.Environment.NewLine + textBox1.Text;
+                        }));
+                        listConsole.Remove(listConsole[i]);
+                        Thread.Sleep(100);
+                    }
+                }
+            }
+        }
+
         public class tran : UnIntTransfer
         {
+            
 
             public void progress(UnAttrPgs pgs)
             {
+                lock (lockConsole)
+                {
+                    listConsole.Add("进度：" + pgs.percentage() + "%");
+                }
                 Console.WriteLine("进度：" + pgs.percentage() + "%");
             }
 
             public bool success(UnAttrRst rst)
             {
                 i--;
+                listConsole.Add("完成" + rst.code + "/" + rst.msg + "/" + rst.back);
                 Console.WriteLine("完成" + rst.code + "/" + rst.msg + "/" + rst.back);
+                timerState = false;
                 return true;
             }
 
             public void error(UnAttrRst rst)
             {
                 i--;
+                listConsole.Add("错误" + rst.code + "/" + rst.msg + "/" + rst.back);
                 Console.WriteLine("错误" + rst.code + "/" + rst.msg + "/" + rst.back);
+                timerState = false;
             }
         }
 
@@ -251,6 +338,11 @@ namespace UnTestWin
         public void error(UnAttrRst rst)
         {
             Console.WriteLine("错误" + rst.code + "/" + rst.msg + "/" + rst.back);
+        }
+
+        private void textBox6_TextChanged(object sender, EventArgs e)
+        {
+
         }
     }
 }
