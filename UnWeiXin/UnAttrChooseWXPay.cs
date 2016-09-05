@@ -5,19 +5,34 @@ using System.Text;
 
 namespace UnWeiXin
 {
+    /// <summary>
+    /// 
+    /// </summary>
     public class UnAttrChooseWXPay
     {
-        // appid
+        /// <summary>
+        /// appid
+        /// </summary>
         public string appId { get; set; }
-        // 时间戳
+        /// <summary>
+        /// 时间戳
+        /// </summary>
         public long timestamp { get;set; }
-        // 随机串 <=32
+        /// <summary>
+        /// 随机串 小于等于32
+        /// </summary>
         public string nonceStr { get; set; }
-        // 统一支付接口返回的prepay_id
+        /// <summary>
+        /// 统一支付接口返回的prepay_id
+        /// </summary>
         public string package { get; set; }
-        // 签名方式
+        /// <summary>
+        /// 签名方式
+        /// </summary>
         public string signType { get; set; }
-        // 支付签名
+        /// <summary>
+        /// 支付签名
+        /// </summary>
         public string paySign { get; set; }
     }
 }

@@ -8,6 +8,9 @@ using UnCommon.Extend;
 
 namespace UnWeiXin
 {
+    /// <summary>
+    /// 微信签名类
+    /// </summary>
     public class UnSign
     {
 
@@ -38,7 +41,7 @@ namespace UnWeiXin
         /// </summary>
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="t">对象</param>
-        /// <param name="t">排除的key</param>
+        /// <param name="excludes">排除的key</param>
         /// <returns></returns>
         public static Dictionary<string, string> filterPara<T>(T t, string excludes) where T : new()
         {
@@ -84,9 +87,9 @@ namespace UnWeiXin
         }
 
         /// <summary>
-        /// 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+        /// 把数组所有元素，按照“参数=参数值”的模式用 字符拼接成字符串
         /// </summary>
-        /// <param name="sArray">需要拼接的数组</param>
+        /// <param name="dicArray">需要拼接的数组</param>
         /// <returns>拼接完成以后的字符串</returns>
         public static string createLinkString(Dictionary<string, string> dicArray)
         {
@@ -103,9 +106,9 @@ namespace UnWeiXin
         }
 
         /// <summary>
-        /// 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串，并对参数值做urlencode
+        /// 把数组所有元素，按照“参数=参数值”的模式用 字符拼接成字符串，并对参数值做urlencode
         /// </summary>
-        /// <param name="sArray">需要拼接的数组</param>
+        /// <param name="dicArray">需要拼接的数组</param>
         /// <param name="code">字符编码</param>
         /// <returns>拼接完成以后的字符串</returns>
         public static string createLinkStringUrlencode(Dictionary<string, string> dicArray, Encoding code)

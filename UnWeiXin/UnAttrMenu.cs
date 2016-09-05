@@ -5,9 +5,14 @@ using System.Text;
 
 namespace UnWeiXin
 {
+    /// <summary>
+    /// 菜单顶层类
+    /// </summary>
     public class UnAttrMenu
     {
-        // 菜单
+        /// <summary>
+        /// 菜单
+        /// </summary>
         public List<UnAttrButton> button { get; set; }
     }
 }

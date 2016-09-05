@@ -5,84 +5,135 @@ using System.Text;
 
 namespace UnWeiXin
 {
+    /// <summary>
+    /// 模板消息
+    /// </summary>
     public class UnAttrTemplate
     {
-        // 用户openid
+        /// <summary>
+        /// 用户openid
+        /// </summary>
         public string touser { get; set; }
 
-        // 模板id
+        /// <summary>
+        /// 模板id
+        /// </summary>
         public string template_id { get; set; }
 
-        // 链接地址
+        /// <summary>
+        /// 链接地址
+        /// </summary>
         public string url { get; set; }
 
-        // 数据
+        /// <summary>
+        /// 数据
+        /// </summary>
         //[NonSerialized]
         [System.Xml.Serialization.XmlIgnore]
         public Dictionary<string, UnAttrTmpData> data;
 
-        // 行业1
+        /// <summary>
+        /// 行业1
+        /// </summary>
         //[NonSerialized]
         [System.Xml.Serialization.XmlIgnore]
         public Dictionary<string, string> primary_industry;
 
-        // 行业2
+        /// <summary>
+        ///  行业2
+        /// </summary>
         //[NonSerialized]
         [System.Xml.Serialization.XmlIgnore]
         public Dictionary<string, string> secondary_industry;
 
-        // 模板列表
+        /// <summary>
+        /// 模板列表
+        /// </summary>
         public List<UnAttrTmpInfo> template_list;
 
-        // 模板发送data
+        /// <summary>
+        /// 模板发送data
+        /// </summary>
         public List<UnAttrTmpSend> ArrayOfUnAttrTmpSend;
 
     }
 
-    // 模板键值数据
+    /// <summary>
+    /// 模板键值数据
+    /// </summary>
     public class UnAttrTmpData
     {
-        // 构造类
+        /// <summary>
+        /// 构造类
+        /// </summary>
+        /// <param name="value"></param>
+        /// <param name="color"></param>
         public UnAttrTmpData(string value, string color)
         {
             this.value = value;
             this.color = color;
         }
 
-        // 值
+        /// <summary>
+        /// 值
+        /// </summary>
         public string value { get; set; }
 
-        // 颜色
+        /// <summary>
+        /// 颜色
+        /// </summary>
         public string color { get; set; }
     }
 
-    // 模板信息
+    /// <summary>
+    /// 模板信息
+    /// </summary>
     public class UnAttrTmpInfo
     {
-        // 模板ID 
+        /// <summary>
+        /// 模板ID 
+        /// </summary>
         public string template_id { get; set; }
-        // 模板标题
+        /// <summary>
+        /// 模板标题
+        /// </summary>
         public string title { get; set; }
-        // 模板所属行业的一级行业
+        /// <summary>
+        /// 模板所属行业的一级行业
+        /// </summary>
         public string primary_industry { get; set; }
-        // 模板所属行业的二级行业
+        /// <summary>
+        /// 模板所属行业的二级行业
+        /// </summary>
         public string deputy_industry { get; set; }
-        // 模板内容
+        /// <summary>
+        /// 模板内容
+        /// </summary>
         public string content { get; set; }
-        // 模板示例
+        /// <summary>
+        /// 模板示例
+        /// </summary>
         public string example { get; set; }
     }
 
-    // 模板发送键值
+    /// <summary>
+    /// 模板发送键值
+    /// </summary>
     public class UnAttrTmpSend
     {
-        // 键名
+        /// <summary>
+        /// 键名
+        /// </summary>
         public string name { get; set; }
 
-        // 属性-键值
+        /// <summary>
+        /// 属性-键值
+        /// </summary>
         public string value { get; set; }
 
-        // 属性-颜色
+        /// <summary>
+        /// 属性-颜色
+        /// </summary>
         public string color { get; set; }
     }
 }

@@ -256,6 +256,7 @@
             this.Controls.Add(this.button1);
             this.Name = "Udp";
             this.Text = "Udp";
+            this.Load += new System.EventHandler(this.Udp_Load);
             this.ResumeLayout(false);
             this.PerformLayout();
 

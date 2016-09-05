@@ -12,6 +12,7 @@ using System.Windows.Forms;
 using UnCommon;
 using UnCommon.Config;
 using UnCommon.Encrypt;
+using UnCommon.Redis;
 using UnCommon.Tool;
 using UnCommon.XMMP;
 using UnDataBase;
@@ -124,14 +125,14 @@ namespace UnTestWin
         }
 
 
-        private static RedisClient redis = new RedisClient("127.0.0.1", 6379);
+        private static RedisHelper redis = new RedisHelper("127.0.0.1", 6379, 3, 1);
 
         private void set<T>(List<T> list)
         {
-            redis.Set("sss", list);
-            redis.Expire("sss", 5);
-            var list0 = redis.Get<List<T>>("sss");
-            Console.WriteLine(list0.Count + "//");
+            //redis.Set("sss", list);
+            //redis.Expire("sss", 5);
+            //var list0 = redis.Get<List<T>>("sss");
+            //Console.WriteLine(list0.Count + "//");
             
         }
 
@@ -144,18 +145,18 @@ namespace UnTestWin
             //{
             //    Console.WriteLine(item.Name + "/");
             //}
-
-
+           
+            return;
             var page = sql.queryPage<TestUser>(null, "TestUserID = {0}", "212734", "TestUserID", 1, 3, 5);
             //page = sql.queryPage<TestUser>(null, null, (string)null, null, 2, 2, 5);
             //page = sql.queryPage<TestCard>(null, null, (string)null, null, 2, 2, 5);
             var dt = sql.queryDT<TestUser>("Select * From TestUser", null, 5);
             //Console.WriteLine(page.PageSize + "/" + page.DataSource.Rows.Count+"/"+((List<TestUser>)page.TSource)[0].TestUserID);
 
-            Console.WriteLine(dt.Rows.Count);
-            Console.WriteLine(page.DataSource.Rows.Count);
-            return;
-            var keys = redis.GetAllKeys();
+            //Console.WriteLine(dt.Rows.Count);
+            //Console.WriteLine(page.DataSource.Rows.Count);
+            //return;
+            var keys = redis.getAllKeys();
             Console.WriteLine("key数量1:" + keys.Count);
 
             //TestUser tu = new TestUser();
@@ -166,12 +167,12 @@ namespace UnTestWin
             //sql.removeQueryPageRedis(typeof(TestUser));
             //sql.removeQueryDTRedis(typeof(TestUser));
             //sql.removeAllRedis();
-
-            keys = redis.GetAllKeys();
+            //redis = new RedisClient("127.0.0.1", 6379);
+            keys = redis.getAllKeys();
             Console.WriteLine("key数量2:" + keys.Count);
             foreach (var item in keys)
             {
-                //Console.WriteLine("key:" + item);
+                Console.WriteLine("key:" + item);
             }
             //sql.query<TestUser>(null, null, null, null, false, -1);
             //sql.queryPage<TestUser>(null, null, (string)null, null, 1, 2, -2);
@@ -217,17 +218,34 @@ namespace UnTestWin
             cn.commit();
         }
 
+        RedisHelper help = new RedisHelper("192.168.100.141", 6379, 3, 1);
+
+        RedisClient rd = new RedisClient("192.168.100.141", 6379);
+
         private void button7_Click(object sender, EventArgs e)
         {
+            Console.WriteLine(help.exists("name"));
+            help.set("name", "11", 5);
 
-            var keys = redis.GetAllKeys();
+            string a = help.get<string>("UnSql_6ab035824d4d942d_EnterpriseInfo_Query_f875564a16101c80");
+            Console.WriteLine(a);
+            var keys = help.getAllKeys();
             Console.WriteLine("key数量:" + keys.Count);
             foreach (var item in keys)
             {
                 Console.WriteLine("key:" + item);
-                redis.Remove(item);
+                help.remove(item);
             }
 
+        }
+
+        private void button8_Click(object sender, EventArgs e)
+        {
+            //rd.Add("a", "1");
+            rd.Set("b", "2");
+
+      
+            Console.WriteLine(rd.Get<string>("b"));
         }
     }
 }

@@ -126,8 +126,15 @@ namespace UnDataBase
         {
             if (this.comd.Transaction != null)
             {
-                this.comd.Transaction.Rollback();
-                this.comd.Transaction = null;
+                try
+                {
+                    this.comd.Transaction.Rollback();
+                    this.comd.Transaction = null;
+                }
+                catch (Exception e)
+                {
+                    UnFile.writeLog("rollback", e.ToString() + "\r\n链接串:" + cs + "\r\nCmdText：" + cmdText + "\r\n");
+                }
             }
             close();
             string s = ex.ToString() + "\r\n链接串:" + cs + "\r\nCmdText：" + cmdText + "\r\n";
@@ -139,7 +146,6 @@ namespace UnDataBase
                     s += par.ParameterName + "：" + par.Value + "\r\n";
                 }
             }
-
             UnFile.writeLog(pre, s);
         }
 
@@ -399,6 +405,7 @@ namespace UnDataBase
             SqlParameterCollection pmts = this.getPageKeys(keyName, from, currentPage, pageSize);
             if (pmts == null)
             {
+                writeLog("getPage", null, "keyName:" + keyName + "\r\ntable:" + table + "\r\nwhere:" + where + "\r\norder:" + order + "\r\ncurrentPage:" + currentPage + "\r\npageSize:" + pageSize, null);
                 return null;
             }
             string keys = pmts["@Keys"].Value.ToString() + "";

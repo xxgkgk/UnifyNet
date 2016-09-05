@@ -9,7 +9,9 @@ using UnQuote.Images;
 
 namespace UnWeiXin
 {
- 
+    /// <summary>
+    /// 微信支付类
+    /// </summary>
     public class UnWeMch
     {
         // 文档地址：https://pay.weixin.qq.com/wiki/doc/api/index.html

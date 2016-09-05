@@ -40,6 +40,18 @@
       <SpecificVersion>False</SpecificVersion>
       <HintPath>..\UnLibrary\Newtonsoft.Json.dll</HintPath>
     </Reference>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\UnLibrary\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\UnLibrary\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Redis">
+      <HintPath>..\UnLibrary\ServiceStack.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\UnLibrary\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.configuration" />
     <Reference Include="System.Core" />
@@ -77,12 +89,13 @@
     <Compile Include="Files\UnFileExtension.cs" />
     <Compile Include="Files\UnFileInfo.cs" />
     <Compile Include="Files\UnFileScanner.cs" />
+    <Compile Include="HTTP\UnHttpSimpleServer.cs" />
     <Compile Include="HTTP\UnHttpClient.cs" />
     <Compile Include="HTTP\UnHttpHelp.cs" />
-    <Compile Include="HTTP\UnHttpServer.cs" />
     <Compile Include="HTTP\UnHttpUpEvent.cs" />
     <Compile Include="Interfaces\UnIntUdpServer.cs" />
     <Compile Include="Interfaces\UnIntTransfer.cs" />
+    <Compile Include="Redis\RedisHelper.cs" />
     <Compile Include="Tool\UnSign.cs" />
     <Compile Include="Tool\UnTo.cs" />
     <Compile Include="Tool\UnToGen.cs" />

@@ -684,7 +684,7 @@ If Exists (Select * From sys.objects Where name = 'Pro_PageKeys')
         {
             string s = @"
 Create Procedure [dbo].[Pro_PageKeys]
-    @KeyName varchar(50),
+    @KeyName varchar(100),
 	@From varchar(6000),
 	@CurrentPage int = 0 OutPut,
 	@PageSize int = 0 OutPut,

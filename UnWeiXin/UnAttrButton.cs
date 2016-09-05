@@ -5,20 +5,34 @@ using System.Text;
 
 namespace UnWeiXin
 {
-    // 微信公众号菜单
+    /// <summary>
+    /// 微信公众号菜单
+    /// </summary>
     public class UnAttrButton
     {
-        // 类型
+        /// <summary>
+        /// 类型
+        /// </summary>
         public string type { get; set; }
-        // 名称
+        /// <summary>
+        /// 名称
+        /// </summary>
         public string name { get; set; }
-        // 键值
+        /// <summary>
+        /// 键值
+        /// </summary>
         public string key { get; set; }
-        // 网页链接
+        /// <summary>
+        /// 网页链接
+        /// </summary>
         public string url { get; set; }
-        // 调用新增永久素材接口返回的合法media_id 
+        /// <summary>
+        /// 调用新增永久素材接口返回的合法media_id 
+        /// </summary>
         public string media_id { get; set; }
-        // 子菜单
+        /// <summary>
+        ///  子菜单
+        /// </summary>
         public List<UnAttrButton> sub_button { get; set; } 
         
     }

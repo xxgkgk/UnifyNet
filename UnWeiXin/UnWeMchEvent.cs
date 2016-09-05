@@ -5,14 +5,38 @@ using System.Text;
 
 namespace UnWeiXin
 {
+    /// <summary>
+    /// 微信支付事件
+    /// </summary>
     public enum UnWeMchEvent
     {
+        /// <summary>
+        /// 统一下单
+        /// </summary>
         统一下单,
+        /// <summary>
+        /// 查询订单
+        /// </summary>
         查询订单,
+        /// <summary>
+        /// 关闭订单
+        /// </summary>
         关闭订单,
+        /// <summary>
+        /// 申请退款
+        /// </summary>
         申请退款,
+        /// <summary>
+        /// 查询退款
+        /// </summary>
         查询退款,
+        /// <summary>
+        /// 下载对账单
+        /// </summary>
         下载对账单,
+        /// <summary>
+        /// 刷卡支付
+        /// </summary>
         刷卡支付
     }
 
@@ -21,7 +45,11 @@ namespace UnWeiXin
     /// </summary>
     public static class UnExtWeMchEvent
     {
-        // 接口地址
+        /// <summary>
+        /// 接口地址
+        /// </summary>
+        /// <param name="t"></param>
+        /// <returns></returns>
         public static string apiUrl(this UnWeMchEvent t)
         {
             switch (t)

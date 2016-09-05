@@ -18,44 +18,98 @@ namespace UnCommon.Extend
         /// <summary>
         /// 将字符串转换为Int
         /// </summary>
-        /// <param name="t"></param>
-        /// <returns>当转换失败时返回0</returns>
-        public static int toInt(this string t)
+        /// <param name="t">字符串</param>
+        /// <returns>当转换失败时返回null</returns>
+        public static int? toInt(this string t)
         {
-            int id = 0;
-            int.TryParse(t, out id);
-            return id;
+            int r;
+            if (int.TryParse(t, out r))
+            {
+                return r;
+            }
+            return null;
         }
 
         /// <summary>
         /// 将字符串转为Long
         /// </summary>
-        /// <param name="t"></param>
-        /// <returns>当转换失败时返回0</returns>
-        public static long toLong(this string t)
+        /// <param name="t">字符串</param>
+        /// <returns>当转换失败时返回null</returns>
+        public static long? toLong(this string t)
         {
-            long id;
-            long.TryParse(t, out id);
-            return id;
+            long r;
+            if (long.TryParse(t, out r))
+            {
+                return r;
+            }
+            return null;
         }
 
         /// <summary>
         /// 将字符串转为double
         /// </summary>
-        /// <param name="t"></param>
-        /// <returns>当转换失败时返回0</returns>
-        public static double toDouble(this string t)
+        /// <param name="t">字符串</param>
+        /// <returns>当转换失败时返回null</returns>
+        public static double? toDouble(this string t)
         {
-            double id;
-            double.TryParse(t, out id);
-            return id;
+            double r;
+            if(double.TryParse(t, out r))
+            {
+                return r;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 将字符串转为decimal
+        /// </summary>
+        /// <param name="t">字符串</param>
+        /// <returns>当转换失败时返回null</returns>
+        public static decimal? toDecimal(this string t)
+        {
+            decimal r;
+            if (decimal.TryParse(t, out r))
+            {
+                return r;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 将字符串转为Guid
+        /// </summary>
+        /// <param name="t">字符串</param>
+        /// <returns>当转换失败时返回null</returns>
+        public static Guid? toGuid(this string t)
+        {
+            Guid r;
+            if (Guid.TryParse(t, out r))
+            {
+                return r;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 将字符串转为bool
+        /// </summary>
+        /// <param name="t">字符串</param>
+        /// <returns>当转换失败时返回null</returns>
+        public static bool? toBool(this string t)
+        {
+            bool r;
+            if (bool.TryParse(t, out r))
+            {
+                return r;
+            }
+            return null;
         }
 
         /// <summary>
         /// 16位加密
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">字符串</param>
+        /// <returns>返回16位md5</returns>
         public static string md5Hash16(this string input)
         {
             MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
@@ -68,17 +122,17 @@ namespace UnCommon.Extend
         /// <summary>
         /// 32位加密
         /// </summary>
-        /// <param name="input"></param>
-        /// <returns></returns>
+        /// <param name="input">字符串</param>
+        /// <returns>返回32位md5</returns>
         public static string md5Hash(this string input)
         {
             return UnEncMD5.getMd5Hash(input);
         }
 
         /// <summary>
-        /// 多重加密
+        /// 强加密
         /// </summary>
-        /// <returns></returns>
+        /// <returns>返回强加密md5</returns>
         public static string md5Hashs(this string input)
         {
             return UnEncMD5.getMd5Hashs(input);

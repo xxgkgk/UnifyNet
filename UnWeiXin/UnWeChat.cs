@@ -14,49 +14,92 @@ using UnCommon.Tool;
 
 namespace UnWeiXin
 {
+    /// <summary>
+    /// 微信公众号辅助类
+    /// </summary>
     public class UnWeChat
     {
-        // 应用id
+        /// <summary>
+        /// 应用id
+        /// </summary>
         private string _appid = "wx8162f4aa084d5a0e";
-        // 应用密钥
-       public string _appsecret = "f8019b1d64f3199d9c44d60c5dc98142";
+        /// <summary>
+        /// 应用密钥
+        /// </summary>
+        public string _appsecret = "f8019b1d64f3199d9c44d60c5dc98142";
 
-        // 接口地址
+        /// <summary>
+        /// 接口地址
+        /// </summary>
         private static string _url = "https://api.weixin.qq.com/cgi-bin/";
-        // 网页授权接口地址
+        /// <summary>
+        /// 网页授权接口地址
+        /// </summary>
         private static string _urlWeb = "https://api.weixin.qq.com/sns/";
 
-        // 获取token
+        /// <summary>
+        /// 获取token
+        /// </summary>
         private string _urlToken = _url + "token?grant_type=client_credential";
-        // 创建菜单
+        /// <summary>
+        /// 创建菜单
+        /// </summary>
         private string _urlCreateMenu = _url + "menu/create";
-        // 删除菜单
+        /// <summary>
+        /// 删除菜单
+        /// </summary>
         private string _urlDeleteMenu = _url + "menu/delete";
-        // 创建二维码
+        /// <summary>
+        /// 创建二维码
+        /// </summary>
         private string _urlCreateQrcode = _url + "qrcode/create";
-        // 二维码图片地址
+        /// <summary>
+        /// 二维码图片地址
+        /// </summary>
         private string _urlShowQrcode = "https://mp.weixin.qq.com/cgi-bin/showqrcode";
-        // 用户信息
+        /// <summary>
+        /// 用户信息
+        /// </summary>
         private string _urlUserInfo = _url + "user/info";
-        // 提交素材
+        /// <summary>
+        /// 提交素材
+        /// </summary>
         private string _urlUpload = _url + "user/upload?access_token=ACCESS_TOKEN&type=TYPE";
-        // 网页授权
+        /// <summary>
+        /// 网页授权
+        /// </summary>
         private string _urlAuthorize = "https://open.weixin.qq.com/connect/oauth2/authorize";
-        // 网页令牌
+        /// <summary>
+        /// 网页令牌
+        /// </summary>
         private string _urlWebToken = _urlWeb + "oauth2/access_token";
-        // 网页令牌刷新
+        /// <summary>
+        /// 网页令牌刷新
+        /// </summary>
         private string _urlWebRefreshToken = _urlWeb + "oauth2/refresh_token";
-        // 网页用户信息
+        /// <summary>
+        /// 网页用户信息
+        /// </summary>
         private string _urlWebUserInfo = _urlWeb + "userinfo";
-        // allow
+        /// <summary>
+        /// allow
+        /// </summary>
         private bool _allowRefresh = false;
-        // token
+        /// <summary>
+        /// token
+        /// </summary>
         private string _access_token = string.Empty;
 
-        // 令牌接口
+        /// <summary>
+        /// 令牌接口
+        /// </summary>
         private UnItfToken _itfToken;
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <param name="appsecret"></param>
         public UnWeChat(string appid, string appsecret)
         {
             this._appid = appid;
@@ -64,7 +107,13 @@ namespace UnWeiXin
             this._urlToken += "&appid=" + _appid + "&secret=" + _appsecret;
         }
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <param name="appsecret"></param>
+        /// <param name="itf"></param>
+        /// <param name="allowRefresh"></param>
         public UnWeChat(string appid, string appsecret, UnItfToken itf, bool allowRefresh)
         {
             this._appid = appid;
@@ -74,7 +123,12 @@ namespace UnWeiXin
             this._allowRefresh = allowRefresh;
         }
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <param name="appsecret"></param>
+        /// <param name="itf"></param>
         public UnWeChat(string appid, string appsecret, UnItfToken itf)
         {
             this._appid = appid;
@@ -83,6 +137,12 @@ namespace UnWeiXin
             this._itfToken = itf;
         }
 
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="appid"></param>
+        /// <param name="appsecret"></param>
+        /// <param name="accesstoken"></param>
         public UnWeChat(string appid, string appsecret, string accesstoken)
         {
             this._appid = appid;
@@ -91,13 +151,20 @@ namespace UnWeiXin
             this._access_token = accesstoken;
         }
 
-        // 设置全局Token委托
+        /// <summary>
+        /// 设置全局Token委托
+        /// </summary>
+        /// <param name="itf"></param>
         public void setItfToken(UnItfToken itf)
         {
             this._itfToken = itf;
         }
 
-        // 接收地址验证
+        /// <summary>
+        /// 接收地址验证
+        /// </summary>
+        /// <param name="context"></param>
+        /// <param name="token"></param>
         public void valid(HttpContext context, string token)
         {
             var echostr = context.Request["echoStr"].ToString();
@@ -111,7 +178,14 @@ namespace UnWeiXin
             }
         }
 
-        // 验证方法
+        /// <summary>
+        /// 验证方法
+        /// </summary>
+        /// <param name="signature"></param>
+        /// <param name="timestamp"></param>
+        /// <param name="nonce"></param>
+        /// <param name="token"></param>
+        /// <returns></returns>
         private bool checkSignature(string signature, string timestamp, string nonce, string token)
         {
             string[] ArrTmp = { token, timestamp, nonce };
@@ -130,13 +204,21 @@ namespace UnWeiXin
             }
         }
 
-        // 公众号ID
+        /// <summary>
+        /// 公众号ID
+        /// </summary>
+        /// <returns></returns>
         public string getAppID()
         {
             return _appid;
         }
 
-        // 同步提交
+        /// <summary>
+        /// 同步提交
+        /// </summary>
+        /// <param name="url"></param>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         private string sendMsgSyn(string url, string msg)
         {
             string str = null;
@@ -156,7 +238,10 @@ namespace UnWeiXin
         // 获取token状态
         //private static bool onGet = false;
 
-        // 获取token
+        /// <summary>
+        /// 获取token
+        /// </summary>
+        /// <returns></returns>
         public string token()
         {
             if (_access_token != string.Empty && _access_token != null)
@@ -187,7 +272,11 @@ namespace UnWeiXin
             return tk;
         }
 
-        // 检查结果是否成功
+        /// <summary>
+        /// 检查结果是否成功
+        /// </summary>
+        /// <param name="rst"></param>
+        /// <returns></returns>
         private bool checkErr(UnAttrRst rst)
         {
             try
@@ -205,14 +294,21 @@ namespace UnWeiXin
             return false;
         }
 
-        // 新建菜单
+        /// <summary>
+        /// 新建菜单
+        /// </summary>
+        /// <param name="json"></param>
+        /// <returns></returns>
         public string createMenu(string json)
         {
             string url = this._urlCreateMenu + "?access_token=" + token();
             return sendMsgSyn(url, json);
         }
 
-        // 删除菜单
+        /// <summary>
+        /// 删除菜单
+        /// </summary>
+        /// <returns></returns>
         public bool deleteMeun()
         {
             string url = this._urlDeleteMenu += "?access_token=" + token();
@@ -223,7 +319,11 @@ namespace UnWeiXin
             return false;
         }
 
-        // 创建二维码
+        /// <summary>
+        /// 创建二维码
+        /// </summary>
+        /// <param name="qrc"></param>
+        /// <returns></returns>
         public string createQRC(UnAttrQRC qrc)
         {
             string url = this._urlCreateQrcode + "?access_token=" + token();
@@ -252,56 +352,89 @@ namespace UnWeiXin
             return null;
         }
 
-        // 获得用户信息
+        /// <summary>
+        /// 获得用户信息
+        /// </summary>
+        /// <param name="openid"></param>
+        /// <returns></returns>
         public string getUserInfo(string openid)
         {
             string url = this._urlUserInfo + "?access_token=" + token() + "&openid=" + openid + "&lang=zh_CN";
             return sendMsgSyn(url, "");
         }
 
-        // 获取授权url
+        /// <summary>
+        /// 获取授权url
+        /// </summary>
+        /// <param name="scope"></param>
+        /// <param name="reurl"></param>
+        /// <param name="state"></param>
+        /// <returns></returns>
         public string getAuthUrl(string scope, string reurl, string state)
         {
             string url = this._urlAuthorize + "?appid=" + _appid + "&redirect_uri=" + reurl + "&response_type=code&scope=" + scope + "&state=" + state + "#wechat_redirect";
             return url;
         }
 
-        // 获取网页access_token
+        /// <summary>
+        /// 获取网页access_token
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public string getWebToken(string code)
         {
             string url = this._urlWebToken + "?appid=" + _appid + "&secret=" + _appsecret + "&code=" + code + "&grant_type=authorization_code";
             return sendMsgSyn(url, "");
         }
 
-        // 获取网页refresh_token
+        /// <summary>
+        /// 获取网页refresh_token
+        /// </summary>
+        /// <param name="reToken"></param>
+        /// <returns></returns>
         public string getWebReToken(string reToken)
         {
             string url = this._urlWebRefreshToken + "?appid=" + _appid + "&grant_type=refresh_token&refresh_token=" + reToken;
             return sendMsgSyn(url, "");
         }
 
-        // 获取网页用户信息
+        /// <summary>
+        /// 获取网页用户信息
+        /// </summary>
+        /// <param name="openid"></param>
+        /// <param name="webToken"></param>
+        /// <returns></returns>
         public string getWebUserInfo(string openid, string webToken)
         {
             string url = this._urlWebUserInfo + "?access_token=" + webToken + "&openid=" + openid + "&lang=zh_CN";
             return sendMsgSyn(url, "");
         }
 
-        // 添加临时素材
+        /// <summary>
+        /// 添加临时素材
+        /// </summary>
+        /// <returns></returns>
         public string upMaterial()
         {
             string url = "https://api.weixin.qq.com/cgi-bin/media/uploadimg?access_token=" + token();
             return sendMsgSyn(url, "");
         }
 
-        // 获取jsticket
+        /// <summary>
+        /// 获取jsticket
+        /// </summary>
+        /// <returns></returns>
         public string getJsapiTicket()
         {
             string url = "https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token=" + token() + "&type=jsapi";
             return sendMsgSyn(url, "");
         }
 
-        // 获取文本XML
+        /// <summary>
+        /// 获取文本XML
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public static string getTextXML(UnAttrMsg msg)
         {
             msg.MsgType = "text";
@@ -309,7 +442,11 @@ namespace UnWeiXin
             return UnXMMPXml.tToXmlNoSm(typeof(UnAttrMsg), msg);
         }
 
-        // 获取图文XML
+        /// <summary>
+        /// 获取图文XML
+        /// </summary>
+        /// <param name="msg"></param>
+        /// <returns></returns>
         public static string getNewsXML(UnAttrMsg msg)
         {
             msg.MsgType = "news";
@@ -323,7 +460,12 @@ namespace UnWeiXin
             return xml;
         }
 
-        // 设置所属行业
+        /// <summary>
+        /// 设置所属行业
+        /// </summary>
+        /// <param name="id1"></param>
+        /// <param name="id2"></param>
+        /// <returns></returns>
         public string setIndustry(string id1, string id2)
         {
             string str = "{'industry_id1':'" + id1 + "','industry_id2':'" + id2 + "'}";
@@ -331,14 +473,20 @@ namespace UnWeiXin
             return sendMsgSyn(url, str);
         }
 
-        // 获取设置的行业信息
+        /// <summary>
+        /// 获取设置的行业信息
+        /// </summary>
+        /// <returns></returns>
         public string getIndustry()
         {
             string url = "https://api.weixin.qq.com/cgi-bin/template/get_industry?access_token=" + token();
             return sendMsgSyn(url, "");
         }
 
-        // 获取设置的行业信息
+        /// <summary>
+        /// 获取设置的行业信息
+        /// </summary>
+        /// <returns></returns>
         public UnAttrTemplate getIndustryToT()
         {
             string rtstr = getIndustry();
@@ -350,7 +498,11 @@ namespace UnWeiXin
             return tmp;
         }
 
-        // 获得模板ID
+        /// <summary>
+        /// 获得模板ID
+        /// </summary>
+        /// <param name="template_id"></param>
+        /// <returns></returns>
         public string addTemplate(string template_id)
         {
             string str = "{'template_id'='" + template_id + "'}";
@@ -358,14 +510,20 @@ namespace UnWeiXin
             return sendMsgSyn(url, str);
         }
 
-        // 获取模板列表
+        /// <summary>
+        /// 获取模板列表
+        /// </summary>
+        /// <returns></returns>
         public string getAllPrivateTemplate()
         {
             string url = "https://api.weixin.qq.com/cgi-bin/template/get_all_private_template?access_token=" + token();
             return sendMsgSyn(url, "");
         }
 
-        // 获取模板列表
+        /// <summary>
+        /// 获取模板列表
+        /// </summary>
+        /// <returns></returns>
         public List<UnAttrTmpInfo> getAllPrivateTemplateToT()
         {
             string rtstr = getAllPrivateTemplate();
@@ -377,7 +535,11 @@ namespace UnWeiXin
             return tmp.template_list;
         }
 
-        // 删除模板
+        /// <summary>
+        /// 删除模板
+        /// </summary>
+        /// <param name="template_id"></param>
+        /// <returns></returns>
         public string delPrivateTemplate(string template_id)
         {
             string str = "{'template_id'='" + template_id + "'}";
@@ -385,7 +547,11 @@ namespace UnWeiXin
             return sendMsgSyn(url, str);
         }
 
-        // 删除模板
+        /// <summary>
+        /// 删除模板
+        /// </summary>
+        /// <param name="template_id"></param>
+        /// <returns></returns>
         public UnAttrErr delPrivateTemplateToT(string template_id)
         {
             string str = delPrivateTemplate(template_id);
@@ -393,14 +559,22 @@ namespace UnWeiXin
             return err;
         }
 
-        // 发送模板消息
+        /// <summary>
+        /// 发送模板消息
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         public string sendTemplate(string str)
         {
             string url = "https://api.weixin.qq.com/cgi-bin/message/template/send?access_token=" + token();
             return sendMsgSyn(url, str);
         }
 
-        // 发送模板消息
+        /// <summary>
+        /// 发送模板消息
+        /// </summary>
+        /// <param name="tmp"></param>
+        /// <returns></returns>
         public UnAttrErr sendTemplate(UnAttrTemplate tmp)
         {
             // 如果data数据是用ArrayOfUnAttrTmpSend承载
