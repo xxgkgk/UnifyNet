@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("UnWeiXin")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("微信业务层（公众号、支付）")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("UnWeiXin")]

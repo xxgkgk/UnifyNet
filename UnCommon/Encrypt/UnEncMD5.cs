@@ -101,6 +101,19 @@ namespace UnCommon.Encrypt
         }
 
         /// <summary>
+        /// 双重加密 
+        /// </summary>
+        /// <param name="s"></param>
+        /// <returns></returns>
+        public static string getMd5Hash2(string s)
+        {
+            string s1 = getMd5Hash(s);
+            s1 = getMd5Hash(s1.ToLower());
+            return s1;
+        }
+
+
+        /// <summary>
         /// 字节组md5
         /// </summary>
         /// <param name="t"></param>

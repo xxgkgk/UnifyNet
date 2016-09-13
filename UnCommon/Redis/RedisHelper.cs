@@ -107,7 +107,7 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("Add", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key + "\r\nvalue:" + value + "\r\nexpiry:" + expiry.ToShortDateString());
+                UnFile.writeLog("set", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key + "\r\nvalue:" + value + "\r\nexpiry:" + expiry.ToShortDateString());
             }
         }
 
@@ -147,7 +147,7 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("Add", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key + "\r\nvalue:" + value + "\r\nslidingExpiration:" + slidingExpiration.Seconds);
+                UnFile.writeLog("set", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key + "\r\nvalue:" + value + "\r\nslidingExpiration:" + slidingExpiration.Seconds);
             }
         }
 
@@ -192,9 +192,85 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("Get", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\n" + key);
+                UnFile.writeLog("get", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\n" + key);
             }
             return obj;
+        }
+
+        /// <summary>
+        /// 锁定键
+        /// </summary>
+        public IDisposable acquireLock(string key)
+        {
+            try
+            {
+                if (pool != null)
+                {
+                    using (var r = pool.GetClient())
+                    {
+                        if (r != null)
+                        {
+                            r.SendTimeout = 1000;
+                            return r.AcquireLock(key);
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                UnFile.writeLog("acquireLock", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key);
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 删除DB数据
+        /// </summary>
+        public void flushDb()
+        {
+            try
+            {
+                if (pool != null)
+                {
+                    using (var r = pool.GetClient())
+                    {
+                        if (r != null)
+                        {
+                            r.SendTimeout = 1000;
+                            r.FlushDb();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                UnFile.writeLog("flushDb", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool);
+            }
+        }
+
+        /// <summary>
+        /// 删除所有缓存
+        /// </summary>
+        public void flushAll()
+        {
+            try
+            {
+                if (pool != null)
+                {
+                    using (var r = pool.GetClient())
+                    {
+                        if (r != null)
+                        {
+                            r.SendTimeout = 1000;
+                            r.FlushAll();
+                        }
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                UnFile.writeLog("flushAll", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool);
+            }
         }
 
         /// <summary>
@@ -219,7 +295,7 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("Remove", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key);
+                UnFile.writeLog("remove", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key);
             }
         }
 
@@ -246,7 +322,7 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("Exists", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key);
+                UnFile.writeLog("exists", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\nkey:" + key);
             }
             return false;
         }
@@ -273,7 +349,7 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("GetAllKeys", ex.ToString() + "\r\nredisHosts:" + redisHosts + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool);
+                UnFile.writeLog("getAllKeys", ex.ToString() + "\r\nredisHosts:" + redisHosts + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool);
             }
             return new List<string>();
         }
@@ -309,7 +385,7 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("GetRedisKeysByPattern", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool);
+                UnFile.writeLog("getRedisKeysByPattern", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool);
             }
             return list;
         }
@@ -335,7 +411,7 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("RemoveByRegex", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool);
+                UnFile.writeLog("removeByRegex", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool);
             }
         }
     }

@@ -90,7 +90,7 @@ namespace UnWebTool.Handle
                 Stream stream = context.Request.InputStream;
                 string ixml = UnTo.streamToString(stream);
                 XmlData ixd = (XmlData)UnXMMPXml.xmlToT(typeof(XmlData), ixml);
-                if (ixd.AdminLogin.User == "admin" && ixd.AdminLogin.Pass == UnEncMD5.getMd5Hashs("hp2015"))
+                if (ixd.AdminLogin.User == "admin" && ixd.AdminLogin.Pass == UnEncMD5.getMd5Hash2("hp2015"))
                 {
                     oxd.ApiNote.NoteCode = 1;
                     oxd.ApiNote.NoteMsg = "登录成功";

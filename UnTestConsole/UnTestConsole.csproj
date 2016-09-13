@@ -1,19 +1,20 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="14.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Import Project="$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props" Condition="Exists('$(MSBuildExtensionsPath)\$(MSBuildToolsVersion)\Microsoft.Common.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProductVersion>8.0.30703</ProductVersion>
-    <SchemaVersion>2.0</SchemaVersion>
-    <ProjectGuid>{66E1FD7C-E24A-4D33-9B6D-A7C84C6324F1}</ProjectGuid>
-    <OutputType>Library</OutputType>
+    <ProjectGuid>{9B9E2B31-6D73-4BC7-BB72-638F1C5461B2}</ProjectGuid>
+    <OutputType>Exe</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
-    <RootNamespace>UnAli</RootNamespace>
-    <AssemblyName>UnAli</AssemblyName>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <RootNamespace>UnTestConsole</RootNamespace>
+    <AssemblyName>UnTestConsole</AssemblyName>
+    <TargetFrameworkVersion>v4.5.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
+    <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugSymbols>true</DebugSymbols>
     <DebugType>full</DebugType>
     <Optimize>false</Optimize>
@@ -23,56 +24,58 @@
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
+    <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
     <OutputPath>bin\Release\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <DocumentationFile>bin\Release\UnAli.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="ServiceStack.Common">
+      <HintPath>..\UnLibrary\ServiceStack.Common.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Interfaces">
+      <HintPath>..\UnLibrary\ServiceStack.Interfaces.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Redis">
+      <HintPath>..\UnLibrary\ServiceStack.Redis.dll</HintPath>
+    </Reference>
+    <Reference Include="ServiceStack.Text">
+      <HintPath>..\UnLibrary\ServiceStack.Text.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
-    <Reference Include="System.Web" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
     <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Help\AlipayCore.cs" />
-    <Compile Include="Help\Alipaynotify.cs" />
-    <Compile Include="Help\Config.cs" />
-    <Compile Include="Help\F2FBiz.cs" />
-    <Compile Include="Help\LogHelper.cs" />
-    <Compile Include="Help\PayResultEnum.cs" />
+    <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="UnAliAttr.cs" />
-    <Compile Include="UnAliHelp.cs" />
-    <Compile Include="UnAliMch.cs" />
-    <Compile Include="UnAliMchEvent.cs" />
-    <Compile Include="UnAliRSA.cs" />
-    <Compile Include="UnAttrContent.cs" />
-    <Compile Include="UnAttrErrorEvent.cs" />
-    <Compile Include="UnAttrExtend.cs" />
-    <Compile Include="UnAttrGoods.cs" />
-    <Compile Include="UnAttrPub.cs" />
-    <Compile Include="UnAttrReturn.cs" />
-    <Compile Include="UnNotify.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AopSdk\AopSdk.csproj">
-      <Project>{9C11CAE5-5188-4E71-825B-68FC3135728A}</Project>
-      <Name>AopSdk</Name>
-    </ProjectReference>
+    <None Include="App.config" />
+  </ItemGroup>
+  <ItemGroup>
     <ProjectReference Include="..\UnCommon\UnCommon.csproj">
-      <Project>{3998BC66-8A08-46CC-BD68-B0C5E3D85E1E}</Project>
+      <Project>{3998bc66-8a08-46cc-bd68-b0c5e3d85e1e}</Project>
       <Name>UnCommon</Name>
     </ProjectReference>
+    <ProjectReference Include="..\UnDataBase\UnDataBase.csproj">
+      <Project>{be6e344c-cefb-4c2e-8104-b82ea3ee4b7e}</Project>
+      <Name>UnDataBase</Name>
+    </ProjectReference>
+    <ProjectReference Include="..\UnEntity\UnEntity.csproj">
+      <Project>{4a01625b-6382-4dd4-914a-c320f166459c}</Project>
+      <Name>UnEntity</Name>
+    </ProjectReference>
     <ProjectReference Include="..\UnQuote\UnQuote.csproj">
-      <Project>{FAFE77FD-B2AF-4BF6-A6D0-06A8DF53FA66}</Project>
+      <Project>{fafe77fd-b2af-4bf6-a6d0-06a8df53fa66}</Project>
       <Name>UnQuote</Name>
     </ProjectReference>
   </ItemGroup>

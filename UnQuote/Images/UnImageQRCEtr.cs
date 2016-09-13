@@ -1,23 +1,25 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace UnQuote.Images
+﻿namespace UnQuote.Images
 {
     /// <summary>
     /// 二维码级别
     /// </summary>
     public enum UnImageQRCEtr
     {
-        L,M,Q,H
-    }
-
-    /// <summary>
-    /// 二组码等级
-    /// </summary>
-    public enum UnQrVersion
-    {
-       
+        /// <summary>
+        /// L
+        /// </summary>
+        L,
+        /// <summary>
+        /// M
+        /// </summary>
+        M,
+        /// <summary>
+        /// Q
+        /// </summary>
+        Q,
+        /// <summary>
+        /// H
+        /// </summary>
+        H
     }
 }

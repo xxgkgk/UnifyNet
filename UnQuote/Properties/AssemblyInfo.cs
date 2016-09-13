@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("UnQuote")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("扩展引用层")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("UnQuote")]

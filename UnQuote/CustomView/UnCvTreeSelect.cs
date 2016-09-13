@@ -8,8 +8,14 @@ using System.Web.UI.WebControls;
 
 namespace UnQuote.CustomView
 {
+    /// <summary>
+    /// 树形选择控件
+    /// </summary>
     public class UnCvTreeSelect : WebControl, INamingContainer
     {
+        /// <summary>
+        /// 实例化
+        /// </summary>
         public UnCvTreeSelect(){}
 
         #region 私有方法
@@ -17,7 +23,7 @@ namespace UnQuote.CustomView
         /// List转为DataTable
         /// </summary>
         /// <param name="list">集合</param>
-        /// <returns></returns>
+        /// <returns>返回DataTable</returns>
         private static DataTable ListToDataTable(IList list)
         {
             DataTable result = new DataTable();
@@ -63,8 +69,16 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 选择事件
-        //定义事件
+        /// <summary>
+        /// 定义事件
+        /// </summary>
         public event EventHandler SelectedIndexChanged;
+
+        /// <summary>
+        /// ONCHANGE事件
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnChange(object sender, EventArgs e)
         {
             if (SelectedIndexChanged != null)
@@ -72,6 +86,12 @@ namespace UnQuote.CustomView
                     SelectedIndexChanged(sender, e);
             }
         }
+
+        /// <summary>
+        /// 查找控件
+        /// </summary>
+        /// <param name="controlName">控件名</param>
+        /// <returns>返回控件对象</returns>
         private Control findControl(string controlName)
         {
             for (int i = 0; i < Page.Header.Controls.Count; i++)
@@ -86,7 +106,10 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 载入资源
-        //OnPreReader事件是在页面已经执行完所有后台代码，并且在生成标准HTML代码前，将要呈现给Page类的时候，此事件发生
+        /// <summary>
+        /// OnPreReader事件是在页面已经执行完所有后台代码，并且在生成标准HTML代码前，将要呈现给Page类的时候，此事件发生
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnPreRender(EventArgs e)
         {
             if (this.Page != null && findControl("CtmTreeSelect_nHGC1") == null)
@@ -142,6 +165,10 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 绑定数据源
+
+        /// <summary>
+        /// 数据绑定
+        /// </summary>
         public override void DataBind()
         {
             if (!Page.IsPostBack)
@@ -158,6 +185,11 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 输出控件
+
+        /// <summary>
+        /// 重写控件
+        /// </summary>
+        /// <param name="writer">HtmlTextWriter对象</param>
         public override void RenderControl(HtmlTextWriter writer)
         {
             DropDownList _DropDownList = (DropDownList)FindControl("CtmTreeSelect_DDL");
@@ -248,8 +280,14 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 属性
-        //编号文字显示
+        /// <summary>
+        /// 编号文字显示
+        /// </summary>
         private string _DtfIDStr = "编号";
+
+        /// <summary>
+        /// 编号文字显示
+        /// </summary>
         [Description("编号文字显示")]
         [Browsable(true)]
         public virtual string DtfIDStr
@@ -258,8 +296,14 @@ namespace UnQuote.CustomView
             set { _DtfIDStr = value; }
         }
 
-        //表"ID"字段名
+        /// <summary>
+        /// 表"ID"字段名
+        /// </summary>
         private string _DtfID = "";
+
+        /// <summary>
+        /// 表"ID"字段名
+        /// </summary>
         [Description("'编号'字段名")]
         [Browsable(true)]
         public virtual string DtfID
@@ -268,8 +312,14 @@ namespace UnQuote.CustomView
             set { _DtfID = value; }
         }
 
-        //主名称文字显示
+        /// <summary>
+        /// 主名称文字显示
+        /// </summary>
         private string _DtfNameStr = "名称";
+
+        /// <summary>
+        /// 主名称文字显示
+        /// </summary>
         [Description("主名称文字显示")]
         [Browsable(true)]
         public virtual string DtfNameStr
@@ -278,8 +328,14 @@ namespace UnQuote.CustomView
             set { _DtfNameStr = value; }
         }
 
-        //表"主名称"字段名
+        /// <summary>
+        /// 表"主名称"字段名
+        /// </summary>
         private string _DtfName = "";
+
+        /// <summary>
+        /// 表"主名称"字段名
+        /// </summary>
         [Description("'主名称'字段名")]
         [Browsable(true)]
         public virtual string DtfName
@@ -288,8 +344,14 @@ namespace UnQuote.CustomView
             set { _DtfName = value; }
         }
 
-        //副名称文字显示
+        /// <summary>
+        /// 副名称文字显示
+        /// </summary>
         private string _DtfNamezStr = "副名称";
+
+        /// <summary>
+        /// 副名称文字显示
+        /// </summary>
         [Description("副名称文字显示")]
         [Browsable(true)]
         public virtual string DtfNamezStr
@@ -298,8 +360,14 @@ namespace UnQuote.CustomView
             set { _DtfNamezStr = value; }
         }
 
-        //表"副名称"字段名
+        /// <summary>
+        /// 表"副名称"字段名
+        /// </summary>
         private string _DtfNamez = "";
+
+        /// <summary>
+        /// 表"副名称"字段名
+        /// </summary>
         [Description("'副名称'字段名")]
         [Browsable(true)]
         public virtual string DtfNamez
@@ -308,8 +376,14 @@ namespace UnQuote.CustomView
             set { _DtfNamez = value; }
         }
 
-        //编码文字显示
+        /// <summary>
+        /// 编码文字显示
+        /// </summary>
         private string _DtfCodeStr = "编码";
+
+        /// <summary>
+        /// 编码文字显示
+        /// </summary>
         [Description("编码文字显示")]
         [Browsable(true)]
         public virtual string DtfCodeStr
@@ -318,18 +392,30 @@ namespace UnQuote.CustomView
             set { _DtfCodeStr = value; }
         }
 
-        //表"编码"字段名
+        /// <summary>
+        /// 表"编码"字段名
+        /// </summary>
+        private string _DtfCode = "";
+
+        /// <summary>
+        /// 表"编码"字段名
+        /// </summary>
         [Description("'编码'字段名")]
         [Browsable(true)]
-        private string _DtfCode = "";
         public virtual string DtfCode
         {
             get { return _DtfCode; }
             set { _DtfCode = value; }
         }
 
-        //序号文字显示
+        /// <summary>
+        /// 序号文字显示
+        /// </summary>
         private string _DtfSortStr = "序号";
+
+        /// <summary>
+        /// 序号文字显示
+        /// </summary>
         [Description("序号文字显示")]
         [Browsable(true)]
         public virtual string DtfSortStr
@@ -338,8 +424,14 @@ namespace UnQuote.CustomView
             set { _DtfSortStr = value; }
         }
 
-        //表"排序"字段名
+        /// <summary>
+        /// 表"排序"字段名
+        /// </summary>
         private string _DtfSort = "";
+
+        /// <summary>
+        /// 表"排序"字段名
+        /// </summary>
         [Description("'排序'字段名")]
         [Browsable(true)]
         public virtual string DtfSort
@@ -347,8 +439,15 @@ namespace UnQuote.CustomView
             get { return _DtfSort; }
             set { _DtfSort = value; }
         }
-        //数据源
+
+        /// <summary>
+        /// 数据源
+        /// </summary>
         private object _DataSource = new object();
+
+        /// <summary>
+        /// 数据源
+        /// </summary>
         [Description("支持DataTable,IList")]
         [Browsable(true)]
         public virtual object DataSource
@@ -356,8 +455,15 @@ namespace UnQuote.CustomView
             get { return _DataSource; }
             set { _DataSource = value; }
         }
-        //选中的值
+
+        /// <summary>
+        /// 选中的值
+        /// </summary>
         private string _SelectValue = "";
+
+        /// <summary>
+        /// 选中的值
+        /// </summary>
         [Description("选中的ID")]
         [Browsable(true)]
         public virtual string SelectValue
@@ -365,8 +471,15 @@ namespace UnQuote.CustomView
             get { return _SelectValue; }
             set { _SelectValue = value; }
         }
-        //默认文本
+
+        /// <summary>
+        /// 默认文本
+        /// </summary>
         private string _DefaultText = "";
+
+        /// <summary>
+        /// 默认文本
+        /// </summary>
         [Description("默认文本")]
         [Browsable(true)]
         public virtual string DefaultText
@@ -374,8 +487,15 @@ namespace UnQuote.CustomView
             get { return _DefaultText; }
             set { _DefaultText = value; }
         }
-        //默认文本值
+
+        /// <summary>
+        /// 默认文本值
+        /// </summary>
         private string _DefaultValue = "";
+
+        /// <summary>
+        /// 默认文本值
+        /// </summary>
         [Description("默认文本值")]
         [Browsable(true)]
         public virtual string DefaultValue
@@ -383,8 +503,15 @@ namespace UnQuote.CustomView
             get { return _DefaultValue; }
             set { _DefaultValue = value; }
         }
-        //初始层编码
+
+        /// <summary>
+        /// 初始层编码
+        /// </summary>
         private string _StartCode = "0";
+
+        /// <summary>
+        /// 初始层编码
+        /// </summary>
         [Description("初始层编码")]
         [Browsable(true)]
         public virtual string StartCode
@@ -392,16 +519,30 @@ namespace UnQuote.CustomView
             get { return _StartCode; }
             set { _StartCode = value; }
         }
-        //文本值
+
+        /// <summary>
+        /// 文本值
+        /// </summary>
         private string _Text = "";
+
+        /// <summary>
+        /// 文本值
+        /// </summary>
         [Description("获得当前选中的文本")]
         [Browsable(true)]
         protected virtual string Text
         {
             get { return _Text; }
         }
-        //值
+
+        /// <summary>
+        /// 选中的值
+        /// </summary>
         private string _Value = "";
+
+        /// <summary>
+        /// 选中的值
+        /// </summary>
         [Description("获得当前选中的值")]
         [Browsable(true)]
         public virtual string Value
@@ -413,6 +554,10 @@ namespace UnQuote.CustomView
         /// 是否产生向服务器的回发
         /// </summary>
         private bool _AutoPostBack = false;
+
+        /// <summary>
+        /// 是否产生向服务器的回发
+        /// </summary>
         [Description("是否允许向服务器回发")]
         [Browsable(true)]
         public virtual bool AutoPostBack
@@ -422,9 +567,13 @@ namespace UnQuote.CustomView
         }
 
         /// <summary>
-        /// 客户端onchange事件
+        /// onchange方法名
         /// </summary>
         private string _onchange = "";
+
+        /// <summary>
+        /// 客户端onchange事件
+        /// </summary>
         [Description("客户端onchange事件")]
         [Browsable(true)]
         public virtual string onchange

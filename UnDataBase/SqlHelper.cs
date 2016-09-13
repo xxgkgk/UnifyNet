@@ -9,6 +9,9 @@ using System.Xml;
 
 namespace UnDataBase
 {
+    /// <summary>
+    /// SQL帮助类
+    /// </summary>
     class SqlHelper
     {
         public static object ConfigurationManager { get; private set; }

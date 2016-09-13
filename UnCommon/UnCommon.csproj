@@ -89,7 +89,7 @@
     <Compile Include="Files\UnFileExtension.cs" />
     <Compile Include="Files\UnFileInfo.cs" />
     <Compile Include="Files\UnFileScanner.cs" />
-    <Compile Include="HTTP\UnHttpSimpleServer.cs" />
+    <Compile Include="HTTP\UnHttpServerHelp.cs" />
     <Compile Include="HTTP\UnHttpClient.cs" />
     <Compile Include="HTTP\UnHttpHelp.cs" />
     <Compile Include="HTTP\UnHttpUpEvent.cs" />

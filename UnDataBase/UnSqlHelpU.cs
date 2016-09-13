@@ -390,13 +390,16 @@ namespace UnDataBase
         /// <returns>返回翻页结果</returns>
         public UnSqlPage getPage(string columns, string keyName, string table, string where, string order, int currentPage, int pageSize)
         {
+            // 条件为空则强制设定恒定条件
             if (String.IsNullOrWhiteSpace(where))
             {
                 where = "1 = 1";
             }
+            // 排序不为空
             if (!String.IsNullOrWhiteSpace(order))
             {
-                if (order.ToLower().IndexOf("order") < 0)
+                // 如果不含"Order By"关键词则添加
+                if (order.TrimStart().ToLower().IndexOf("order by") < 0)
                 {
                     order = "Order By " + order;
                 }

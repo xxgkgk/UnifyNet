@@ -294,7 +294,7 @@ namespace Aop.Api.Util
                     RSACryptoServiceProvider rsa = DecodeRSAPrivateKey(res);
                     return rsa;
                 }
-                catch (Exception ex)
+                catch 
                 {
                 }
                 return null;
@@ -371,7 +371,7 @@ namespace Aop.Api.Util
                 RSA.ImportParameters(RSAparams);
                 return RSA;
             }
-            catch (Exception ex)
+            catch
             {
                 return null;
             }

@@ -182,11 +182,13 @@ namespace UnTestWin
         private void button5_Click(object sender, EventArgs e)
         {
             UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1");
-            List<TestUser> list = cn.query<TestUser>(null, "1 = 1", null, null);
-            foreach (var item in list)
-            {
-                Console.WriteLine(item.Name + "/");
-            }
+            //List<TestUser> list = cn.query<TestUser>(null, "1 = 1", null, null);
+            //foreach (var item in list)
+            //{
+            //    Console.WriteLine(item.Name + "/");
+            //}
+            var page = cn.queryPage<TestUser>(null, "1 = 1", (string)null, "TestUserID Desc", 1, 2, 10);
+
         }
 
         private void button6_Click(object sender, EventArgs e)

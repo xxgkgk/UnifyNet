@@ -2,18 +2,16 @@
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
-using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Xml;
 using System.Xml.Serialization;
-using UnCommon;
 using UnCommon.Tool;
 
 namespace UnCommon.XMMP
 {
     /// <summary>
-    /// xml解析类
+    /// XML解析类
     /// </summary>
     public class UnXMMPXml
     {
@@ -21,9 +19,9 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 反序列化
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="xml"></param>
-        /// <returns></returns>
+        /// <param name="type">类型</param>
+        /// <param name="xml">XML字符串</param>
+        /// <returns>返回对象</returns>
         public static object xmlToT(Type type, string xml)
         {
             try
@@ -43,9 +41,9 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 反序列化
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="stream"></param>
-        /// <returns></returns>
+        /// <param name="type">类型</param>
+        /// <param name="stream">XML数据流</param>
+        /// <returns>返回对象</returns>
         public static object streamToT(Type type, Stream stream)
         {
             XmlSerializer xmldes = new XmlSerializer(type);
@@ -55,9 +53,9 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="type">类型</param>
+        /// <param name="obj">序列化对象</param>
+        /// <returns>返回XML字符串</returns>
         public static string tToXml(Type type, object obj)
         {
             MemoryStream stream = new MemoryStream();
@@ -94,9 +92,9 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 去掉声明的序列化
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="obj"></param>
-        /// <returns></returns>
+        /// <param name="type">类型</param>
+        /// <param name="obj">XML对象</param>
+        /// <returns>返回XML字符串</returns>
         public static string tToXmlNoSm(Type type, object obj)
         {
             string xml = tToXml(type, obj);
@@ -110,12 +108,12 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="rootName"></param>
-        /// <param name="tagName"></param>
-        /// <param name="listT"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="rootName">根名</param>
+        /// <param name="tagName">标签名</param>
+        /// <param name="listT">序列化对象数组</param>
+        /// <param name="fields">序列化的字段数组</param>
+        /// <returns>返回XML字符串</returns>
         public static StringBuilder tToXml<T>(string rootName, string tagName, List<T> listT, string[] fields)
         {
             StringBuilder sb = new StringBuilder();
@@ -161,12 +159,12 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="rootName"></param>
-        /// <param name="tagName"></param>
-        /// <param name="listT"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="rootName">根名</param>
+        /// <param name="tagName">标签名</param>
+        /// <param name="listT">序列化对象数组</param>
+        /// <param name="fields">序列化的字段,用","分隔</param>
+        /// <returns>返加XML字符串</returns>
         public static StringBuilder tToXml<T>(string rootName, string tagName, List<T> listT, string fields)
         {
             string[] fs = null;
@@ -180,12 +178,12 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="rootName"></param>
-        /// <param name="tagName"></param>
-        /// <param name="t"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="rootName">根名</param>
+        /// <param name="tagName">标签名</param>
+        /// <param name="t">序列化对象</param>
+        /// <param name="fields">序列化的字段,用","分隔</param>
+        /// <returns>返回StringBuilder</returns>
         public static StringBuilder tToXml<T>(string rootName, string tagName, T t, string fields)
         {
             List<T> listT = new List<T>();
@@ -196,10 +194,10 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="list"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="list">序列化对象数组</param>
+        /// <param name="fields">序列化的字段数组</param>
+        /// <returns>返回XmlDocument</returns>
         public static XmlDocument tToXmlDoc<T>(List<T> list, string[] fields) where T : new()
         {
             XmlDocument xd = new XmlDocument();
@@ -240,9 +238,9 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="list"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="list">序列化对象数组</param>
+        /// <returns>返回XmlDocument</returns>
         public static XmlDocument tToXmlDoc<T>(List<T> list) where T : new()
         {
             return tToXmlDoc(list, UnToGen.getFields<T>().Split(','));
@@ -251,15 +249,15 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 反序列化
         /// </summary>
-        /// <param name="xd"></param>
-        /// <param name="xPath"></param>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public static DataTable xmlToDT(XmlDocument xd, string xPath, string tableName)
+        /// <param name="doc">XmlDocument对象</param>
+        /// <param name="xPath">反序列化层级路径</param>
+        /// <param name="tableName">自定义表名</param>
+        /// <returns>返回DataTable</returns>
+        public static DataTable xmlToDT(XmlDocument doc, string xPath, string tableName)
         {
             // 根据第一个元素结构建立表结构
             DataTable _DataTable = new DataTable(tableName);
-            XmlNode _XmlNode = xd.SelectSingleNode(xPath);
+            XmlNode _XmlNode = doc.SelectSingleNode(xPath);
             string colName;
             if (_XmlNode != null)
             {
@@ -271,7 +269,7 @@ namespace UnCommon.XMMP
             }
 
             // 载入数据
-            string xmlString = xd.InnerXml;
+            string xmlString = doc.InnerXml;
             StringReader _StringReader = new StringReader(xmlString);
             XmlTextReader _XmlTextReader = new XmlTextReader(_StringReader);
             _DataTable.ReadXml(_XmlTextReader);
@@ -282,16 +280,16 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 反序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="xd"></param>
-        /// <param name="xpath"></param>
-        /// <param name="tableName"></param>
-        /// <returns></returns>
-        public static List<T> xmlToT<T>(XmlDocument xd,string xpath, string tableName) where T : new()
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="doc">XmlDocument对象</param>
+        /// <param name="xPath">反序列化层级路径</param>
+        /// <param name="tableName">自定义表名</param>
+        /// <returns>返回泛型数组</returns>
+        public static List<T> xmlToT<T>(XmlDocument doc, string xPath, string tableName) where T : new()
         {
             List<T> ListModel = new List<T>();
             DataTable dt = new DataTable();
-            dt = xmlToDT(xd, xpath, tableName);
+            dt = xmlToDT(doc, xPath, tableName);
             ListModel = UnToGen.dtToT<T>(dt);
             return ListModel;
         }
@@ -299,25 +297,25 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 反序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="xd"></param>
-        /// <returns></returns>
-        public static List<T> xmlToT<T>(XmlDocument xd) where T : new()
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="doc">XmlDocument对象</param>
+        /// <returns>返回泛型数组</returns>
+        public static List<T> xmlToT<T>(XmlDocument doc) where T : new()
         {
             string tableName = new T().GetType().Name;
             string xpath = "/xml/" + tableName + "[1]";
-            return xmlToT<T>(xd, xpath, tableName);
+            return xmlToT<T>(doc, xpath, tableName);
         }
 
         /// <summary>
         /// 过滤非打印字符
         /// </summary>
-        /// <param name="tmp"></param>
-        /// <returns></returns>
-        public static string replaceASCII(string tmp)
+        /// <param name="str">需过滤的字符串</param>
+        /// <returns>过滤后的字符串</returns>
+        public static string replaceASCII(string str)
         {
             StringBuilder info = new StringBuilder();
-            foreach (char cc in tmp)
+            foreach (char cc in str)
             {
                 int ss = (int)cc;
                 if (((ss >= 0) && (ss <= 8)) || ((ss >= 11) && (ss <= 12)) || ((ss >= 14) && (ss <= 32)))
@@ -326,8 +324,6 @@ namespace UnCommon.XMMP
             }
             return info.ToString();
         }
-
-
 
     }
 }

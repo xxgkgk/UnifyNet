@@ -10,7 +10,7 @@ using UnQuote.Images;
 namespace UnWeiXin
 {
     /// <summary>
-    /// 微信支付类
+    /// 微信支付基础类
     /// </summary>
     public class UnWeMch
     {
@@ -41,10 +41,10 @@ namespace UnWeiXin
         /// <summary>
         /// 实例化
         /// </summary>
-        /// <param name="appid">appid</param>
-        /// <param name="mchid">mchid</param>
-        /// <param name="key">key</param>
-        public UnWeMch(string appid,string mchid,string key)
+        /// <param name="appid">开发者APPID</param>
+        /// <param name="mchid">合作商家ID</param>
+        /// <param name="key">密钥</param>
+        public UnWeMch(string appid, string mchid, string key)
         {
             _appid = appid;
             _mch_id = mchid;
@@ -54,8 +54,8 @@ namespace UnWeiXin
         /// <summary>
         /// 添加基础属性(appid,mch_id,nonce_str)
         /// </summary>
-        /// <param name="od"></param>
-        /// <returns></returns>
+        /// <param name="od">下单参数对象</param>
+        /// <returns>返回下单参数</returns>
         private UnAttrOrder addBase(UnAttrOrder od)
         {
             od.appid = _appid;
@@ -72,7 +72,7 @@ namespace UnWeiXin
         /// </summary>
         /// <typeparam name="T">泛型</typeparam>
         /// <param name="t">泛型对象</param>
-        /// <returns></returns>
+        /// <returns>返回签名</returns>
         public string sign<T>(T t) where T : new()
         {
             Dictionary<string, string> sdic = UnSign.filterPara(t, "sign");

@@ -1,13 +1,9 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
+using System.Reflection;
 using System.Text;
 using UnCommon.Extend;
-using System.Reflection;
-using UnCommon.XMMP;
-using Newtonsoft.Json.Linq;
-using Newtonsoft.Json;
-using System.Collections;
 
 namespace UnCommon.Tool
 {
@@ -44,7 +40,7 @@ namespace UnCommon.Tool
         /// <summary>
         /// 标记
         /// </summary>
-        private string _tag = "$";
+        const string _tag = "$";
 
         /// <summary>
         /// 实例化
@@ -110,8 +106,8 @@ namespace UnCommon.Tool
         /// <summary>
         /// 字符串添加签名
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
+        /// <param name="str">待签名字符串</param>
+        /// <returns>返回签名后的字符串</returns>
         public string addSign(string str)
         {
             return sign(str) + _tag + str;
@@ -120,9 +116,9 @@ namespace UnCommon.Tool
         /// <summary>
         /// 移除签名
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public string removeSign(string str)
+        /// <param name="str">源字符串</param>
+        /// <returns>返回去掉签名的字符串</returns>
+        public static string removeSign(string str)
         {
             int i = str.IndexOf(_tag);
             string str1 = str.Substring(i + 1);
@@ -132,9 +128,9 @@ namespace UnCommon.Tool
         /// <summary>
         /// 取出签名
         /// </summary>
-        /// <param name="str"></param>
-        /// <returns></returns>
-        public string getSign(string str)
+        /// <param name="str">已签名字符串</param>
+        /// <returns>返回签名串</returns>
+        public static string getSign(string str)
         {
             int i = str.IndexOf(_tag);
             if (i < 0)
@@ -149,7 +145,7 @@ namespace UnCommon.Tool
         /// 验证签名
         /// </summary>
         /// <param name="signStr">已经签名的字符串</param>
-        /// <returns></returns>
+        /// <returns>返回验证结果</returns>
         public bool validSign(string signStr)
         {
             // 源串

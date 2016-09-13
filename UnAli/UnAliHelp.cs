@@ -1,26 +1,23 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.IO;
-using System.Net;
+using System.Collections.Specialized;
 using System.Security.Cryptography;
 using System.Text;
 using System.Web;
-using System.Collections.Specialized;
-using UnCommon;
-using UnCommon.Files;
 
 namespace UnAli
 {
+    /// <summary>
+    /// 支付帮助类
+    /// </summary>
     public class UnAliHelp
     {
 
         /// <summary>
         /// [即时到账]提交请求接口
         /// </summary>
-        /// <param name="out_trade_no">订单号</param>
-        /// <param name="subject">商品名称</param>
-        /// <param name="total_fee">交易金额</param>
-        /// <param name="extra_common_param">公共回传参数</param>
+        /// <param name="ap"></param>
+        /// <returns></returns>
         public static string getPayUrl(UnAliAttr ap)
         {
             //把请求参数打包成数组
@@ -77,9 +74,9 @@ namespace UnAli
         }
 
         /// <summary>
-        /// 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串
+        /// 把数组所有元素，按照“参数=参数值”的模式用“”字符拼接成字符串
         /// </summary>
-        /// <param name="sArray">需要拼接的数组</param>
+        /// <param name="dicArray">需要拼接的数组</param>
         /// <returns>拼接完成以后的字符串</returns>
         public static string createLinkString(Dictionary<string, string> dicArray)
         {
@@ -97,9 +94,9 @@ namespace UnAli
         }
 
         /// <summary>
-        /// 把数组所有元素，按照“参数=参数值”的模式用“&”字符拼接成字符串，并对参数值做urlencode
+        /// 把数组所有元素，按照“参数=参数值”的模式用“”字符拼接成字符串，并对参数值做urlencode
         /// </summary>
-        /// <param name="sArray">需要拼接的数组</param>
+        /// <param name="dicArray">需要拼接的数组</param>
         /// <param name="code">字符编码</param>
         /// <returns>拼接完成以后的字符串</returns>
         public static string createLinkStringUrlencode(Dictionary<string, string> dicArray, Encoding code)

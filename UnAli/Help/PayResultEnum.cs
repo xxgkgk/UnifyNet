@@ -1,16 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-//using System.Linq;
-using System.Web;
+﻿
 
 namespace Com.Alipay
 {
-    public  class ResultCode
+    /// <summary>
+    /// 结果类
+    /// </summary>
+    public class ResultCode
     {
-         public const string SUCCESS = "10000";
-         public const string INRROCESS = "10003";
-         public const string FAIL = "40004";
+        /// <summary>
+        /// 成功
+        /// </summary>
+        public const string SUCCESS = "10000";
+        /// <summary>
+        /// 处理中
+        /// </summary>
+        public const string INRROCESS = "10003";
+        /// <summary>
+        /// 失败
+        /// </summary>
+        public const string FAIL = "40004";
     }
-        
-    
+
 }

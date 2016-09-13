@@ -1067,7 +1067,7 @@ end;";
             }
             if (orderBy != null && orderBy.Length > 0)
             {
-                if (orderBy.ToLower().IndexOf("order") < 0)
+                if (orderBy.TrimStart().ToLower().IndexOf("order by") < 0)
                 {
                     orderBy = "Order By " + orderBy;
                 }

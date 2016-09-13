@@ -6,7 +6,7 @@ using System.Runtime.InteropServices;
 // 特性集控制。更改这些特性值可修改
 // 与程序集关联的信息。
 [assembly: AssemblyTitle("UnAli")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyDescription("支付宝业务层")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("UnAli")]

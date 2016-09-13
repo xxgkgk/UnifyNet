@@ -1,12 +1,11 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
-
-using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using UnCommon.Tool;
 
 namespace UnCommon.XMMP
@@ -22,7 +21,7 @@ namespace UnCommon.XMMP
         /// </summary>
         /// <param name="type">类型</param>
         /// <param name="json">json串</param>
-        /// <returns></returns>
+        /// <returns>返回对象</returns>
         public static object jsonToT(Type type, string json)
         {
             try
@@ -44,7 +43,7 @@ namespace UnCommon.XMMP
         /// </summary>
         /// <param name="type">类型</param>
         /// <param name="obj">序列化对象</param>
-        /// <returns></returns>
+        /// <returns>返回JSON字符串</returns>
         public static string tToJson(Type type, object obj)
         {
             StringWriter sw = new StringWriter();
@@ -66,11 +65,11 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="rootName"></param>
-        /// <param name="listT"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="rootName">根名</param>
+        /// <param name="listT">序列化泛型数组</param>
+        /// <param name="fields">序列化字段数组</param>
+        /// <returns>返回StringBuilder</returns>
         private static StringBuilder tToJson<T>(string rootName, List<T> listT, string[] fields) where T : new()
         {
             StringBuilder sb = new StringBuilder();
@@ -113,11 +112,11 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="rootName"></param>
-        /// <param name="listT"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="rootName">根名</param>
+        /// <param name="listT">序列化泛型数组</param>
+        /// <param name="fields">序列化字段,用","分隔</param>
+        /// <returns>返回StringBuilder</returns>
         public static StringBuilder tToJson<T>(string rootName, List<T> listT, string fields) where T : new()
         {
             string[] fs = null;
@@ -131,11 +130,11 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 序列化
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="rootName"></param>
-        /// <param name="t"></param>
-        /// <param name="fields"></param>
-        /// <returns></returns>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="rootName">根名</param>
+        /// <param name="t">序列化对象</param>
+        /// <param name="fields">序列化字段,用","分隔</param>
+        /// <returns>返回StringBuilder</returns>
         public static StringBuilder tToJson<T>(string rootName, T t, string fields) where T : new()
         {
             List<T> listT = new List<T>();
@@ -146,9 +145,9 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 反序列化
         /// </summary>
-        /// <param name="strJson"></param>
-        /// <param name="rootName"></param>
-        /// <returns></returns>
+        /// <param name="strJson">JSON字符串</param>
+        /// <param name="rootName">根名</param>
+        /// <returns>返回DataTable</returns>
         public static DataTable jsonToDT(string strJson, string rootName)
         {
             //加上头文件
@@ -221,9 +220,9 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 反序列化
         /// </summary>
-        /// <param name="strJson"></param>
-        /// <param name="rootName"></param>
-        /// <returns></returns>
+        /// <param name="strJson">JSON字符串</param>
+        /// <param name="rootName">根名</param>
+        /// <returns>返回字典数组</returns>
         public static List<Dictionary<string, object>> jsonToDic(string strJson, string rootName)
         {
             //加上头文件
@@ -285,9 +284,9 @@ namespace UnCommon.XMMP
         /// <summary>
         /// 反序列化
         /// </summary>
-        /// <param name="strJson"></param>
-        /// <param name="rootName"></param>
-        /// <returns></returns>
+        /// <param name="strJson">JSON字符串</param>
+        /// <param name="rootName">根名</param>
+        /// <returns>返回字典</returns>
         public static Dictionary<string, object> jsonToDicSingle(string strJson, string rootName)
         {
             List<Dictionary<string, object>> list = jsonToDic(strJson, rootName);
@@ -303,7 +302,7 @@ namespace UnCommon.XMMP
         /// </summary>
         /// <param name="jobj">原始JSON JToken.Parse(string json);</param>
         /// <param name="obj">初始值Null</param>
-        /// <returns></returns>
+        /// <returns>返回JToken</returns>
         public static JToken sortJson(JToken jobj, JToken obj)
         {
             if (obj == null)
@@ -437,8 +436,8 @@ namespace UnCommon.XMMP
         /// <summary>
         /// JSON排序
         /// </summary>
-        /// <param name="jobj"></param>
-        /// <returns></returns>
+        /// <param name="jobj">JToken对象</param>
+        /// <returns>返回JToken</returns>
         public static JToken sortJson(JToken jobj)
         {
             List<JToken> list = jobj.ToList<JToken>();

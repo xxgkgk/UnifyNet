@@ -1,15 +1,15 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Drawing2D;
 using System.IO;
 using ThoughtWorks.QRCode.Codec;
-using UnCommon.Files;
 using UnCommon.Config;
-using System.Drawing.Drawing2D;
+using UnCommon.Files;
 
 namespace UnQuote.Images
 {
     /// <summary>
-    /// 图片类
+    /// 图片处理类
     /// </summary>
     public class UnImage
     {
@@ -19,7 +19,8 @@ namespace UnQuote.Images
         /// </summary>
         /// <param name="strCode">二维码内容</param>
         /// <param name="version">等级</param>
-        /// <param name="errorCorrect">容错等级</param>
+        /// <param name="etr">容错等级</param>
+        /// <param name="scale">缩放比例</param>
         /// <returns></returns>
         public static Bitmap createQrcCode(string strCode, int version, UnImageQRCEtr etr, int scale)
         {
@@ -49,10 +50,9 @@ namespace UnQuote.Images
         /// </summary>
         /// <param name="strCode">二维码内容</param>
         /// <param name="version">等级(默认0)</param>
-        /// <param name="errorCorrec">容错率</param>
-        /// <param name="width">宽</param>
-        /// <param name="height">高</param>
-        /// <returns></returns>
+        /// <param name="etr">容错率</param>
+        /// <param name="scale">缩放比例</param>
+        /// <returns>返回UnFileInfo</returns>
         public static UnFileInfo createQrcPath(string strCode, int version, UnImageQRCEtr etr, int scale)
         {
             FileInfo f = UnFile.createFile(UnFileEvent.tmp, ".png", true);
@@ -68,8 +68,8 @@ namespace UnQuote.Images
         /// </summary>
         /// <param name="strCode">二维码内容</param>
         /// <param name="version">等级(默认0)</param>
-        /// <param name="errorCorrec">容错率</param>
-        /// <returns></returns>
+        /// <param name="etr">容错率</param>
+        /// <returns>返回UnFileInfo</returns>
         public static UnFileInfo createQrcPath(string strCode, int version, UnImageQRCEtr etr)
         {
             return createQrcPath(strCode, version, etr, 4);

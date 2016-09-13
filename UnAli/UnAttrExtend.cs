@@ -1,21 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
-namespace UnAli
+﻿namespace UnAli
 {
+    /// <summary>
+    /// 扩展类
+    /// </summary>
     public class UnAttrExtend
     {
-        // id
+        /// <summary>
+        /// id
+        /// </summary>
         public string id { get; set; }
-        // 编号
+        /// <summary>
+        /// 编号 
+        /// </summary>
         public string num { get; set; }
-        // guid
+        /// <summary>
+        /// guid
+        /// </summary>
         public string guid { get; set; }
-        // 时间
+        /// <summary>
+        /// 时间
+        /// </summary>
         public string time { get; set; }
-        // 内容
+        /// <summary>
+        /// 内容
+        /// </summary>
         public string content { get; set; }
     }
 }

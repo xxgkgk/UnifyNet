@@ -25,7 +25,10 @@ namespace Com.Alipay
     {
         #region 字段
         private string _partner = "";               //合作身份者ID
-        private string _key = "";                   //商户的私钥
+        /// <summary>
+        /// 商户的私钥
+        /// </summary>
+        //private string _key = "";                  
         private string _charset = "";         //编码格式
         private string _sign_type = "";             //签名方式
 
@@ -38,8 +41,6 @@ namespace Com.Alipay
         /// 构造函数
         /// 从配置文件中初始化变量
         /// </summary>
-        /// <param name="inputPara">通知返回参数数组</param>
-        /// <param name="notify_id">通知验证ID</param>
         public Notify()
         {
             //初始化基础配置信息
@@ -49,6 +50,13 @@ namespace Com.Alipay
             Https_veryfy_url = Config.mapiUrl + "?service=notify_verify&";
         }
 
+        /// <summary>
+        /// 结果通知
+        /// </summary>
+        /// <param name="charset">字符串</param>
+        /// <param name="sign_type">签名类型</param>
+        /// <param name="partner">合作商家</param>
+        /// <param name="mapiUrl">网关</param>
         public Notify(string charset, string sign_type,string partner,string mapiUrl)
         {
             //初始化基础配置信息

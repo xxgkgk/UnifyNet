@@ -11,6 +11,7 @@ namespace UnDataBase
     /// <summary>
     /// SQL操作对象帮助类
     /// </summary>
+    [Obsolete]
     public class UnSqlHelp
     {
         /// <summary>

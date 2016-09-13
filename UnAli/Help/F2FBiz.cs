@@ -17,9 +17,16 @@ namespace Com.Alipay
     {
         private F2FBiz() { }
 
+        /// <summary>
+        /// 链接对象
+        /// </summary>
         public static readonly IAopClient client = new DefaultAopClient(Config.serverUrl, Config.appId, Config.merchant_private_key, "", Config.version,
         Config.sign_type, Config.alipay_public_key, Config.charset);
 
+        /// <summary>
+        /// 获取链接对象
+        /// </summary>
+        /// <returns></returns>
         public static IAopClient GetAopClient()
         {
             return client;

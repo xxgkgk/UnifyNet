@@ -17,7 +17,7 @@ using System.IO;
 namespace UnCommon.UDP
 {
     /// <summary>
-    /// UDP客户端
+    /// UDP客户端类
     /// </summary>
     public class UnUdpClient
     {
@@ -88,8 +88,8 @@ namespace UnCommon.UDP
         /// <summary>
         /// 实例化
         /// </summary>
-        /// <param name="host"></param>
-        /// <param name="port"></param>
+        /// <param name="host">远程主机IP地址</param>
+        /// <param name="port">远程主机端口</param>
         public UnUdpClient(string host, int port)
         {
             this.udpPort = port;
@@ -135,7 +135,7 @@ namespace UnCommon.UDP
         /// <summary>
         /// 设置超时时间
         /// </summary>
-        /// <param name="time"></param>
+        /// <param name="time">超时时间(秒)</param>
         public void setTimeOut(int time)
         {
             if (time < resendTime)
@@ -284,9 +284,9 @@ namespace UnCommon.UDP
 
 
         /// <summary>
-        /// UpFile
+        /// 上传文件
         /// </summary>
-        /// <param name="filePath"></param>
+        /// <param name="filePath">文件路径</param>
         public void upFile(string filePath)
         {
             if (_isFinish)

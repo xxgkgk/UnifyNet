@@ -1,13 +1,13 @@
 ﻿using System;
-using System.Text;
-using System.Web.UI;
 using System.ComponentModel;
+using System.Web.UI;
 using System.Web.UI.WebControls;
-using System.Data;
-
 
 namespace UnQuote.CustomView
 {
+    /// <summary>
+    /// 翻页控件
+    /// </summary>
     public class UnCvPageFoot : WebControl, INamingContainer
     {
         #region 私用方法
@@ -22,7 +22,10 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 载入资源
-        //OnPreReader事件是在页面已经执行完所有后台代码，并且在生成标准HTML代码前，将要呈现给Page类的时候，此事件发生
+        /// <summary>
+        /// OnPreReader事件是在页面已经执行完所有后台代码，并且在生成标准HTML代码前，将要呈现给Page类的时候，此事件发生
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnPreRender(EventArgs e)
         {
             if (this.Page != null && Page.FindControl("CtmPageFoot_nHGC1") == null)
@@ -57,7 +60,10 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 重绘头部
-        //重绘会头部内容
+        /// <summary>
+        /// 重绘会头部内容
+        /// </summary>
+        /// <param name="writer"></param>
         public override void RenderBeginTag(HtmlTextWriter writer)
         {
             writer.AddAttribute(HtmlTextWriterAttribute.Id, "CtmPageFoot");
@@ -67,7 +73,10 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 重绘内容
-        //重绘主体内容
+        /// <summary>
+        /// 重绘主体内容
+        /// </summary>
+        /// <param name="writer"></param>
         protected override void RenderContents(HtmlTextWriter writer)
         {
             string type = "";
@@ -90,7 +99,10 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 重绘底部
-        //重绘底部内容
+        /// <summary>
+        /// 重绘底部内容
+        /// </summary>
+        /// <param name="writer"></param>
         public override void RenderEndTag(HtmlTextWriter writer)
         {
             writer.RenderEndTag();
@@ -99,8 +111,14 @@ namespace UnQuote.CustomView
         #endregion
 
         #region 属性
-        //总记录数
+        /// <summary>
+        /// 总记录数
+        /// </summary>
         private int _Ctm_TotalCount = 0;
+
+        /// <summary>
+        /// 总记录数
+        /// </summary>
         [Description("总记录数")] 
         [Browsable(true)]
         public virtual int Ctm_TotalCount
@@ -109,8 +127,14 @@ namespace UnQuote.CustomView
             set { _Ctm_TotalCount = value; }
         }
 
-        //页面尺码
+        /// <summary>
+        /// 页面尺码
+        /// </summary>
         private int _Ctm_PageSize = 1;
+
+        /// <summary>
+        /// 页面尺码
+        /// </summary>
         [Description("页面尺码")]
         [Browsable(true)]
         public virtual int Ctm_PageSize
@@ -119,8 +143,14 @@ namespace UnQuote.CustomView
             set { _Ctm_PageSize = value; }
         }
 
-        //当前页码
+        /// <summary>
+        /// 当前页码
+        /// </summary>
         private int _Ctm_CurrentPage = 0;
+
+        /// <summary>
+        /// 当前页码
+        /// </summary>
         [Description("当前页码")]
         [Browsable(true)]
         public virtual int Ctm_CurrentPage
@@ -134,12 +164,24 @@ namespace UnQuote.CustomView
         /// </summary>
         public enum PageFootMode
         {
+           /// <summary>
+           /// FROM提交
+           /// </summary>
            Submit,
+           /// <summary>
+           /// 超链接
+           /// </summary>
            Link
         }
 
-        //模式
+        /// <summary>
+        /// 模式
+        /// </summary>
         private PageFootMode _Ctm_PageFootMode = PageFootMode.Submit;
+
+        /// <summary>
+        /// 模式
+        /// </summary>
         [Description("翻页模式")]
         [Browsable(true)]
         public virtual PageFootMode Ctm_PageFootMode

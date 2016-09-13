@@ -3,15 +3,13 @@ using System.Collections.Generic;
 using System.Data;
 using System.Data.SqlClient;
 using System.Text;
-using UnCommon.Tool;
-using UnCommon.Config;
-using ServiceStack.Redis;
-using UnCommon.Extend;
-using UnCommon.XMMP;
 using System.Text.RegularExpressions;
-using System.IO;
+using UnCommon.Config;
+using UnCommon.Extend;
 using UnCommon.Files;
 using UnCommon.Redis;
+using UnCommon.Tool;
+using UnCommon.XMMP;
 
 namespace UnDataBase
 {
@@ -194,8 +192,8 @@ namespace UnDataBase
         /// <summary>
         /// 实例化
         /// </summary>
-        /// <param name="constr"></param>
-        /// <param name="trans"></param>
+        /// <param name="constr">链接字符串</param>
+        /// <param name="trans">是否开启事务</param>
         public UnSql(string constr, bool trans)
         {
             help = new UnSqlHelpU(constr, trans);
@@ -878,7 +876,7 @@ namespace UnDataBase
         /// -1 = 清除缓存
         /// </param>
         /// <returns>返回查询泛型数组,没有数据返回0条,cacheExpire = -1时返回NULL</returns>
-        private List<T> query<T>(string strSql, SqlParameter[] parms, int? cacheExpire) where T : new()
+        public List<T> query<T>(string strSql, SqlParameter[] parms, int? cacheExpire) where T : new()
         {
             // 缓存key
             string cacheKey = null;
@@ -950,7 +948,7 @@ namespace UnDataBase
         /// <param name="isLinkedServer">是否链接服务器</param>
         /// <param name="cacheExpire">缓存时间(秒)</param>
         /// <returns>返回查询泛型数组,没有数据返回0条</returns>
-        private List<T> query<T>(string columns, string selection, string[] selectionArgs, string groupBy, string having, string orderBy, bool isLinkedServer, int? cacheExpire) where T : new()
+        public List<T> query<T>(string columns, string selection, string[] selectionArgs, string groupBy, string having, string orderBy, bool isLinkedServer, int? cacheExpire) where T : new()
         {
             string[] cs = null;
             if (columns != null)
@@ -1044,13 +1042,13 @@ namespace UnDataBase
         }
 
         /// <summary>
-        /// 
+        /// 一般查询语句
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="orderBy"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
         /// <param name="isLinkedServer">是否链接服务器</param>
         /// <param name="cacheExpire">缓存时间(秒)</param>
         /// <returns>返回泛型对象,无数据则为NULL</returns>

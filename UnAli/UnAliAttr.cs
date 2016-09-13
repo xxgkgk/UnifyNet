@@ -1,16 +1,29 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-
+﻿/// <summary>
+/// 支付宝业务层
+/// </summary>
 namespace UnAli
 {
+    /// <summary>
+    /// 支付参数类
+    /// </summary>
     public class UnAliAttr
     {
+        /// <summary>
+        /// 实例化
+        /// </summary>
         public UnAliAttr()
         {
 
         }
+
+        /// <summary>
+        /// 支付参数
+        /// </summary>
+        /// <param name="PayType">
+        /// 支付类型
+        /// 1=网页支付
+        /// 2=app支付
+        /// </param>
         public UnAliAttr(int PayType)
         {
             partner = "2088411486262468";
@@ -41,51 +54,95 @@ namespace UnAli
             }
         }
 
-        // 商家合作ID
+        /// <summary>
+        /// 商家合作ID
+        /// </summary>
         public string partner { get; set; }
-        // 卖家ID
+        /// <summary>
+        /// 卖家ID
+        /// </summary>
         public string seller_id { get; set; }
-        // 卖家邮箱
+        /// <summary>
+        /// 卖家邮箱
+        /// </summary>
         public string seller_email { get; set; }
-        // 第三方支付单号
+        /// <summary>
+        /// 第三方支付单号
+        /// </summary>
         public string out_trade_no { get; set; }
-        // 商品主题
+        /// <summary>
+        /// 商品主题
+        /// </summary>
         public string subject { get; set; }
-        // 商家内容
+        /// <summary>
+        /// 商家内容
+        /// </summary>
         public string body { get; set; }
-        // 商品总价
+        /// <summary>
+        /// 商品总价
+        /// </summary>
         public string total_fee { get; set; }
-        // 接口名称
+        /// <summary>
+        /// 接口名称
+        /// </summary>
         public string service { get; set; }
-        // 默认值为：1（商品购买）
+        /// <summary>
+        /// 默认值为：1（商品购买）
+        /// </summary>
         public string payment_type { get; set; }
-        // 参数编码字符串
+        /// <summary>
+        /// 参数编码字符串
+        /// </summary>
         public string _input_charset { get; set; }
-        // 编码方式
+        /// <summary>
+        /// 编码方式
+        /// </summary>
         public string sign_type { get; set; }
-        // 支付有效时间(30m---)
+        /// <summary>
+        /// 支付有效时间(30m---)
+        /// </summary>
         public string it_b_pay { get; set; }
-        // 商品展示地址
+        /// <summary>
+        /// 商品展示地址
+        /// </summary>
         public string show_url { get; set; }
-        // 支付宝消息验证地址
+        /// <summary>
+        /// 支付宝消息验证地址
+        /// </summary>
         public string Https_veryfy_url { get; set; }
-        // 支付宝网关地址（新）
+        /// <summary>
+        /// 支付宝网关地址（新）
+        /// </summary>
         public string gateway_new { get; set; }
-        // 支付宝服务器主动通知地址
+        /// <summary>
+        /// 支付宝服务器主动通知地址
+        /// </summary>
         public string notify_url { get; set; }
-        // 支付宝处理完请求后跳转地址
+        /// <summary>
+        /// 支付宝处理完请求后跳转地址
+        /// </summary>
         public string return_url { get; set; }
-        // 默认加密
+        /// <summary>
+        /// 默认加密
+        /// </summary>
         public string key { get; set; }
-        // rsa私钥
+        /// <summary>
+        /// rsa私钥
+        /// </summary>
         public string rsa_private { get; set; }
-        // rsa公钥
+        /// <summary>
+        /// rsa公钥
+        /// </summary>
         public string rsa_public { get; set; }
-        // 公共回传参数
+        /// <summary>
+        /// 公共回传参数
+        /// </summary>
         public string extra_common_param { get; set; }
 
 
-        // 支付链接
+        /// <summary>
+        /// 支付链接
+        /// </summary>
         public string pay_url { get; set; }
     }
 }

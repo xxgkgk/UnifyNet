@@ -1,27 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnCommon;
-using System.Data;
-using Aop.Api.Util;
-using Aop.Api;
-using Aop.Api.Response;
+﻿using Aop.Api;
 using Aop.Api.Request;
-using UnQuote;
 using UnCommon.XMMP;
 using UnQuote.Images;
 
 namespace UnAli
 {
+    /// <summary>
+    /// 支付基础类
+    /// </summary>
     public class UnAliMch
     {
-        // 配置参数
+        /// <summary>
+        /// 配置参数
+        /// </summary>
         private UnAttrPub _config;
-        // 客户端对象
+        /// <summary>
+        /// 客户端对象
+        /// </summary>
         private IAopClient _client;
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="appid">开发者APPID</param>
+        /// <param name="merchant_private_key">商家私钥</param>
+        /// <param name="alipay_public_key">支付宝公钥</param>
         public UnAliMch(string appid, string merchant_private_key, string alipay_public_key)
         {
             UnAttrPub config = new UnAttrPub();
@@ -34,7 +37,13 @@ namespace UnAli
             init(config);
         }
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="appid">开发者APPID</param>
+        /// <param name="merchant_private_key">商家私钥</param>
+        /// <param name="alipay_public_key">支付宝公钥</param>
+        /// <param name="notify_url">结果通知地址</param>
         public UnAliMch(string appid, string merchant_private_key, string alipay_public_key, string notify_url)
         {
             UnAttrPub config = new UnAttrPub();
@@ -48,13 +57,19 @@ namespace UnAli
             init(config);
         }
 
-        // 实例化
+        /// <summary>
+        /// 实例化
+        /// </summary>
+        /// <param name="config"></param>
         public UnAliMch(UnAttrPub config)
         {
             init(config);
         }
 
-        // 初始化
+        /// <summary>
+        /// 初始化
+        /// </summary>
+        /// <param name="config"></param>
         public void init(UnAttrPub config)
         {
             _config = config;
@@ -62,7 +77,12 @@ namespace UnAli
             
         }
 
-        // 下单
+        /// <summary>
+        /// 下单
+        /// </summary>
+        /// <param name="ct">订单对象</param>
+        /// <param name="eve">事件</param>
+        /// <returns>返回结果</returns>
         public AopResponse order(UnAttrContent ct, UnAliMchEvent eve)
         {
             string biz_content = UnXMMPJson.tToJson(typeof(UnAttrContent), ct);
@@ -99,13 +119,21 @@ namespace UnAli
             return response;
         }
 
-        // 生成并返回二维码图片路径
+        /// <summary>
+        /// 生成并返回二维码图片路径
+        /// </summary>
+        /// <param name="code_url"></param>
+        /// <returns></returns>
         public string getQRCPath(string code_url)
         {
             return UnImage.createQrcPath(code_url, 0, UnImageQRCEtr.Q).fullName;
         }
 
-        // 错误事件
+        /// <summary>
+        /// 错误事件
+        /// </summary>
+        /// <param name="code"></param>
+        /// <returns></returns>
         public UnAttrErrorEvent errorEventFromCode(string code)
         {
              switch (code)

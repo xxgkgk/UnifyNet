@@ -1,16 +1,12 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Web;
-using System.Security.Cryptography;
-using System.IO;
+﻿using System.Net;
 using System.Net.Mail;
-using System.Net;
-using UnCommon;
+using System.Text;
 
 namespace UnQuote.Send
 {
+    /// <summary>
+    /// 发送短信/邮件帮助类
+    /// </summary>
     public class UnSendMail
     {
         // eamil主机
@@ -20,7 +16,12 @@ namespace UnQuote.Send
         // email主机密码
         private string _emPass = "server-0000";
 
-        // 实例化(发邮件)
+        /// <summary>
+        /// 实例化(发邮件)
+        /// </summary>
+        /// <param name="emHost"></param>
+        /// <param name="emUser"></param>
+        /// <param name="emPass"></param>
         public UnSendMail(string emHost, string emUser, string emPass)
         {
             _emHost = emHost;

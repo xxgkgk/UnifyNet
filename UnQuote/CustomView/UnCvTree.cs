@@ -1,15 +1,16 @@
 ﻿using System;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Web.UI;
-using System.ComponentModel;
-using System.Web.UI.WebControls;
-using System.Data;
 using System.Collections;
+using System.ComponentModel;
+using System.Data;
 using System.Reflection;
+using System.Web.UI;
+using System.Web.UI.WebControls;
 
 namespace UnQuote.CustomView
 {
+    /// <summary>
+    /// 树型控件
+    /// </summary>
     public class UnCvTree : WebControl, INamingContainer, IPostBackEventHandler
     {
         /// <summary>
@@ -42,7 +43,9 @@ namespace UnQuote.CustomView
             }
             return result;
         }
-        //重绘默认外层标签
+        /// <summary>
+        /// 重绘默认外层标签
+        /// </summary>
         protected override HtmlTextWriterTag TagKey
         {
             get
@@ -50,13 +53,19 @@ namespace UnQuote.CustomView
                 return HtmlTextWriterTag.Span;
             }
         }
-        //重写TagKey我们也有必要重写此方法，设定对应样式属性
+        /// <summary>
+        /// 重写TagKey我们也有必要重写此方法，设定对应样式属性
+        /// </summary>
+        /// <returns></returns>
         protected override Style CreateControlStyle()
         {
             //return new TableStyle(ViewState);//表格
             return base.CreateControlStyle();//默认样式
         }
-        //OnPreReader事件是在页面已经执行完所有后台代码，并且在生成标准HTML代码前，将要呈现给Page类的时候，此事件发生
+        /// <summary>
+        /// OnPreReader事件是在页面已经执行完所有后台代码，并且在生成标准HTML代码前，将要呈现给Page类的时候，此事件发生
+        /// </summary>
+        /// <param name="e"></param>
         protected override void OnPreRender(EventArgs e)
         {
             if (this.Page != null && Page.FindControl("CtmTreeView_nHGC1") == null)
@@ -94,14 +103,20 @@ namespace UnQuote.CustomView
             }
             base.OnPreRender(e);
         }
-        //重绘会头部内容
+        /// <summary>
+        /// 重绘会头部内容
+        /// </summary>
+        /// <param name="writer"></param>
         public override void RenderBeginTag(HtmlTextWriter writer)
         {
             writer.AddAttribute(HtmlTextWriterAttribute.Id, "CtmTreeView");
             writer.RenderBeginTag(HtmlTextWriterTag.Div);
             base.RenderBeginTag(writer);
         }
-        //重绘主体内容
+        /// <summary>
+        /// 重绘主体内容
+        /// </summary>
+        /// <param name="writer"></param>
         protected override void RenderContents(HtmlTextWriter writer)
         {
             //绘制递增框
@@ -137,13 +152,20 @@ namespace UnQuote.CustomView
             writer.RenderEndTag();
             base.RenderContents(writer);//重绘
         }
-        //重绘底部内容
+        /// <summary>
+        /// 重绘底部内容
+        /// </summary>
+        /// <param name="writer"></param>
         public override void RenderEndTag(HtmlTextWriter writer)
         {
             writer.RenderEndTag();
             base.RenderEndTag(writer);
         }
-        //获取图片地址
+        /// <summary>
+        /// 获取图片地址
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
         private string ImgUrl(string str)
         {
             string Url = "";
@@ -259,8 +281,14 @@ namespace UnQuote.CustomView
             }
         }
 
-        //编号文字显示
+        /// <summary>
+        /// 编号文字显示
+        /// </summary>
         private string _DtfIDStr = "编号";
+
+        /// <summary>
+        /// 编号文字显示
+        /// </summary>
         [Description("编号文字显示")]
         [Browsable(true)]
         public virtual string DtfIDStr
@@ -269,8 +297,14 @@ namespace UnQuote.CustomView
             set { _DtfIDStr = value; }
         }
 
-        //表"ID"字段名
+        /// <summary>
+        /// 表"ID"字段名
+        /// </summary>
         private string _DtfID = "";
+
+        /// <summary>
+        /// 表"ID"字段名
+        /// </summary>
         [Description("'编号'字段名")]
         [Browsable(true)]
         public virtual string DtfID
@@ -279,8 +313,14 @@ namespace UnQuote.CustomView
             set { _DtfID = value; }
         }
 
-        //主名称文字显示
+        /// <summary>
+        /// 主名称文字显示
+        /// </summary>
         private string _DtfNameStr = "名称";
+
+        /// <summary>
+        /// 主名称文字显示
+        /// </summary>
         [Description("主名称文字显示")]
         [Browsable(true)]
         public virtual string DtfNameStr
@@ -289,8 +329,14 @@ namespace UnQuote.CustomView
             set { _DtfNameStr = value; }
         }
 
-        //表"主名称"字段名
+        /// <summary>
+        /// 表"主名称"字段名
+        /// </summary>
         private string _DtfName = "";
+
+        /// <summary>
+        /// 表"主名称"字段名
+        /// </summary>
         [Description("'主名称'字段名")]
         [Browsable(true)]
         public virtual string DtfName
@@ -299,8 +345,14 @@ namespace UnQuote.CustomView
             set { _DtfName = value; }
         }
 
-        //副名称文字显示
+        /// <summary>
+        /// 副名称文字显示
+        /// </summary>
         private string _DtfNamezStr = "副名称";
+
+        /// <summary>
+        /// 副名称文字显示
+        /// </summary>
         [Description("副名称文字显示")]
         [Browsable(true)]
         public virtual string DtfNamezStr
@@ -309,8 +361,14 @@ namespace UnQuote.CustomView
             set { _DtfNamezStr = value; }
         }
 
-        //表"副名称"字段名
+        /// <summary>
+        /// 表"副名称"字段名
+        /// </summary>
         private string _DtfNamez = "";
+
+        /// <summary>
+        /// 表"副名称"字段名
+        /// </summary>
         [Description("'副名称'字段名")]
         [Browsable(true)]
         public virtual string DtfNamez
@@ -319,8 +377,14 @@ namespace UnQuote.CustomView
             set { _DtfNamez = value; }
         }
 
-        //编码文字显示
+        /// <summary>
+        /// 编码文字显示
+        /// </summary>
         private string _DtfCodeStr = "编码";
+
+        /// <summary>
+        /// 编码文字显示
+        /// </summary>
         [Description("编码文字显示")]
         [Browsable(true)]
         public virtual string DtfCodeStr
@@ -329,18 +393,30 @@ namespace UnQuote.CustomView
             set { _DtfCodeStr = value; }
         }
 
-        //表"编码"字段名
+        /// <summary>
+        /// 表"编码"字段名
+        /// </summary>
+        private string _DtfCode = "";
+
+        /// <summary>
+        /// 表"编码"字段名
+        /// </summary>
         [Description("'编码'字段名")]
         [Browsable(true)]
-        private string _DtfCode = "";
         public virtual string DtfCode
         {
             get { return _DtfCode; }
             set { _DtfCode = value; }
         }
 
-        //序号文字显示
+        /// <summary>
+        /// 序号文字显示
+        /// </summary>
         private string _DtfSortStr = "序号";
+
+        /// <summary>
+        /// 序号文字显示
+        /// </summary>
         [Description("序号文字显示")]
         [Browsable(true)]
         public virtual string DtfSortStr
@@ -349,8 +425,14 @@ namespace UnQuote.CustomView
             set { _DtfSortStr = value; }
         }
 
-        //表"排序"字段名
+        /// <summary>
+        /// 表"排序"字段名
+        /// </summary>
         private string _DtfSort = "";
+
+        /// <summary>
+        /// 表"排序"字段名
+        /// </summary>
         [Description("'排序'字段名")]
         [Browsable(true)]
         public virtual string DtfSort
@@ -359,8 +441,14 @@ namespace UnQuote.CustomView
             set { _DtfSort = value; }
         }
 
-        //数据源
+        /// <summary>
+        /// 数据源
+        /// </summary>
         private object _DataSource = new object();
+
+        /// <summary>
+        /// 数据源
+        /// </summary>
         [Description("支持DataTable,IList")]
         [Browsable(true)]
         public virtual object DataSource
@@ -368,7 +456,9 @@ namespace UnQuote.CustomView
             get { return _DataSource; }
             set { _DataSource = value; }
         }
-        //数据表
+        /// <summary>
+        /// 数据表
+        /// </summary>
         public static DataTable _DtfDT = new DataTable();
         /// <summary>
         /// 数据源转为数据表
@@ -386,8 +476,14 @@ namespace UnQuote.CustomView
             }
         }
 
-        //增加Div的name属性
+        /// <summary>
+        /// 增加Div的name属性
+        /// </summary>
         private bool _Unfold = false;
+
+        /// <summary>
+        /// 增加Div的name属性
+        /// </summary>
         [Description("初始是否展开")]
         [Browsable(true)]
         public virtual bool Unfold
@@ -396,10 +492,14 @@ namespace UnQuote.CustomView
             set { _Unfold = value; }
         }
 
-        // 定义一个Click事件委托对象
+        /// <summary>
+        /// 定义一个Click事件委托对象
+        /// </summary>
         private static readonly object EventClick = new object();
 
-        //实现Click事件属性
+        /// <summary>
+        /// 实现Click事件属性
+        /// </summary>
         [Description("Click事件属性"), Category("Action")]
         public event EventHandler Click
         {
@@ -413,7 +513,10 @@ namespace UnQuote.CustomView
             }
         }
 
-        //实现事件方法
+        /// <summary>
+        /// 实现事件方法
+        /// </summary>
+        /// <param name="e">事件基类</param>
         protected virtual void OnClick(EventArgs e)
         {
             EventHandler clickHandler = (EventHandler)Events[EventClick];
@@ -424,7 +527,10 @@ namespace UnQuote.CustomView
             }
         }
 
-        // 实现IPostBackEventHandler接口成员
+        /// <summary>
+        /// 实现IPostBackEventHandler接口成员
+        /// </summary>
+        /// <param name="eventArgument"></param>
         void IPostBackEventHandler.RaisePostBackEvent(string eventArgument)
         {
             OnClick(EventArgs.Empty);

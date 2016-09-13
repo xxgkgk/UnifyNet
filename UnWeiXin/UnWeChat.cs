@@ -1,21 +1,16 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using UnCommon;
-using System.Data;
 using System.Web;
-using System.IO;
 using UnCommon.Entity;
-using UnCommon.XMMP;
-using UnCommon.HTTP;
 using UnCommon.Files;
+using UnCommon.HTTP;
 using UnCommon.Tool;
+using UnCommon.XMMP;
 
 namespace UnWeiXin
 {
     /// <summary>
-    /// 微信公众号辅助类
+    /// 微信公众号基础类
     /// </summary>
     public class UnWeChat
     {

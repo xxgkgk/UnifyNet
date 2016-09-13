@@ -5,5 +5,8 @@
     },
     getMd5Hashs: function (str) {
         return $.md5($.md5(str));
+    },
+    getMd5Hash2: function (str) {
+        return $.md5($.md5(str));
     }
 }
