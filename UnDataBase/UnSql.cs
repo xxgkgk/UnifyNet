@@ -316,6 +316,41 @@ namespace UnDataBase
         }
 
         /// <summary>
+        /// 修改字段名
+        /// </summary>
+        /// <param name="t">类型</param>
+        /// <returns>返回修改的列名数量:null=执行失败,-1=未执行</returns>
+        public int? renameColumn(Type t)
+        {
+            StringBuilder sb = new StringBuilder();
+            var listDB = getDBTableColumns(t);
+            var listFP = UnToGen.getListFieldPropertyInfo(t);
+            string tableName = UnToGen.getTableName(t);
+            int count = 0;
+            foreach (var item in listFP)
+            {
+                string fName = UnToGen.getFieldName(item);
+                string ofName = UnToGen.getOldFieldName(item);
+                // 新老字段不同 且 表有老字段 且 表没有新字段 
+                if (fName != ofName && listDB.Find(e => e == ofName) != null && listDB.Find(e => e == fName) == null)
+                {
+                    sb.AppendLine("Exec sp_rename '" + tableName + ".[" + ofName + "]','" + fName + "','column';");
+                    count++;
+                }
+            }
+            if (sb.Length > 0)
+            {
+                int? ret = help.exSql(sb.ToString());
+                if (ret == -1)
+                {
+                    return count;
+                }
+                return ret;
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// 添加字段
         /// </summary>
         /// <param name="t">类型</param>
@@ -421,14 +456,22 @@ namespace UnDataBase
         /// <returns>是否成功</returns>
         public bool updateTable(Type t)
         {
+            // 重命名字段
+            if (renameColumn(t) == null)
+            {
+                return false;
+            }
+            // 删除字段
             if (dropColumn(t) == null)
             {
                 return false;
             }
+            // 添加字段
             if (addColumn(t) == null)
             {
                 return false;
             }
+            // 修改字段类型
             if (alterColumn(t) == null)
             {
                 return false;

@@ -161,6 +161,21 @@ namespace UnCommon.Tool
         }
 
         /// <summary>
+        /// 获取老字段名
+        /// </summary>
+        /// <param name="item"></param>
+        /// <returns></returns>
+        public static string getOldFieldName(PropertyInfo item)
+        {
+            UnAttrSql attr = getAttrSql(item);
+            if (attr != null && attr.oldFieldName != null)
+            {
+                return attr.oldFieldName;
+            }
+            return item.Name;
+        }
+
+        /// <summary>
         /// 获取不含自增ID的字段组(核心)
         /// </summary>
         /// <typeparam name="T"></typeparam>

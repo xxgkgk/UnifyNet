@@ -23,6 +23,11 @@ namespace UnCommon.Entity
         public string fieldName;
 
         /// <summary>
+        /// 老字段名(会将oldFieldName 重命名为 fieldName)
+        /// </summary>
+        public string oldFieldName;
+
+        /// <summary>
         /// 字段类型
         /// </summary>
         public string fieldType;

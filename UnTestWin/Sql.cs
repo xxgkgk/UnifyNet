@@ -112,6 +112,8 @@ namespace UnTestWin
             listT.Add(typeof(TestCard));
 
             UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1");
+            //int? i = cn.renameColumn(typeof(TestUser));
+            //Console.WriteLine(i);
             cn.updateBase();
             cn.createTableList(listT);
             cn.dropTableRelationList(listT);

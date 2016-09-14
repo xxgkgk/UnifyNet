@@ -9,8 +9,8 @@ namespace UnCommon
     public class TestUser
     {
         // 自增ID
-        [UnAttrSql(fieldType = "bigint IDENTITY(1,1)", fieldNULL = false)]
-        public long? TestUserID { get; set; }
+        [UnAttrSql(fieldType = "bigint IDENTITY(1,1)", fieldNULL = false,oldFieldName = "TestUserID")]
+        public long? TestUserIDD { get; set; }
 
         // 编码
         [UnAttrSql(fieldType = "varchar(32)", fieldNULL = false, fieldDefault = "1234")]
@@ -56,8 +56,8 @@ namespace UnCommon
         [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionNonclustered)]
         public string UnionNonclusteredB { get; set; }
 
-        [UnAttrSql(fieldType = "varchar(65)",fieldDefault = "333")]
-        public string a { get; set; }
+        [UnAttrSql(fieldType = "varchar(65)",fieldDefault = "333", oldFieldName = "a")]
+        public string a1 { get; set; }
 
         //[UnAttrSql(fieldNULL = false, fieldDefault = "0")]
         //public int? b { get; set; }
