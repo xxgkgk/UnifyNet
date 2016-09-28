@@ -9,8 +9,8 @@ namespace UnCommon
     public class TestUser
     {
         // 自增ID
-        [UnAttrSql(fieldType = "bigint IDENTITY(1,1)", fieldNULL = false,oldFieldName = "TestUserID")]
-        public long? TestUserIDD { get; set; }
+        [UnAttrSql(fieldType = "bigint IDENTITY(1,1)", fieldNULL = false,oldFieldName = "TestUserIDD")]
+        public long? TestUserID { get; set; }
 
         // 编码
         [UnAttrSql(fieldType = "varchar(32)", fieldNULL = false, fieldDefault = "1234")]
@@ -56,14 +56,18 @@ namespace UnCommon
         [UnAttrSql(fieldType = "varchar(32)", indexModel = IndexModel.UnionNonclustered)]
         public string UnionNonclusteredB { get; set; }
 
-        [UnAttrSql(fieldType = "varchar(65)",fieldDefault = "333", oldFieldName = "a")]
-        public string a1 { get; set; }
+        [UnAttrSql(fieldType = "varchar(65)",fieldDefault = "333", oldFieldName = "a1")]
+        public string a { get; set; }
 
-        //[UnAttrSql(fieldNULL = false, fieldDefault = "0")]
-        //public int? b { get; set; }
+        [UnAttrSql(fieldDefault = "0")]
+        public int? b { get; set; }
 
 
-       // public Guid? c { get; set; }
+        [UnAttrSql(fieldType = "varchar(20)", fieldDefault = "'李二罗'")]
+        public string c { get; set; }
+
+
+        //public Guid? c { get; set; }
 
         //public float? d { get; set; }
 
@@ -71,7 +75,7 @@ namespace UnCommon
 
         //public decimal? f { get; set; }
 
-       // public Int64? g { get; set; }
+        // public Int64? g { get; set; }
 
         //public Int16? h { get; set; }
 

@@ -99,7 +99,6 @@ namespace UnCommon.Files
             return fi.Exists;
         }
 
-
         /// <summary>
         /// mime字典
         /// </summary>

@@ -13,7 +13,7 @@ namespace UnCommon
         public long? TestCardID { get; set; }
 
         // 编码
-        [UnAttrSql(fieldType = "varchar(32)", fieldNULL = false,fieldDefault = "123")]
+        [UnAttrSql(fieldType = "varchar(32)", fieldNULL = false, fieldDefault = "123")]
         public string TestCardUID { get; set; }
 
         [UnAttrSql(isPrimaryKey = true, fieldNULL = false)]
@@ -49,5 +49,8 @@ namespace UnCommon
         // 余额
         [UnAttrSql(fieldDefault = "0", fieldNULL = false)]
         public decimal? Money { get; set; }
+
+        [UnAttrSql(fieldType = "varchar(20)", fieldDefault = "'李二罗'")]
+        public string b { get; set; }
     }
 }

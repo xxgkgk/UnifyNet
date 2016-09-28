@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 
 namespace UnCommon.Entity
 {
@@ -23,7 +20,7 @@ namespace UnCommon.Entity
         public string fieldName;
 
         /// <summary>
-        /// 老字段名(会将oldFieldName 重命名为 fieldName)
+        /// 旧字段名(会将oldFieldName 重命名为 fieldName)
         /// </summary>
         public string oldFieldName;
 

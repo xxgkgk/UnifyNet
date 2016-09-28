@@ -41,7 +41,7 @@ namespace UnQuote.Send
         /// </summary>
         /// <param name="pNum">手机号</param>
         /// <param name="sCont">类型</param>
-        /// <param name="sTime">发送时间</param>
+        /// <param name="sTime">发送时间,null则为当前时间</param>
         /// <returns></returns>
         public UnAttrRst send(string pNum, string sCont, string sTime)
         {

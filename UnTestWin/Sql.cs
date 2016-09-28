@@ -111,7 +111,7 @@ namespace UnTestWin
             listT.Add(typeof(TestCardType));
             listT.Add(typeof(TestCard));
 
-            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1");
+            UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", true);
             //int? i = cn.renameColumn(typeof(TestUser));
             //Console.WriteLine(i);
             cn.updateBase();
@@ -119,6 +119,13 @@ namespace UnTestWin
             cn.dropTableRelationList(listT);
             cn.updateTableList(listT);
             cn.createTableRelationList(listT);
+
+            cn.updateNullToDefaultList(listT);
+            cn.commit();
+            //cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", true);
+   
+            //cn.commit();
+
         }
 
         public UnSqlHelpU getSql(bool b)

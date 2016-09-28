@@ -450,6 +450,34 @@ namespace UnDataBase
         }
 
         /// <summary>
+        /// 将表字段NULL值更新为默认值
+        /// </summary>
+        /// <param name="t">类型</param>
+        /// <returns>返回受影响的行数:null=执行失败,-1=未执行</returns>
+        public int? updateNullToDefault(Type t)
+        {
+            StringBuilder sb = new StringBuilder();
+            var listDB = getDBTableColumns(t);
+            var listFP = UnToGen.getListFieldPropertyInfo(t);
+            string tableName = UnToGen.getTableName(t);
+            foreach (var item in listFP)
+            {
+                string fName = UnToGen.getFieldName(item);
+                //如果有默认值且有空值数据则更新
+                var dfValue = UnSqlStr.getFieldDefault(item);
+                if (dfValue != null)
+                {
+                    sb.AppendLine("Update " + tableName + " Set [" + fName + "] = " + dfValue + " Where [" + fName + "] Is NULL;");
+                }
+            }
+            if (sb.Length > 0)
+            {
+                return help.exSql(sb.ToString());
+            }
+            return -1;
+        }
+
+        /// <summary>
         /// 更新表
         /// </summary>
         /// <param name="t">类型</param>
@@ -554,13 +582,30 @@ namespace UnDataBase
         /// <summary>
         /// 创建多个表关系
         /// </summary>
-        /// <param name="list"></param>
+        /// <param name="list">要更新的表数组</param>
         /// <returns>是否全部成功</returns>
         public bool createTableRelationList(List<Type> list)
         {
             foreach (var item in list)
             {
                 if (createTableRelation(item) == null)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 将多个表字段NULL值更新为默认值
+        /// </summary>
+        /// <param name="list">要更新的表数组</param>
+        /// <returns>是否全部成功</returns>
+        public bool updateNullToDefaultList(List<Type> list)
+        {
+            foreach (var item in list)
+            {
+                if (updateNullToDefault(item) == null)
                 {
                     return false;
                 }

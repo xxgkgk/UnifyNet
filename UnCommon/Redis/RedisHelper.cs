@@ -192,7 +192,7 @@ namespace UnCommon.Redis
             }
             catch (Exception ex)
             {
-                UnFile.writeLog("get", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\n:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\n" + key);
+                UnFile.writeLog("get", ex.ToString() + "\r\nredisHosts:" + IP + ":" + Port + "\r\nRedisMaxReadPool:" + RedisMaxReadPool + "\r\nRedisMaxWritePool:" + RedisMaxWritePool + "\r\n" + key);
             }
             return obj;
         }

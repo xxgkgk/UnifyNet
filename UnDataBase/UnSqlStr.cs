@@ -86,8 +86,8 @@ namespace UnDataBase
         /// <summary>
         /// 获得AttrSql,无则默认
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
+        /// <param name="item">特性访问器</param>
+        /// <returns>获得AttrSql,无则默认</returns>
         public static UnAttrSql getAttrSqlDefault(PropertyInfo item)
         {
             string name = item.Name;
@@ -199,8 +199,8 @@ namespace UnDataBase
         /// <summary>
         /// 获得字段类型+是否空值
         /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
+        /// <param name="item">特性访问器</param>
+        /// <returns>获得字段类型+是否空值</returns>
         public static string getFieldTypeAndNull(PropertyInfo item)
         {
             UnAttrSql attr = getAttrSqlDefault(item);
@@ -212,6 +212,21 @@ namespace UnDataBase
                     nullStr = "NOT NULL";
                 }
                 return "[" + UnToGen.getFieldName(item) + "] " + attr.fieldType + " " + nullStr;
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// 获得字段默认值
+        /// </summary>
+        /// <param name="item">特性访问器</param>
+        /// <returns>获得字段默认值，无则返回NULL</returns>
+        public static string getFieldDefault(PropertyInfo item)
+        {
+            UnAttrSql attr = getAttrSqlDefault(item);
+            if (attr != null)
+            {
+                return attr.fieldDefault;
             }
             return null;
         }
