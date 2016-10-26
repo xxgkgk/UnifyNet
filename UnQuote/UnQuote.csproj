@@ -32,6 +32,10 @@
     <DocumentationFile>bin\Release\UnQuote.XML</DocumentationFile>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=4.5.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <SpecificVersion>False</SpecificVersion>
+      <HintPath>..\UnLibrary\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
@@ -47,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Send\UnSendSMSTxy.cs" />
     <Compile Include="Webs\UnCookie.cs" />
     <Compile Include="CustomView\UnCvPageFoot.cs" />
     <Compile Include="CustomView\UnCvTree.cs" />

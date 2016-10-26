@@ -107,6 +107,10 @@ namespace UnCommon.Entity
         /// </summary>
         Unique,
         /// <summary>
+        /// 联合唯一索引
+        /// </summary>
+        UnionUnique,
+        /// <summary>
         /// 联合聚集索引
         /// </summary>
         UnionClustered,

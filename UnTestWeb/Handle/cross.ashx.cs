@@ -94,6 +94,8 @@ namespace UnWebTool.Handle
                 {
                     oxd.ApiNote.NoteCode = 1;
                     oxd.ApiNote.NoteMsg = "登录成功";
+                    // 设置session时间（分钟）
+                    context.Session.Timeout = 720;
                     // 后台登录状态
                     context.Session["alState"] = 1;
                     // 上传权限状态
@@ -101,6 +103,8 @@ namespace UnWebTool.Handle
                     // 后台Cookie
                     UnCookie ck = new UnCookie(context);
                     Dictionary<string, string> dic = new Dictionary<string, string>();
+                    dic.Add("alState", "1");
+                    dic.Add("upState", "2");
                     dic.Add("ID", "1");
                     dic.Add("User", "admin");
                     dic.Add("Name", "管理员");

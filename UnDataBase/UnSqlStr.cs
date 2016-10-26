@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Data.SqlClient;
-using System.Text.RegularExpressions;
-using UnCommon;
 using System.Reflection;
 using System.Text;
-using UnCommon.Tool;
-using UnCommon.Entity;
+using System.Text.RegularExpressions;
 using UnCommon.Config;
-using UnCommon.Files;
-using System.IO;
+using UnCommon.Entity;
+using UnCommon.Tool;
 
 namespace UnDataBase
 {
@@ -255,13 +252,14 @@ namespace UnDataBase
             dicSql.Add("ind_Clustered", new StringBuilder());
             dicSql.Add("ind_Nonclustered", new StringBuilder());
             dicSql.Add("ind_Unique", new StringBuilder());
+            dicSql.Add("ind_UnionUnique", new StringBuilder());
             dicSql.Add("ind_UnionClustered", new StringBuilder());
             dicSql.Add("ind_UnionNonclustered", new StringBuilder());
 
             Dictionary<string, StringBuilder> dicNames = new Dictionary<string, StringBuilder>();
             dicNames.Add("con_PrimarykKey", new StringBuilder());
             dicNames.Add("ind_Clustered", new StringBuilder());
-            dicNames.Add("ind_Unique", new StringBuilder());
+            dicNames.Add("ind_UnionUnique", new StringBuilder());
             dicNames.Add("ind_UnionClustered", new StringBuilder());
             dicNames.Add("ind_UnionNonclustered", new StringBuilder());
 
@@ -331,15 +329,19 @@ namespace UnDataBase
                                 break;
                             case IndexModel.Nonclustered:// 非聚集索引
                                 keyName = "IND_" + tableName + "_NO_" + name;
-                                dicSql["ind_Nonclustered"].Append("Create Nonclustered Index " + keyName + " On " + tableName + "(" + name + ")");
+                                dicSql["ind_Nonclustered"].AppendLine("Create Nonclustered Index " + keyName + " On " + tableName + "(" + name + ");");
                                 break;
                             case IndexModel.Unique:// 唯一索引
                                 keyName = "IND_" + tableName + "_UN_" + name;
-                                if (dicSql["ind_Unique"].Length == 0)
+                                dicSql["ind_Unique"].AppendLine("Create Unique Index " + keyName + " On " + tableName + "(" + name + ");");
+                                break;
+                            case IndexModel.UnionUnique:// 联合唯一索引
+                                keyName = "IND_" + tableName + "_UNUN_" + name;
+                                if (dicSql["ind_UnionUnique"].Length == 0)
                                 {
-                                    dicSql["ind_Unique"].Append("Create Unique Index " + keyName + " On " + tableName + "(");
+                                    dicSql["ind_UnionUnique"].Append("Create Unique Index " + keyName + " On " + tableName + "(");
                                 }
-                                dicNames["ind_Unique"].Append(name + ",");
+                                dicNames["ind_UnionUnique"].Append(name + ",");
                                 break;
                             case IndexModel.UnionClustered:// 联合聚集索引
                                 keyName = "IND_" + tableName + "_UNCL_" + name;

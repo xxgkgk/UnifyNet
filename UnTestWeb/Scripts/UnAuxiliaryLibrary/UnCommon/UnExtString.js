@@ -48,8 +48,8 @@ String.prototype.byteLength = function () {
     }
     return (bytesCount);
 }
-String.prototype.isBetweenLength = function (input, min, max) {
-    var length = (input + "").byteLength();
+String.prototype.isBetweenLength = function (min, max) {
+    var length = this.byteLength();
     if (min != null && length < min) {
         return false;
     }

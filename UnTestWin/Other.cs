@@ -20,6 +20,7 @@ using UnCommon.Extend;
 using System.Text.RegularExpressions;
 using UnCommon.HTTP;
 using UnCommon.Entity;
+using UnQuote.Send;
 
 namespace UnTestWin
 {
@@ -87,7 +88,8 @@ namespace UnTestWin
         {
             UnSign unsign = new UnSign("hesdjaslf54asj1fkl10jaslfjslsdlj");
             //UnSign unsign = new UnSign("123");
-
+            Console.WriteLine(UnStrRan.getStr(256, 512));
+            return;
             XmlData xd = getXD();
             string xml = UnXMMPXml.tToXml(xd.GetType(), xd);
 
@@ -260,6 +262,71 @@ namespace UnTestWin
         {
             UnFileInfo info = UnQuote.Images.UnImage.createQrcPath("http://s.hesbbq.com/sale.apk", 0, UnQuote.Images.UnImageQRCEtr.H, 8);
             Console.WriteLine(info.fullName);
+        }
+
+        private void button9_Click(object sender, EventArgs e)
+        {
+            DataTable tblDatas = new DataTable("Datas");
+            tblDatas.Columns.Add("序号", Type.GetType("System.Int32"));
+            tblDatas.Columns[0].AutoIncrement = true;
+            tblDatas.Columns[0].AutoIncrementSeed = 1;
+            tblDatas.Columns[0].AutoIncrementStep = 1;
+            tblDatas.Columns.Add("原始单号", Type.GetType("System.String"));
+            tblDatas.Columns.Add("流水单号", Type.GetType("System.String"));
+            tblDatas.Columns.Add("结账时间", Type.GetType("System.String"));
+            tblDatas.Columns.Add("状态", Type.GetType("System.String"));
+            tblDatas.Columns.Add("门店", Type.GetType("System.String"));
+            tblDatas.Columns.Add("交易类型", Type.GetType("System.String"));
+            tblDatas.Columns.Add("消费合计(元)", Type.GetType("System.String"));
+            tblDatas.Columns.Add("收款金额(元)", Type.GetType("System.String"));
+            tblDatas.Columns.Add("实收金额(元)", Type.GetType("System.String"));
+            tblDatas.Columns.Add("退款金额(元)", Type.GetType("System.String"));
+            tblDatas.Columns.Add("会员顾客", Type.GetType("System.String"));
+            tblDatas.Columns.Add("收银员", Type.GetType("System.String"));
+            tblDatas.Columns.Add("列13", Type.GetType("System.String"));
+            tblDatas.Columns.Add("列14", Type.GetType("System.String"));
+            tblDatas.Columns.Add("列15", Type.GetType("System.String"));
+            tblDatas.Columns.Add("列16", Type.GetType("System.String"));
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+            tblDatas.Rows.Add(new object[] { null, "v1", "v2", "v3", "v4", "v5", "v6", "v7", "v8", "v9", "v10", "v11", "v12", "v13", "v14", "v15", "v16" });
+
+            UnExport ep = new UnExport();
+            string s = ep.dtToCSV(tblDatas, (string)null).ToString();
+            Console.WriteLine(s);
+        }
+
+        private void button10_Click(object sender, EventArgs e)
+        {
+            UnSendSMSTxy txy = new UnSendSMSTxy(1400016617, "c21e95cbb478325141937e3a497c8729");
+            List<string> list = new List<string>();
+            list.Add("18980826967");
+            list.Add("18684011818");
+            list.Add("18284563899");
+            var rst = txy.sendMsg("86", list, "亲，您的验证码是：22324，打死也不要告诉任何人哦！如非本人操作，请忽略本短信。 ");
+            Console.WriteLine(rst.code);
+            Console.WriteLine(rst.msg);
         }
     }
 }

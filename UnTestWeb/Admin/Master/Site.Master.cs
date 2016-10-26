@@ -1,11 +1,5 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Web;
-using System.Web.UI;
-using System.Web.UI.WebControls;
-using UnCommon;
-using UnCommon.Tool;
+using UnQuote.Webs;
 
 namespace Web.Admin.Master
 {
@@ -24,13 +18,16 @@ namespace Web.Admin.Master
         protected void Page_Load(object sender, EventArgs e)
         {
             object sobj = Session["alState"];
+            object cobj = new UnCookie(this.Page).getCookies("alCookie", "alState");
             if (sobj != null)
             {
                 alState = Convert.ToInt32(Convert.ToString(sobj));
             }
-            if (alState == 0)
+            // Session或Cookie为空则回到登录页面
+            if (alState == 0 || cobj == null)
             {
-                Response.Redirect("/admin/login.htm");
+                Session.Clear();
+                Response.Redirect("/login.htm");
             }
         }
     }

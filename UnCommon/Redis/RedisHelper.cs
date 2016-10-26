@@ -95,11 +95,11 @@ namespace UnCommon.Redis
             {
                 if (pool != null)
                 {
-                    using (var r = pool.GetClient())
+                    using (var r = pool.GetCacheClient())
                     {
                         if (r != null)
                         {
-                            r.SendTimeout = 1000;
+                            //r.SendTimeout = 1000;
                             r.Set(key, value, expiry - DateTime.Now);
                         }
                     }
@@ -135,11 +135,11 @@ namespace UnCommon.Redis
             {
                 if (pool != null)
                 {
-                    using (var r = pool.GetClient())
+                    using (var r = pool.GetCacheClient())
                     {
                         if (r != null)
                         {
-                            r.SendTimeout = 1000;
+                            //r.SendTimeout = 1000;
                             r.Set(key, value, slidingExpiration);
                         }
                     }
@@ -180,11 +180,12 @@ namespace UnCommon.Redis
             {
                 if (pool != null)
                 {
-                    using (var r = pool.GetClient())
+                    // 只读链接
+                    using (var r = pool.GetCacheClient())
                     {
                         if (r != null)
                         {
-                            r.SendTimeout = 1000;
+                            //r.SendTimeout = 1000;
                             obj = r.Get<T>(key);
                         }
                     }
