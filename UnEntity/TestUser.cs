@@ -84,6 +84,7 @@ namespace UnCommon
 
         //public string k { get; set; }
 
-        //public string l { get; set; }
+        [UnAttrSql(fieldType = "varchar(20)", fieldDefault = "'ddA人'",fieldNULL = false)]
+        public string l { get; set; }
     }
 }

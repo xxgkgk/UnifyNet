@@ -367,7 +367,7 @@ namespace UnDataBase
                 // 数据库字段不分大小写
                 if (listDB.Find(e => e == fName) == null)
                 {
-                    sb.AppendLine("Alter Table " + tableName + " Add " + UnSqlStr.getFieldTypeAndNull(item) + ";");
+                    sb.AppendLine("Alter Table " + tableName + " Add [" + fName + "]" + UnSqlStr.getAttrSqlDefault(item).fieldType + ";");
                 }
             }
             if (sb.Length > 0)
@@ -436,6 +436,13 @@ namespace UnDataBase
                         // 不能修改自增
                         if (fType != null && fType.ToUpper().IndexOf("IDENTITY") < 0)
                         {
+                            var dfValue = UnSqlStr.getFieldDefault(item);
+                            // 如果不允许为空且存在默认值则将NULL更新为默认值
+                            if (attr.fieldNULL && dfValue != null)
+                            {
+                                sb.AppendLine("Update " + tableName + " Set [" + fName + "] = " + UnSqlStr.getFieldDefault(item) + " Where [" + fName + "] Is NULL;");
+                            }
+                            // 更改字段属性
                             sb.AppendLine("Alter Table " + tableName + " Alter Column " + UnSqlStr.getFieldTypeAndNull(item) + ";");
                         }
                         break;

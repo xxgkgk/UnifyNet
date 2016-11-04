@@ -120,7 +120,7 @@ namespace UnTestWin
             cn.updateTableList(listT);
             cn.createTableRelationList(listT);
 
-            cn.updateNullToDefaultList(listT);
+            //cn.updateNullToDefaultList(listT);
             cn.commit();
             //cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013", "AEnterprise1", true);
    

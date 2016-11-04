@@ -44,11 +44,13 @@
                 }
             }
             else {
-                if (msg_err != "") {
-                    layer.msg(msg_err);
-                }
-                if (fun_err != null) {
-                    fun_err(rst);
+                if (rst.code != -100) {
+                    if (msg_err != "") {
+                        layer.msg(msg_err);
+                    }
+                    if (fun_err != null) {
+                        fun_err(rst);
+                    }
                 }
             }
         };

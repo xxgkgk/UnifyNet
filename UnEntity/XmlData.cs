@@ -40,20 +40,31 @@ namespace UnEntity
         //    }
         //}
 
-    }
+        public Test Test { get; set; }
 
-    public class Testa
-    {
-        public string d { get; set; }
-        public string a { get; set; }
-    }
-
-    public class Test
-    {
-        public string b { get; set; }
-        public int? a { get; set; }
         public Testa Testa { get; set; }
 
+    }
 
+
+
+    public class Testa: Test
+    {
+        public string c { get; set; }
+        public string d { get; set; }
+        public string AddTime{ get; set; }
+    }
+
+    public class Test: Test1
+    {
+        public string a { get; set; }
+        public int? b { get; set; }
+
+    }
+
+    public class Test1
+    {
+        public string e { get; set; }
+        public string f { get; set; }
     }
 }

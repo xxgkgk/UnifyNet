@@ -131,6 +131,15 @@ namespace UnCommon.Tool
         }
 
         /// <summary>
+        /// 当前时间戳(毫秒)
+        /// </summary>
+        /// <returns>返回当前时间戳</returns>
+        public static long ticksMSecToLong()
+        {
+            return Convert.ToInt64(ticksMSec());
+        }
+
+        /// <summary>
         /// 当前时间戳(秒)
         /// </summary>
         /// <returns>返回当前时间戳</returns>
@@ -142,7 +151,7 @@ namespace UnCommon.Tool
         /// <summary>
         /// 当前时间短格式
         /// </summary>
-        /// <returns>返回当前时间短格式</returns>
+        /// <returns>返回当前时间短格式：yyyy-MM-dd HH:mm:ss</returns>
         public static string shortNowTime()
         {
             return DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss");

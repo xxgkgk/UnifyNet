@@ -21,11 +21,16 @@ namespace UnCommon.XMMP
         /// </summary>
         /// <param name="type">类型</param>
         /// <param name="xml">XML字符串</param>
+        /// <param name="isRemoveNotes">是否移除节点注释</param>
         /// <returns>返回对象</returns>
-        public static object xmlToT(Type type, string xml)
+        public static object xmlToT(Type type, string xml, bool isRemoveNotes)
         {
             try
             {
+                if (isRemoveNotes)
+                {
+                    removeXmlNotes(ref xml);
+                }
                 using (StringReader sr = new StringReader(xml))
                 {
                     XmlSerializer xmldes = new XmlSerializer(type);
@@ -36,6 +41,17 @@ namespace UnCommon.XMMP
             {
                 return null;
             }
+        }
+
+        /// <summary>
+        /// 反序列化
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="xml">XML字符串</param>
+        /// <returns>返回对象</returns>
+        public static object xmlToT(Type type, string xml)
+        {
+            return xmlToT(type, xml, false);
         }
 
         /// <summary>
@@ -55,8 +71,9 @@ namespace UnCommon.XMMP
         /// </summary>
         /// <param name="type">类型</param>
         /// <param name="obj">序列化对象</param>
+        /// <param name="isRemoveNotes">是否移除节点注释</param>
         /// <returns>返回XML字符串</returns>
-        public static string tToXml(Type type, object obj)
+        public static string tToXml(Type type, object obj, bool isRemoveNotes)
         {
             MemoryStream stream = new MemoryStream();
             XmlSerializer xml = new XmlSerializer(type);
@@ -66,7 +83,7 @@ namespace UnCommon.XMMP
                 XmlSerializerNamespaces ns = new XmlSerializerNamespaces();
                 ns.Add("", "");
                 XmlWriterSettings settings = new XmlWriterSettings();
-                // Remove tversion
+                // Remove version
                 settings.OmitXmlDeclaration = true;
                 XmlWriter writer = XmlWriter.Create(stream, settings);
                 xml.Serialize(writer, obj, ns);
@@ -82,11 +99,53 @@ namespace UnCommon.XMMP
             sr.Dispose();
             stream.Dispose();
 
-            // 去掉 nil
-            Regex reg = new Regex(@"<[^<]*\sp\d:[^>]*>");
-            str = reg.Replace(str, "");
+            if (isRemoveNotes)
+            {
+                removeXmlNotes(ref str);
+            }
 
             return str;
+        }
+
+        /// <summary>
+        /// 序列化
+        /// </summary>
+        /// <param name="type">类型</param>
+        /// <param name="obj">序列化对象</param>
+        /// <returns></returns>
+        public static string tToXml(Type type, object obj)
+        {
+            return tToXml(type, obj, false);
+        }
+
+        /// <summary>
+        /// 移除XML节点注释及空值
+        /// </summary>
+        /// <param name="str"></param>
+        /// <returns></returns>
+        public static void removeXmlNotes(ref string str)
+        {
+            //Console.WriteLine(str);
+
+            // 去掉<A ** />注释
+            Regex reg = new Regex(@"(<[^\s]+)(\s[^<]*)(/>)");
+            str = reg.Replace(str, "$1$3");
+            //Console.WriteLine(str);
+
+            // 去掉<A ** >注释
+            reg = new Regex(@"(<[^\s]+)(\s[^<]*)(>)");
+            str = reg.Replace(str, "$1$3");
+            //Console.WriteLine(str);
+
+            // 去掉 <A/>
+            reg = new Regex(@"<[^/>]+/>");
+            str = reg.Replace(str, "");
+            //Console.WriteLine(str);
+
+            // 去掉 <A><A/>
+            reg = new Regex(@"<[^/>]+></[^>]+>");
+            str = reg.Replace(str, "");
+            //Console.WriteLine(str);
         }
 
         /// <summary>

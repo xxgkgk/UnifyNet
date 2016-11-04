@@ -1,13 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Reflection;
-using System.Data;
-using UnCommon.Files;
-using UnCommon.Entity;
 using System.Configuration;
+using System.Data;
+using System.Reflection;
 using UnCommon.Config;
+using UnCommon.Entity;
+using UnCommon.Files;
 
 namespace UnCommon.Tool
 {
