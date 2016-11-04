@@ -533,6 +533,25 @@ namespace UnDataBase
         }
 
         /// <summary>
+        /// 删除多个表
+        /// </summary>
+        /// <param name="list"></param>
+        /// <returns></returns>
+        public bool dropTableList(List<Type> list)
+        {
+            foreach (var item in list)
+            {
+                int? rst = dropTable(item);
+                if (rst == null)
+                {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+
+        /// <summary>
         /// 清除多个表关系
         /// </summary>
         /// <param name="list">要删除表关系的表数组</param>
