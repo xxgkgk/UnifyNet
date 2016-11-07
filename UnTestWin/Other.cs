@@ -235,7 +235,8 @@ namespace UnTestWin
 
         private void button8_Click(object sender, EventArgs e)
         {
-            UnFileInfo info = UnQuote.Images.UnImage.createQrcPath("http://s.hesbbq.com/sale.apk", 0, UnQuote.Images.UnImageQRCEtr.H, 8);
+            //UnFileInfo info = UnQuote.Images.UnImage.createQrcPath("http://s.hesbbq.com/app/sale.apk", 0, UnQuote.Images.UnImageQRCEtr.H, 8);
+            UnFileInfo info = UnQuote.Images.UnImage.createQrcPath("http://s.hesbbq.com/app/padorder.apk", 0, UnQuote.Images.UnImageQRCEtr.H, 8);
             Console.WriteLine(info.fullName);
         }
 

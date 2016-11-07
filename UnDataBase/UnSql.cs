@@ -438,7 +438,7 @@ namespace UnDataBase
                         {
                             var dfValue = UnSqlStr.getFieldDefault(item);
                             // 如果不允许为空且存在默认值则将NULL更新为默认值
-                            if (attr.fieldNULL && dfValue != null)
+                            if (attr != null && !attr.fieldNULL && dfValue != null)
                             {
                                 sb.AppendLine("Update " + tableName + " Set [" + fName + "] = " + UnSqlStr.getFieldDefault(item) + " Where [" + fName + "] Is NULL;");
                             }
@@ -1196,15 +1196,31 @@ namespace UnDataBase
         /// <param name="selectionArgs">条件参数</param>
         /// <param name="orderBy">排序</param>
         /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <param name="cacheExpire">缓存</param>
         /// <returns></returns>
-        public T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy, bool isLinkedServer) where T : new()
+        public T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy, bool isLinkedServer, int? cacheExpire) where T : new()
         {
-            List<T> list = query<T>(columns, selection, selectionArgs, orderBy, isLinkedServer);
+            List<T> list = query<T>(columns, selection, selectionArgs, orderBy, isLinkedServer, cacheExpire);
             if (list.Count > 0)
             {
                 return list[0];
             }
             return default(T);
+        }
+
+        /// <summary>
+        /// 获取实体
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="columns">字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="orderBy">排序</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <returns></returns>
+        public T querySingle<T>(string columns, string selection, string selectionArgs, string orderBy, bool isLinkedServer) where T : new()
+        {
+            return querySingle<T>(columns, selection, selectionArgs, orderBy, isLinkedServer, null);
         }
 
         /// <summary>
