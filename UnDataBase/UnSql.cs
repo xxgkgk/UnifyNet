@@ -1792,7 +1792,10 @@ namespace UnDataBase
         /// </summary>
         public void removeAllRedis()
         {
-            redis.removeByRegex("^" + redisKeyPre + ".*");
+            if (redis != null)
+            {
+                redis.removeByRegex("^" + redisKeyPre + ".*");
+            }
         }
 
         /// <summary>
@@ -1801,7 +1804,10 @@ namespace UnDataBase
         /// <param name="t">表对应实体类型</param>
         public void removeQueryRedis(Type t)
         {
-            redis.removeByRegex("^" + getQueryKeyPre(t) + ".*");
+            if (redis != null)
+            {
+                redis.removeByRegex("^" + getQueryKeyPre(t) + ".*");
+            }
         }
 
         /// <summary>
@@ -1810,7 +1816,10 @@ namespace UnDataBase
         /// <param name="t"></param>
         public void removeQueryPageRedis(Type t)
         {
-            redis.removeByRegex("^" + getQueryPageKeyPre(t) + ".*");
+            if (redis != null)
+            {
+                redis.removeByRegex("^" + getQueryPageKeyPre(t) + ".*");
+            }
         }
 
         /// <summary>
@@ -1819,7 +1828,10 @@ namespace UnDataBase
         /// <param name="t"></param>
         public void removeQueryDTRedis(Type t)
         {
-            redis.removeByRegex("^" + getQueryDTKeyPre(t) + ".*");
+            if (redis != null)
+            {
+                redis.removeByRegex("^" + getQueryDTKeyPre(t) + ".*");
+            }
         }
 
         /// <summary>
