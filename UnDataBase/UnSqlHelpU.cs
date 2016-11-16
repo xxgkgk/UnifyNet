@@ -5,6 +5,7 @@ using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
+using UnCommon.Entity;
 using UnCommon.Files;
 
 namespace UnDataBase

@@ -5,6 +5,7 @@ using System.Data.SqlClient;
 using System.Text;
 using System.Text.RegularExpressions;
 using UnCommon.Config;
+using UnCommon.Entity;
 using UnCommon.Extend;
 using UnCommon.Files;
 using UnCommon.Redis;

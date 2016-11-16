@@ -1,10 +1,7 @@
-﻿
-using System.Data;
-namespace UnDataBase
+﻿using System.Data;
+
+namespace UnCommon.Entity
 {
-    /// <summary>
-    /// 翻页参数
-    /// </summary>
     public class UnSqlPage
     {
         /// <summary>

@@ -60,7 +60,6 @@
     <Compile Include="UnSqlHelp.cs" />
     <Compile Include="SqlHelper.cs" />
     <Compile Include="UnSqlHelpU.cs" />
-    <Compile Include="UnSqlPage.cs" />
     <Compile Include="UnSqlStr.cs" />
   </ItemGroup>
   <ItemGroup>

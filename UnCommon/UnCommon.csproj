@@ -80,6 +80,7 @@
     <Compile Include="Entity\UnAttrPgs.cs" />
     <Compile Include="Entity\UnAttrRst.cs" />
     <Compile Include="Entity\UnAttrtStati.cs" />
+    <Compile Include="Entity\UnSqlPage.cs" />
     <Compile Include="Extend\UnExtByte.cs" />
     <Compile Include="Extend\UnExtDriveInfo.cs" />
     <Compile Include="Extend\UnExtLong.cs" />
