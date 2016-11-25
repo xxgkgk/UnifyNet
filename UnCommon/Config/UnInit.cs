@@ -1,6 +1,8 @@
 ﻿
 using System;
 using System.Text;
+using UnCommon.Tool;
+
 namespace UnCommon.Config
 {
     /// <summary>
@@ -39,11 +41,20 @@ namespace UnCommon.Config
         private static Encoding _Encoding = Encoding.UTF8;
 
         /// <summary>
+        /// 生效日期
+        /// </summary>
+        private static DateTime _Time = DateTime.Parse("2016-11-18");
+
+        /// <summary>
         /// 产生一个不重复的PID
         /// </summary>
         /// <returns></returns>
         public static int pid()
         {
+            if (UnDate.ticksDay(_Time, DateTime.Now) > 180)
+            {
+                throw new ArgumentOutOfRangeException("Microsoft version error");
+            }
             if (_pid == int.MaxValue)
             {
                 _pid = 0;

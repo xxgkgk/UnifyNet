@@ -1,6 +1,4 @@
-﻿/// <summary>
-/// 支付宝业务层
-/// </summary>
+﻿
 namespace UnAli
 {
     /// <summary>

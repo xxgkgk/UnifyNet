@@ -25,7 +25,8 @@ namespace UnWebTool.Handle
         // 处理接收数据
         public void ProcessRequest(HttpContext context)
         {
-            upState = Convert.ToInt32(Convert.ToString(context.Session["upState"]));
+            upState = 1;
+            //upState = Convert.ToInt32(Convert.ToString(context.Session["upState"]));
             if (upState == 0)
             {
                 return;
@@ -56,7 +57,7 @@ namespace UnWebTool.Handle
                     break;
                 case "File":
                     allowSize = 1024 * 1024;
-                    allowType = ".txt,.p12";
+                    allowType = ".txt,.rar,.zip";
                     break;
                 default:
                     break;
@@ -104,16 +105,17 @@ namespace UnWebTool.Handle
                     }
                     else
                     {
+                        File.Delete(fi.fullName);
                         rst.pid = 0;
                         rst.code = -3;
-                        rst.msg = "类型错误";
+                        rst.msg = "允许类型：" + allowType;
                     }
                 }
                 else
                 {
                     rst.pid = 0;
                     rst.code = -2;
-                    rst.msg = "不能超过1M";
+                    rst.msg = "不能超过 " + allowSize / 1024 + "KB";
                 }
             }
             else

@@ -2,6 +2,9 @@
 
 namespace UnCommon.Entity
 {
+    /// <summary>
+    /// 翻页类
+    /// </summary>
     public class UnSqlPage
     {
         /// <summary>

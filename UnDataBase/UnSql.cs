@@ -694,11 +694,41 @@ namespace UnDataBase
         /// <summary>
         /// 添加一条记录(核心)
         /// </summary>
-        /// <typeparam name="T">表对应泛型</typeparam>
-        /// <param name="t">表数据对象</param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="t">泛型对象</param>
         /// <param name="isXactAbort">是否嵌套事务</param>
-        /// <param name="isRemoveRedis">是否清除表缓存</param>
-        /// <returns>非嵌套事务返回自增ID,嵌套事务返回受影响行数,失败返回-1</returns>
+        /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <param name="beginSql">前置语句</param>
+        /// <param name="endSql">后置语句</param>
+        /// <param name="isRemoveRedis">是否清除缓存</param>
+        /// <returns>返回受影响的条数,执行失败返回NULL</returns>
+        public int? insert<T>(T t, bool isXactAbort, bool isLinkedServer, string beginSql, string endSql, bool? isRemoveRedis) where T : new()
+        {
+            SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t);
+            StringBuilder strSql = new StringBuilder();
+            if (isXactAbort)
+            {
+                strSql.Append("Set xact_abort ON;");
+            }
+            strSql.Append(beginSql);
+            strSql.Append("Insert Into " + UnToGen.getTableName(typeof(T), isLinkedServer) + " ");
+            strSql.Append(UnSqlStr.getAddStr<T>(SqlPmtA));
+            strSql.Append(endSql);
+
+            int? i = help.exSql(strSql.ToString(), SqlPmtA);
+            // 清除表缓存
+            removeTableRedis(typeof(T), isRemoveRedis);
+            return i;
+        }
+
+        /// <summary>
+        /// 添加一条记录(核心)
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="t">泛型对象</param>
+        /// <param name="isXactAbort">是否嵌套事务</param>
+        /// <param name="isRemoveRedis">是否清除缓存</param>
+        /// <returns></returns>
         public long insert<T>(T t, bool isXactAbort, bool? isRemoveRedis) where T : new()
         {
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t);
@@ -754,6 +784,37 @@ namespace UnDataBase
             return insert(t, false);
         }
 
+        /// <summary>
+        /// 批量添加
+        /// </summary>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="list">泛型数组</param>
+        /// <param name="isXactAbort">是否嵌套事务</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
+        /// <param name="isRemoveRedis">是否清除缓存</param>
+        /// <returns>返回受影响行数,失败返回NULL</returns>
+        public int? insert<T>(List<T> list, bool isXactAbort, bool isLinkedServer, bool? isRemoveRedis) where T : new()
+        {
+            int i = 0;
+            foreach (T t in list)
+            {
+                int? n = this.insert<T>(t, isXactAbort, isLinkedServer, null, null, isRemoveRedis);
+                if (n == null)
+                {
+                    return null;
+                }
+                i = i + n.Value;
+                // 仅需一次
+                if (isXactAbort)
+                {
+                    isXactAbort = false;
+                }
+            }
+            commit();
+            // 清除表缓存
+            removeTableRedis(typeof(T), isRemoveRedis);
+            return i;
+        }
         #endregion
 
         #region 修改数据
@@ -766,10 +827,11 @@ namespace UnDataBase
         /// <param name="columns">字段</param>
         /// <param name="selection">条件</param>
         /// <param name="selectionArgs">条件参数</param>
-        /// <param name="isXactAbort">是否链接服务顺</param>
+        /// <param name="isXactAbort">是否添加嵌套事务头</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
         /// <param name="isRemoveRedis">是否清除缓存</param>
         /// <returns>成功返回受影响行数，失败返回null</returns>
-        private int? update<T>(T t, string columns, string selection, string[] selectionArgs, bool isXactAbort, bool? isRemoveRedis) where T : new()
+        private int? update<T>(T t, string columns, string selection, string[] selectionArgs, bool isXactAbort, bool isLinkedServer, bool? isRemoveRedis) where T : new()
         {
             // 实体属性参数化
             SqlParameter[] SqlPmtA = UnSqlStr.getSqlPmtA<T>(t, columns);
@@ -800,16 +862,16 @@ namespace UnDataBase
         /// <summary>
         /// 条件修改
         /// </summary>
-        /// <typeparam name="T"></typeparam>
-        /// <param name="t"></param>
-        /// <param name="columns"></param>
-        /// <param name="selection"></param>
-        /// <param name="selectionArgs"></param>
-        /// <param name="isXactAbort"></param>
+        /// <typeparam name="T">泛型</typeparam>
+        /// <param name="t">泛型对象</param>
+        /// <param name="columns">限定字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否添加嵌套事务头</param>
         /// <returns>成功返回受影响行数，失败返回null</returns>
         public int? update<T>(T t, string columns, string selection, string[] selectionArgs, bool isXactAbort) where T : new()
         {
-            return update<T>(t, columns, selection, selectionArgs, isXactAbort, null);
+            return update<T>(t, columns, selection, selectionArgs, isXactAbort, isXactAbort, null);
         }
 
         /// <summary>
@@ -831,20 +893,37 @@ namespace UnDataBase
         /// </summary>
         /// <typeparam name="T">表对应泛型</typeparam>
         /// <param name="t">表数据对象</param>
-        /// <param name="columns">字段</param>
+        /// <param name="columns">限定字段</param>
         /// <param name="selection">条件</param>
         /// <param name="selectionArgs">条件参数</param>
-        /// <param name="isXactAbort">是否链接服务器</param>
+        /// <param name="isXactAbort">是否添加嵌套事务</param>
+        /// <param name="isLinkedServer">是否链接服务器</param>
         /// <param name="isRemoveRedis">是否清除表缓存</param>
         /// <returns>成功返回受影响行数，失败返回null</returns>
-        public int? update<T>(T t, string columns, string selection, string selectionArgs, bool isXactAbort, bool? isRemoveRedis) where T : new()
+        public int? update<T>(T t, string columns, string selection, string selectionArgs, bool isXactAbort, bool isLinkedServer, bool? isRemoveRedis) where T : new()
         {
             string[] args = null;
             if (selectionArgs != null)
             {
                 args = selectionArgs.Split(',');
             }
-            return update<T>(t, columns, selection, args, isXactAbort, isRemoveRedis);
+            return update<T>(t, columns, selection, args, isXactAbort, isLinkedServer, isRemoveRedis);
+        }
+
+        /// <summary>
+        /// 修改数据
+        /// </summary>
+        /// <typeparam name="T">表对应泛型</typeparam>
+        /// <param name="t">表数据对象</param>
+        /// <param name="columns">限定字段</param>
+        /// <param name="selection">条件</param>
+        /// <param name="selectionArgs">条件参数</param>
+        /// <param name="isXactAbort">是否添加嵌套事务</param>
+        /// <param name="isRemoveRedis">是否清除表缓存</param>
+        /// <returns></returns>
+        public int? update<T>(T t, string columns, string selection, string selectionArgs, bool isXactAbort, bool? isRemoveRedis) where T : new()
+        {
+            return update<T>(t, columns, selection, selectionArgs, isXactAbort, isXactAbort, isRemoveRedis);
         }
 
         /// <summary>

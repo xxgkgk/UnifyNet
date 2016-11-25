@@ -3,20 +3,20 @@
 <head>
     <title>后台 — 登录</title>
     <link href="/Admin/Styles/login.css" type="text/css" rel="Stylesheet" />
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Jquery/jquery-1.8.0.js" ></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Layer/layer.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnInit.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnXMMPXml.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnHttpClient.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnCookie.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnAttrRst.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/XmlData.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/ApiBase.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/ApiNote.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryEntity/AdminLogin.js"></script>
-    <script type="text/javascript" src="/Scripts/UnModel/HttpM.js"></script>
-    <script type="text/javascript" src="/Scripts/UnModel/ValidCodeM.js"></script>
-    <script type="text/javascript" src="/Scripts/UnModel/AdminLoginM.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/Jquery/jquery-1.8.0.js" ></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/Layer/layer.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/UnCommon/UnInit.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/UnCommon/UnXMMPXml.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/UnCommon/UnHttpClient.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/UnCommon/UnCookie.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/UnCommon/UnAttrRst.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxEntity/XmlData.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxEntity/ApiBase.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxEntity/ApiNote.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxEntity/AdminLogin.js"></script>
+    <script type="text/javascript" src="/Scripts/UnBLL/HttpB.js"></script>
+    <script type="text/javascript" src="/Scripts/UnBLL/ValidCodeB.js"></script>
+    <script type="text/javascript" src="/Scripts/UnBLL/AdminLoginB.js"></script>
 </head>
 <body>
     <div class="logo"><img alt="" src="/Admin/Images/public/top_logo.png" /></div>
@@ -31,8 +31,8 @@
             </ul>
         </div>
     </div>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/Jquery/jquery.md5.js" ></script>
-    <script type="text/javascript" src="/Scripts/UnAuxiliaryLibrary/UnCommon/UnEncMD5.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/Jquery/jquery.md5.js" ></script>
+    <script type="text/javascript" src="/Scripts/UnAuxLibrary/UnCommon/UnEncMD5.js"></script>
     <script type="text/javascript">;
 
     // 验证码-校验
@@ -42,7 +42,7 @@
             layer.msg("验证码错误!");
             return;
         }
-        var vcm = ValidCodeM.createNew(success_ver, null);
+        var vcm = ValidCodeB.createNew(success_ver, null);
         vcm.valid(ver);
     }
 
@@ -83,7 +83,7 @@
             return;
         }
         al.Pass = UnEncMD5.getMd5Hash2(al.Pass);
-        var alm = AdminLoginM.createNew(success_login, null);
+        var alm = AdminLoginB.createNew(success_login, null);
         alm.valid(al);
     }
 

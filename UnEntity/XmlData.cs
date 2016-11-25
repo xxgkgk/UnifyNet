@@ -4,6 +4,7 @@ using System.Linq;
 using System.Text;
 using UnCommon;
 using System.Xml;
+using System.Xml.Serialization;
 
 namespace UnEntity
 {
@@ -13,15 +14,20 @@ namespace UnEntity
         public string Sign { get; set; }
 
         public ApiBase ApiBase { get; set; }
+
+        //[XmlElement(IsNullable = false)]
         public ApiNote ApiNote { get; set; }
         public SMSInfo SMSInfo { get; set; }
         public EmailInfo EmailInfo { get; set; }
         public WxPayOrder WxPayOrder { get; set; }
         public AdminLogin AdminLogin { get; set; }
+
+     
         public List<WxPayOrder> ArrayOfWxPayOrder { get; set; }
 
         public List<string> listString { get; set; }
 
+        [XmlArray(IsNullable = false)]
         public List<ApiNote> ArrayOfApiNote { get; set; }
 
         //private XmlNode m_parameters = new XmlDocument().CreateNode(XmlNodeType.CDATA, "", "");

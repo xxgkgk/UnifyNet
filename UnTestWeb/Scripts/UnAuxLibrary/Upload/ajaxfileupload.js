@@ -27,7 +27,7 @@ jQuery.extend({
 
         return io;
     },
-    createUploadForm: function (id, fileElementId,data) {
+    createUploadForm: function (id, fileElementId, data) {
         //create form 
         var formId = 'jUploadForm' + id;
         var fileId = 'jUploadFile' + id;
@@ -55,7 +55,7 @@ jQuery.extend({
         // TODO introduce global settings, allowing the client to modify them for all requests, not only timeout  
         s = jQuery.extend({}, jQuery.ajaxSettings, s);
         var id = s.fileElementId;
-        var form = jQuery.createUploadForm(id, s.fileElementId,s.data);
+        var form = jQuery.createUploadForm(id, s.fileElementId, s.data);
         var io = jQuery.createUploadIframe(id, s.secureuri);
         var frameId = 'jUploadFrame' + id;
         var formId = 'jUploadForm' + id;
@@ -198,5 +198,18 @@ jQuery.extend({
         }
 
         return data;
+    },
+
+    // jquery1.4.2后没有，所以加上
+    handleError: function (s, xhr, status, e) {
+        // If a local callback was specified, fire it  
+        if (s.error) {
+            s.error.call(s.context || s, xhr, status, e);
+        }
+
+        // Fire the global callback  
+        if (s.global) {
+            (s.context ? jQuery(s.context) : jQuery.event).trigger("ajaxError", [xhr, s, e]);
+        }
     }
 });

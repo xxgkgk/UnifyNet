@@ -71,9 +71,9 @@ namespace UnCommon.XMMP
         /// </summary>
         /// <param name="type">类型</param>
         /// <param name="obj">序列化对象</param>
-        /// <param name="isRemoveNotes">是否移除节点注释</param>
+        /// <param name="isRemoveNil">是否移除节点注释</param>
         /// <returns>返回XML字符串</returns>
-        public static string tToXml(Type type, object obj, bool isRemoveNotes)
+        public static string tToXml(Type type, object obj, bool isRemoveNil)
         {
             MemoryStream stream = new MemoryStream();
             XmlSerializer xml = new XmlSerializer(type);
@@ -99,9 +99,9 @@ namespace UnCommon.XMMP
             sr.Dispose();
             stream.Dispose();
 
-            if (isRemoveNotes)
+            if (isRemoveNil)
             {
-                removeXmlNotes(ref str);
+                removeNil(ref str);
             }
 
             return str;
@@ -146,6 +146,16 @@ namespace UnCommon.XMMP
             reg = new Regex(@"<[^/>]+></[^>]+>");
             str = reg.Replace(str, "");
             //Console.WriteLine(str);
+        }
+
+        /// <summary>
+        /// 移除空值
+        /// </summary>
+        /// <param name="str"></param>
+        public static void removeNil(ref string str)
+        {
+            Regex reg = new Regex(@"(<[^>]*\sp\d:nil=[^<]*)/>");
+            str = reg.Replace(str, "");
         }
 
         /// <summary>

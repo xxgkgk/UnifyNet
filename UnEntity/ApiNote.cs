@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.Xml.Serialization;
 
 namespace UnEntity
 {
@@ -14,10 +15,13 @@ namespace UnEntity
         /// 结果通知编号
         /// </summary>
         public int? NoteCode { get; set; }
+
+     
         /// <summary>
         /// 结果通知信息
         /// </summary>
         public string NoteMsg { get; set; }
+
 
         public DateTime? dt { get; set; }
     }

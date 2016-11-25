@@ -28,8 +28,10 @@
             <li><span class="title"></span><input id="FilePath" class="lable" type="text" readonly="readonly" /><span class="error" id="FilePath_error">* 请上传文件</span></li>
 
             <li>
-            <span class="title">内容：</span>
-            <script id="editor" class="editor" type="text/plain" style="width:700px;height:350px;" ></script>
+               <span class="title">简介：</span>
+               <div class="editor">
+                   <script id="Content" type="text/plain"></script>
+               </div>
             </li>
             <li><span class="title">作者：</span><input id="InsertPerson" class="lable" type="text" value="管理员" readonly="readonly" /></li>
             <li><span class="title">日期：</span><input id="InsertDate" class="lable" type="text" readonly="readonly" /></li>
@@ -44,7 +46,15 @@
 <asp:Content ID="Content3" ContentPlaceHolderID="bottom" runat="server">
 <script type="text/javascript">
    
-    var ue = UE.getEditor('editor');
+    var ue = UE.getEditor('Content', {
+        initialFrameWidth: 800,
+        initialFrameHeight: 350
+    });
+
+    ue.ready(function () {
+        //设置编辑器的内容
+        //ue.setContent("hello");
+    });
 
     // 上传图片
     $("#btImg").click(function () {

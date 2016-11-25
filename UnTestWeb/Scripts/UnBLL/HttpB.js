@@ -1,4 +1,4 @@
-﻿var HttpM = {
+﻿var HttpB = {
     createNew: function (url) {
         var n = {};
         n.success = function (xd) {

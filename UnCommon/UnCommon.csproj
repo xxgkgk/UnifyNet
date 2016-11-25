@@ -57,6 +57,7 @@
     <Reference Include="System.Core" />
     <Reference Include="System.Drawing" />
     <Reference Include="System.Web" />
+    <Reference Include="System.Web.Extensions" />
     <Reference Include="System.Xml.Linq" />
     <Reference Include="System.Data.DataSetExtensions" />
     <Reference Include="Microsoft.CSharp" />
@@ -115,6 +116,7 @@
     <Compile Include="UDP\UnUdpServer.cs" />
     <Compile Include="UDP\UnUdpServerItf.cs" />
     <Compile Include="UDP\UnUdpState.cs" />
+    <Compile Include="XMMP\UnXMMPHelp.cs" />
     <Compile Include="XMMP\UnXMMPJson.cs" />
     <Compile Include="XMMP\UnXMMPXml.cs" />
   </ItemGroup>

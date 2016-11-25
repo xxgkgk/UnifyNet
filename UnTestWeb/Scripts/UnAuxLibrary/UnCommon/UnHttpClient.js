@@ -73,7 +73,7 @@
                            var rst = UnAttrRst.createNew();
                            rst.pid = upCusor;
                            rst.code = -100;
-                           rst.msg = "系统/网络错误";
+                           rst.msg = "错误：" + status + "," + e;
                            n.error(rst);
                        }
                    }

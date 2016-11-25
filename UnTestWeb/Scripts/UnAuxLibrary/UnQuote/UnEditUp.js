@@ -1,6 +1,7 @@
 ﻿var UnEditUp = {
     upImage: function (clickID, fileID, showID_text, showID_img) {
         var n = {};
+        n.clickValue = $("#" + clickID).val();
         var success_http = function (success) {
             if (success.code > 0) {
                 var bi = UnXMMPXml.xmlToT("BackInfo", success.back);
@@ -9,13 +10,13 @@
                 $("#" + showID_img).show();
             }
             $("#" + clickID).attr('disabled', false)
-            $("#" + clickID).val("上传");
+            $("#" + clickID).val(n.clickValue);
             layer.msg(success.msg);
         };
         var error_http = function (error) {
             layer.msg(error.msg);
             $("#" + clickID).attr('disabled', false)
-            $("#" + clickID).val("上传");
+            $("#" + clickID).val(n.clickValue);
             layer.msg(error.msg);
         };
         var http = UnHttpClient.createNew(UnInit.uploadUrl("", "Image"));
@@ -27,19 +28,20 @@
     },
     upFile: function (clickID, fileID, showID_text) {
         var n = {};
+        n.clickValue = $("#" + clickID).val();
         var success_http = function (success) {
             if (success.code > 0) {
                 var bi = UnXMMPXml.xmlToT("BackInfo", success.back);
                 $("#" + showID_text).val(bi.UNCode);
             }
             $("#" + clickID).attr('disabled', false)
-            $("#" + clickID).val("上传");
+            $("#" + clickID).val(n.clickValue);
             layer.msg(success.msg);
         };
         var error_http = function (error) {
             layer.msg(error.msg);
             $("#" + clickID).attr('disabled', false)
-            $("#" + clickID).val("上传");
+            $("#" + clickID).val(n.clickValue);
             layer.msg(error.msg);
         };
         var http = UnHttpClient.createNew(UnInit.uploadUrl("", "File"));

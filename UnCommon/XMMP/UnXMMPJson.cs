@@ -6,6 +6,7 @@ using System.Data;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Web.Script.Serialization;
 using UnCommon.Tool;
 
 namespace UnCommon.XMMP
@@ -59,6 +60,7 @@ namespace UnCommon.XMMP
             {
                 throw;
             }
+            //return new JavaScriptSerializer().Serialize(obj);
             return sw.ToString();
         }
 
