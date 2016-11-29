@@ -50,35 +50,26 @@ namespace UnTestWin
         private void button2_Click(object sender, EventArgs e)
         {
             UnSql cn = new UnSql("192.168.100.141", "1433", "hpadmin", "cdhpadmin2013","AEnterprise1",true);
-            TestUser user = new TestUser();
-            user.UnionNonclusteredA = "indexA";
-            //user.UnionNonclusteredB = "";
-            //user.IsDelete = true;
-            user.Name = "Name_" + UnStrRan.getStr(1, 10);
-            //user.Pass = UnEncMD5.getMd5Hashs(UnStrRan.getStr(1, 10));
-            cn.update<TestUser>(user, null, "TestUserID = {0}", "17");
 
-
-            user.NonclusteredA = "NonclusteredA";
-            user.NonclusteredB = "NonclusteredB";
-            user.TestUserGUID = Guid.NewGuid();
-            user.TestUserUID = UnStrRan.getUID();
-            //user.e = 100;
-            //user.i = 1;
-            //user.j = 255;
-            //cn.insert(user);
-            user.Name = "Name_" + UnStrRan.getStr(1, 10);
-            user.TestUserGUID = Guid.NewGuid();
-            user.TestUserUID = UnStrRan.getUID();
-            //cn.insert(user);
-
-            user.Name = "Name_" + UnStrRan.getStr(1, 10);
+            List<TestUser> list1 = new List<TestUser>();
+            list1.Add(new TestUser());
+            list1.Add(new TestUser());
+            list1.ForEach(t => {
+                t.Name = "Name_" + UnStrRan.getUID();
+                t.Pass = UnEncMD5.getMd5Hashs(UnStrRan.getStr(1, 10));
+                t.TestUserGUID = Guid.NewGuid();
+                t.TestUserUID = UnStrRan.getUID();
+                t.NonclusteredA = "NonclusteredA";
+                t.NonclusteredB = "NonclusteredB";
+            });
+            int? i = cn.insert(list1, false, false, false);
+            Console.WriteLine(i+"/");
 
             //cn.delete<TestUser>("TestUserID = {0} Or TestUserID = {1}", "11,16");
             //cn.delete<TestUser>("TestUserID = {0} Or TestUserID = {1}", "12,15");
             //List<TestUser> users = cn.query<TestUser>(null, "TestUserID = {0} Or TestUserID = {1}", "11,16", null);
             //Console.WriteLine(users.Count+"%%");
-            cn.commit();
+            //cn.commit();
             //cn.queryDT("Select * From abc",null);
 
             TestUserDetail det = new TestUserDetail();

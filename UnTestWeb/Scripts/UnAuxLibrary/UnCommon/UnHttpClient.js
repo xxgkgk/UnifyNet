@@ -64,16 +64,21 @@
                        fileElementId: id,
                        success: function (data, status) {
                            var rst = UnXMMPXml.xmlDocToT("UnAttrRst", data);
-                           rst.pid = upCusor;
-                           n.success(rst);
-                           upCusor++;
+                           if (rst != null) {
+                               rst.pid = upCusor;
+                               n.success(rst);
+                               upCusor++;
+                           }
+                           else {
+                               this.error(null, id + "-服务端异常", "配置错误或文件受限制");
+                           }
                            n.upFile(cName);
                        },
                        error: function (data, status, e) {
                            var rst = UnAttrRst.createNew();
                            rst.pid = upCusor;
                            rst.code = -100;
-                           rst.msg = "错误：" + status + "," + e;
+                           rst.msg = status + "," + e;
                            n.error(rst);
                        }
                    }

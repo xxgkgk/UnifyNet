@@ -28,10 +28,10 @@
     <script type="text/javascript" src="/Scripts/UnAuxLibrary/Upload/ajaxfileupload.js"></script>
     <script type="text/javascript" src="/Scripts/UnAuxLibrary/Layer/layer.js"></script>
 
-    <script type="text/javascript" src="/Scripts/UnAuxEntity/BackInfo.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxEntity/XmlData.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxEntity/ApiBase.js"></script>
-    <script type="text/javascript" src="/Scripts/UnAuxEntity/ApiNote.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxEntity/Frames/BackInfo.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxEntity/Frames/XmlData.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxEntity/Frames/ApiBase.js"></script>
+    <script type="text/javascript" src="/Scripts/UnAuxEntity/Frames/ApiNote.js"></script>
 
     <script type="text/javascript" src="/Scripts/UnBLL/HttpB.js"></script>
     <script type="text/javascript" src="/Scripts/UnBLL/HelpB.js"></script>

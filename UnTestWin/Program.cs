@@ -21,8 +21,8 @@ namespace UnTestWin
             //Application.Run(new Udp());
             //Application.Run(new Http());
             //Application.Run(new Ali());
-            Application.Run(new Other());
-            //Application.Run(new Sql());
+            //Application.Run(new Other());
+            Application.Run(new Sql());
         }
     }
 }

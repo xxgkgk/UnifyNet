@@ -722,6 +722,20 @@ namespace UnDataBase
         }
 
         /// <summary>
+        /// 添加一条记录
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="t"></param>
+        /// <param name="isXactAbort"></param>
+        /// <param name="isLinkedServer"></param>
+        /// <param name="isRemoveRedis"></param>
+        /// <returns></returns>
+        public int? insert<T>(T t, bool isXactAbort, bool isLinkedServer, bool? isRemoveRedis) where T : new()
+        {
+            return insert(t, isXactAbort, isLinkedServer, null, null, isRemoveRedis);
+        }
+
+        /// <summary>
         /// 添加一条记录(核心)
         /// </summary>
         /// <typeparam name="T">泛型</typeparam>
